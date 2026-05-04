@@ -1,313 +1,101 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import {
-  Box, Typography, TextField, Button, Alert, CircularProgress,
-  Stepper, Step, StepLabel, Paper
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+// /api/admin/register-verify.js
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 
-// ─── Styled Components (matching your Login design) ─────────────────────────
+// Initialize Firebase Admin (same as register-request)
+if (!getApps().length) {
+  try {
+    const base64Key = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_BASE64;
+    const decoded = Buffer.from(base64Key, 'base64').toString('utf-8');
+    const serviceAccount = JSON.parse(decoded);
+    initializeApp({ credential: cert(serviceAccount) });
+  } catch (err) {
+    console.error('Firebase Admin init failed:', err.message);
+  }
+}
 
-const RegisterWrapper = styled(Box)({
-  minHeight: '100vh',
-  backgroundColor: '#04091a',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '24px',
-});
+const db = getFirestore();
+const auth = getAuth();
 
-const RegisterCard = styled(Paper)({
-  width: '100%',
-  maxWidth: '480px',
-  backgroundColor: '#0b1628',
-  borderRadius: '20px',
-  border: '1px solid rgba(15,184,166,0.13)',
-  padding: '32px',
-});
+// Hash OTP (must match register-request.js exactly)
+async function hashOtp(otp) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(otp);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
 
-// ✅ FIXED: Added missing StyledTextField definition
-const StyledTextField = styled(TextField)({
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: '#0f1e36',
-    borderRadius: '10px',
-    color: '#dde6f0',
-    transition: 'all 0.2s ease',
-    '& fieldset': {
-      borderColor: 'rgba(15,184,166,0.18)',
-    },
-    '&:hover fieldset': {
-      borderColor: 'rgba(15,184,166,0.35)',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#0fb8a6',
-      boxShadow: '0 0 0 3px rgba(15,184,166,0.15)',
-    },
-  },
-  '& .MuiInputBase-input': {
-    fontSize: '14px',
-    padding: '14px 16px',
-  },
-  '& .MuiInputLabel-root': {
-    color: '#3a5070',
-    fontSize: '12px',
-    fontWeight: 600,
-  },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: '#0fb8a6',
-  },
-  '& .MuiFormHelperText-root': {
-    color: '#4a6080',
-    fontSize: '11px',
-  },
-});
+export default async function handler(req, res) {
+  // CORS
+  if (req.method === 'OPTIONS') { res.status(200).end(); return; }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-const RegisterButton = styled(Button)({
-  background: 'linear-gradient(to right, #0fb8a6, #0d9488)',
-  color: 'white',
-  fontWeight: 700,
-  padding: '14px 0',
-  borderRadius: '10px',
-  textTransform: 'none',
-  fontSize: '14px',
-  '&:hover': {
-    background: 'linear-gradient(to right, #0d9488, #0b7a72)',
-    transform: 'translateY(-1px)',
-  },
-  '&.Mui-disabled': {
-    background: 'linear-gradient(to right, #0a5c52, #074038)',
-    color: 'rgba(255,255,255,0.5)',
-  },
-});
+  const { email, otp, fullName, password } = req.body;
+  const normalizedEmail = email?.toLowerCase().trim();
 
-const BackLink = styled(Link)({
-  color: '#0fb8a6',
-  textDecoration: 'none',
-  fontWeight: 600,
-  fontSize: '13px',
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '4px',
-  '&:hover': {
-    color: '#2dd4bf',
-    textDecoration: 'underline',
-  },
-});
+  if (!normalizedEmail || !otp || !fullName || !password) {
+    return res.status(400).json({ error: 'Email, OTP, full name, and password are required' });
+  }
 
-// ─── Main Component ────────────────────────────────────────────────────────
-
-export default function AdminRegister() {
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  
-  // ✅ FIXED: Added password to form state
-  const [formData, setFormData] = useState({
-    email: '',
-    fullName: '',
-    password: '',  // ← Added password field
-    otp: '',
-  });
-
-  const handleChange = (field) => (e) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }));
-    setError(null);
-  };
-
-  // Step 1: Request OTP (send email + password to backend)
-  const handleRequestOtp = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    // Basic password validation
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
+  try {
+    // Get stored OTP data
+    const otpDoc = await db.collection('saas_otp_requests').doc(normalizedEmail).get();
+    
+    if (!otpDoc.exists) {
+      return res.status(400).json({ error: 'No verification request found. Please request a new code.' });
     }
 
-    try {
-      const res = await fetch('/api/admin/register-request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // ✅ FIXED: Send password to backend
-        body: JSON.stringify({ 
-          email: formData.email,
-          password: formData.password  // ← Include password
-        }),
+    const otpData = otpDoc.data();
+    
+    // Check expiry
+    if (new Date() > new Date(otpData.expiry)) {
+      return res.status(400).json({ error: 'Verification code expired. Please request a new one.' });
+    }
+
+    // Check max attempts
+    if (otpData.attempts >= 5) {
+      return res.status(400).json({ error: 'Too many attempts. Please request a new code.' });
+    }
+
+    // Verify OTP hash
+    const inputHash = await hashOtp(otp);
+    if (inputHash !== otpData.otpHash) {
+      // Increment attempts
+      await db.collection('saas_otp_requests').doc(normalizedEmail).update({
+        attempts: (otpData.attempts || 0) + 1
       });
-      
-      const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.error || 'Failed to send code');
-      
-      setSuccess('Verification code sent! Check your email.');
-      setStep(2);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      return res.status(400).json({ error: 'Invalid verification code' });
     }
-  };
 
-  // Step 2: Verify OTP & Register (create Firebase user with password)
-  const handleVerifyAndRegister = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+    // OTP verified — create Firebase user
+    const userRecord = await auth.createUser({
+      email: normalizedEmail,
+      password: password,
+      displayName: fullName,
+    });
 
-    try {
-      const res = await fetch('/api/admin/register-verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          otp: formData.otp,
-          fullName: formData.fullName,
-          password: formData.password,  // ← Send password for account creation
-        }),
-      });
-      
-      const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
-      
-      setSuccess('✅ Admin account created! Redirecting...');
-      
-      // Wait 2 seconds then redirect to login
-      setTimeout(() => {
-        navigate('/login', { 
-          state: { 
-            message: 'Account created! Please sign in with your new credentials.' 
-          } 
-        });
-      }, 2000);
-      
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    // Set admin claim
+    await auth.setCustomUserClaims(userRecord.uid, { admin: true });
+
+    // Clean up OTP document
+    await db.collection('saas_otp_requests').doc(normalizedEmail).delete();
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Admin account created successfully',
+      uid: userRecord.uid 
+    });
+
+  } catch (error) {
+    console.error('Verify error:', error);
+    
+    if (error.code === 'auth/email-already-exists') {
+      return res.status(400).json({ error: 'This email is already registered' });
     }
-  };
-
-  return (
-    <RegisterWrapper>
-      <RegisterCard elevation={0}>
-        <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1, textAlign: 'center' }}>
-          Register as Admin
-        </Typography>
-        <Typography sx={{ color: '#4a6080', mb: 3, textAlign: 'center' }}>
-          Create a new admin account for Smart Clinic
-        </Typography>
-
-        <Stepper activeStep={step - 1} sx={{ mb: 4 }}>
-          <Step><StepLabel>Enter Details</StepLabel></Step>
-          <Step><StepLabel>Verify Code</StepLabel></Step>
-        </Stepper>
-
-        {error && (
-          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>
-        )}
-
-        {/* Step 1: Email + Name + Password */}
-        {step === 1 && (
-          <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <StyledTextField
-              label="Work Email *"
-              type="email"
-              value={formData.email}
-              onChange={handleChange('email')}
-              required
-              disabled={loading}
-              fullWidth
-              placeholder="admin@clinic.com"
-            />
-            <StyledTextField
-              label="Full Name *"
-              value={formData.fullName}
-              onChange={handleChange('fullName')}
-              required
-              disabled={loading}
-              fullWidth
-              placeholder="Dr. Ahmed Mohamed"
-            />
-            {/* ✅ FIXED: Added Password Field */}
-            <StyledTextField
-              label="Password *"
-              type="password"
-              value={formData.password}
-              onChange={handleChange('password')}
-              required
-              disabled={loading}
-              fullWidth
-              placeholder="Min 6 characters"
-              helperText="Use a strong password"
-            />
-            <RegisterButton
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Send Verification Code'}
-            </RegisterButton>
-            <Box sx={{ textAlign: 'center', mt: 1 }}>
-              <BackLink to="/login">← Back to Login</BackLink>
-            </Box>
-          </form>
-        )}
-
-        {/* Step 2: OTP Input */}
-        {step === 2 && (
-          <form onSubmit={handleVerifyAndRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <Typography sx={{ color: '#dde6f0', mb: 1 }}>
-              Enter the 6-digit code sent to <strong>{formData.email}</strong>
-            </Typography>
-            
-            <StyledTextField
-              label="Verification Code *"
-              value={formData.otp}
-              onChange={handleChange('otp')}
-              required
-              disabled={loading}
-              inputProps={{ 
-                maxLength: 6, 
-                pattern: '[0-9]*', 
-                inputMode: 'numeric',
-                style: { textAlign: 'center', letterSpacing: '8px', fontSize: '20px' }
-              }}
-              fullWidth
-            />
-            
-            <RegisterButton
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Verify & Create Account'}
-            </RegisterButton>
-            
-            <Box sx={{ textAlign: 'center', mt: 1 }}>
-              <BackLink 
-                component="button" 
-                type="button" 
-                onClick={() => {
-                  setStep(1);
-                  setFormData(prev => ({ ...prev, otp: '' }));
-                  setError(null);
-                }}
-              >
-                ← Use different email
-              </BackLink>
-            </Box>
-          </form>
-        )}
-      </RegisterCard>
-    </RegisterWrapper>
-  );
+    
+    return res.status(500).json({ error: 'Failed to create account: ' + error.message });
+  }
 }
