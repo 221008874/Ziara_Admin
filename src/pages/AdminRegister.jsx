@@ -6,7 +6,8 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-// Reuse your existing styled components or create new ones
+// ─── Styled Components ─────────────────────────────────────────────────
+
 const RegisterWrapper = styled(Box)({
   minHeight: '100vh',
   backgroundColor: '#04091a',
@@ -25,6 +26,62 @@ const RegisterCard = styled(Paper)({
   padding: '32px',
 });
 
+// ✅ FIXED: Added missing StyledTextField definition
+const StyledTextField = styled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: '#0f1e36',
+    borderRadius: '10px',
+    color: '#dde6f0',
+    transition: 'all 0.2s ease',
+    '& fieldset': {
+      borderColor: 'rgba(15,184,166,0.18)',
+    },
+    '&:hover fieldset': {
+      borderColor: 'rgba(15,184,166,0.35)',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#0fb8a6',
+      boxShadow: '0 0 0 3px rgba(15,184,166,0.15)',
+    },
+  },
+  '& .MuiInputBase-input': {
+    fontSize: '14px',
+    padding: '14px 16px',
+  },
+  '& .MuiInputLabel-root': {
+    color: '#3a5070',
+    fontSize: '12px',
+    fontWeight: 600,
+  },
+  '& .MuiInputLabel-root.Mui-focused': {
+    color: '#0fb8a6',
+  },
+  '& .MuiFormHelperText-root': {
+    color: '#4a6080',
+    fontSize: '11px',
+  },
+});
+
+const RegisterButton = styled(Button)({
+  background: 'linear-gradient(to right, #0fb8a6, #0d9488)',
+  color: 'white',
+  fontWeight: 700,
+  padding: '14px 0',
+  borderRadius: '10px',
+  textTransform: 'none',
+  fontSize: '14px',
+  '&:hover': {
+    background: 'linear-gradient(to right, #0d9488, #0b7a72)',
+    transform: 'translateY(-1px)',
+  },
+  '&.Mui-disabled': {
+    background: 'linear-gradient(to right, #0a5c52, #074038)',
+    color: 'rgba(255,255,255,0.5)',
+  },
+});
+
+// ─── Main Component ──────────────────────────────────────────────────────
+
 export default function AdminRegister() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
@@ -35,7 +92,7 @@ export default function AdminRegister() {
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
-     password: '', 
+    password: '', 
     otp: '',
   });
 
@@ -55,9 +112,9 @@ export default function AdminRegister() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-  email: formData.email,
-  password: formData.password  // ← Send password to backend
-}),
+          email: formData.email,
+          password: formData.password
+        }),
       });
       
       const data = await res.json();
@@ -87,6 +144,7 @@ export default function AdminRegister() {
           email: formData.email,
           otp: formData.otp,
           fullName: formData.fullName,
+          password: formData.password,
         }),
       });
       
@@ -96,7 +154,6 @@ export default function AdminRegister() {
       
       setSuccess('✅ Admin account created! Redirecting...');
       
-      // Wait 2 seconds then redirect to login
       setTimeout(() => {
         navigate('/login', { 
           state: { 
@@ -136,10 +193,10 @@ export default function AdminRegister() {
           <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>
         )}
 
-        {/* Step 1: Email Input */}
+        {/* Step 1: Email + Name + Password */}
         {step === 1 && (
           <form onSubmit={handleRequestOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <TextField
+            <StyledTextField
               label="Work Email *"
               type="email"
               value={formData.email}
@@ -147,68 +204,43 @@ export default function AdminRegister() {
               required
               disabled={loading}
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#0f1e36',
-                  borderRadius: '10px',
-                  color: '#dde6f0',
-                },
-                '& .MuiInputLabel-root': { color: '#3a5070' },
-              }}
+              placeholder="admin@clinic.com"
             />
-            <TextField
+            <StyledTextField
               label="Full Name *"
               value={formData.fullName}
               onChange={handleChange('fullName')}
               required
               disabled={loading}
               fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#0f1e36',
-                  borderRadius: '10px',
-                  color: '#dde6f0',
-                },
-              }}
+              placeholder="Dr. Ahmed Mohamed"
             />
             <StyledTextField
-  label="Password *"
-  type="password"
-  value={formData.password}
-  onChange={handleChange('password')}
-  required
-  disabled={loading}
-  fullWidth
-  sx={{
-    '& .MuiOutlinedInput-root': {
-      backgroundColor: '#0f1e36',
-      borderRadius: '10px',
-      color: '#dde6f0',
-    },
-  }}
-  helperText="Min 8 characters"
-/>
-            <Button
-              type="submit"
-              variant="contained"
+              label="Password *"
+              type="password"
+              value={formData.password}
+              onChange={handleChange('password')}
+              required
               disabled={loading}
-              sx={{
-                background: 'linear-gradient(to right, #0fb8a6, #0d9488)',
-                color: 'white',
-                fontWeight: 700,
-                py: 1.5,
-                '&:hover': { background: 'linear-gradient(to right, #0d9488, #0b7a72)' },
-              }}
+              fullWidth
+              placeholder="Min 6 characters"
+              helperText="Use a strong password"
+            />
+            <RegisterButton
+              type="submit"
+              disabled={loading}
             >
               {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Send Verification Code'}
-            </Button>
-            <Button
-              variant="text"
-              onClick={() => navigate('/login')}
-              sx={{ color: '#4a6080', mt: 1 }}
-            >
-              ← Back to Login
-            </Button>
+            </RegisterButton>
+            <Box sx={{ textAlign: 'center', mt: 1 }}>
+              <Button
+                variant="text"
+                onClick={() => navigate('/login')}
+                sx={{ color: '#0fb8a6', fontWeight: 600, fontSize: '13px' }}
+              >
+                ← Back to Login
+              </Button>
+            </Box>
           </form>
         )}
 
@@ -219,51 +251,41 @@ export default function AdminRegister() {
               Enter the 6-digit code sent to <strong>{formData.email}</strong>
             </Typography>
             
-            <TextField
+            <StyledTextField
               label="Verification Code *"
               value={formData.otp}
               onChange={handleChange('otp')}
               required
               disabled={loading}
-              inputProps={{ maxLength: 6, pattern: '[0-9]*', inputMode: 'numeric' }}
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#0f1e36',
-                  borderRadius: '10px',
-                  color: '#dde6f0',
-                  textAlign: 'center',
-                  fontSize: '24px',
-                  letterSpacing: '8px',
-                },
+              inputProps={{ 
+                maxLength: 6, 
+                pattern: '[0-9]*', 
+                inputMode: 'numeric',
+                style: { textAlign: 'center', letterSpacing: '8px', fontSize: '20px' }
               }}
+              fullWidth
             />
             
-            <Button
+            <RegisterButton
               type="submit"
-              variant="contained"
               disabled={loading}
-              sx={{
-                background: 'linear-gradient(to right, #0fb8a6, #0d9488)',
-                color: 'white',
-                fontWeight: 700,
-                py: 1.5,
-              }}
             >
               {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Verify & Create Account'}
-            </Button>
+            </RegisterButton>
             
-            <Button
-              variant="text"
-              onClick={() => {
-                setStep(1);
-                setFormData(prev => ({ ...prev, otp: '' }));
-                setError(null);
-              }}
-              sx={{ color: '#4a6080' }}
-            >
-              ← Use different email
-            </Button>
+            <Box sx={{ textAlign: 'center', mt: 1 }}>
+              <Button
+                variant="text"
+                onClick={() => {
+                  setStep(1);
+                  setFormData(prev => ({ ...prev, otp: '' }));
+                  setError(null);
+                }}
+                sx={{ color: '#0fb8a6', fontWeight: 600, fontSize: '13px' }}
+              >
+                ← Use different email
+              </Button>
+            </Box>
           </form>
         )}
       </RegisterCard>
