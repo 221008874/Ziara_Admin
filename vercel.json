@@ -2,14 +2,8 @@
   "version": 2,
   "name": "smart-clinic-admin",
   "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
+    { "src": "package.json", "use": "@vercel/next" },
+    { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
     {
@@ -18,7 +12,7 @@
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+        "Access-Control-Allow-Headers": "Authorization, Content-Type"
       }
     },
     {
@@ -27,7 +21,7 @@
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+        "Access-Control-Allow-Headers": "Authorization, Content-Type"
       }
     },
     {
@@ -43,12 +37,6 @@
     "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}",
     "NEXT_PUBLIC_FIREBASE_APP_ID": "${NEXT_PUBLIC_FIREBASE_APP_ID}"
   },
-  "crons": [
-    {
-      "path": "/api/admin/cleanup-otp",
-      "schedule": "0 */6 * * *"
-    }
-  ],
   "github": {
     "silent": true,
     "autoJobCancelation": true
