@@ -156,6 +156,12 @@ const StatusDot = styled(Box)({
   boxShadow: "0 0 8px rgba(52,211,153,0.6)",
 });
 
+
+
+// ... [all your styled components stay exactly the same] ...
+// (pulseRing, LoginWrapper, BgCircle, LoginCard, CardHeader, LogoRing, 
+//  StyledTextField, LoginButton, SecurityIndicator, StatusDot)
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -169,9 +175,21 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      // 1. Sign in with email/password
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // 2. 🔑 CRITICAL: Force token refresh to get latest custom claims
+      await userCredential.user.getIdToken(true); // true = force refresh
+      
+      // 3. Optional debug logging (remove in production)
+      const tokenClaims = await userCredential.user.getIdTokenResult();
+      console.log("🎫 Token claims:", tokenClaims.claims);
+      
+      // 4. Navigate to dashboard
       navigate("/");
+      
     } catch (err) {
+      console.error("Login error:", err);
       setError(
         err.message.includes("invalid-credential")
           ? "Invalid email or password"
@@ -181,6 +199,9 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  
+
 
   return (
     <LoginWrapper>
