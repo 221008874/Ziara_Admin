@@ -264,23 +264,29 @@ export const createDoctor = async (doctorData) => {
     createdAt: serverTimestamp(),
   });
 
-  // 2. Create Firebase Auth account for doctor login (if password provided)
-  let authUser = null;
+  // 2. Create Firebase Auth account via server API (client SDK can't create users while logged in)
   if (doctorData.email && password) {
-    const auth = getAuth();
     try {
-      authUser = await createUserWithEmailAndPassword(
-        auth,
-        doctorData.email,
-        password
-      );
+      const apiBase = import.meta.env.VITE_API_BASE || "";
+      const res = await fetch(`${apiBase}/api/admin/create-doctor-auth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: doctorData.email,
+          password,
+          uid: saasRef.id,
+        }),
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || "Failed to create doctor account");
 
       // 3. Create mapping in comm_doctor_users with firstLogin flag
       await setDoc(
-        doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email),
+        doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email.toLowerCase()),
         {
           doctorId: saasRef.id,
-          email: doctorData.email,
+          email: doctorData.email.toLowerCase(),
+          firebaseUid: result.firebaseUid,
           firstLogin: true,
           createdAt: serverTimestamp(),
         }
@@ -305,11 +311,6 @@ export const createDoctor = async (doctorData) => {
     console.log("Doctor synced to comm_doctors:", saasRef.id);
   } catch (commErr) {
     console.error("comm_doctors write failed:", commErr);
-    // Clean up Auth user
-    if (authUser?.user) {
-      await authUser.user.delete().catch(console.error);
-    }
-    // Clean up saas_doctors
     await deleteDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, saasRef.id));
     throw commErr;
   }
