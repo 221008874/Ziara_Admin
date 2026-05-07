@@ -10,6 +10,9 @@ import {
 } from "../services/firestoreService";
 import { uploadImageToCloudinary } from "../lib/cloudinary";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
+import { useSidebar } from "../App";
+import { Hamburger } from "../components/Sidebar";
+import logo from "../assets/logo.png";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
@@ -24,9 +27,10 @@ import { Eye, EyeOff } from 'lucide-react';
 const PageContainer = styled(Box)({ 
   minHeight: "100vh", 
   backgroundColor: "#04091a", 
-  marginLeft: 220, 
+  marginLeft: { xs: 0, md: "240px" },
   position: "relative", 
-  overflow: "hidden" 
+  overflow: "hidden",
+  transition: "margin-left 0.3s ease",
 });
 
 const TopBar = styled(Box)({
@@ -486,6 +490,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
 // ─── Main Component ───────────────────────────────────────────────────────
 
 export default function Doctors() {
+  const { toggle } = useSidebar();
   const [doctors, setDoctors] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -741,19 +746,15 @@ export default function Doctors() {
 
       <TopBar>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ 
-            width: 40, height: 40, borderRadius: "10px", 
-            background: "linear-gradient(135deg, #2563eb, #0fb8a6)", 
-            display: "flex", alignItems: "center", justifyContent: "center", 
-            boxShadow: "0 4px 15px rgba(37,99,235,0.4)", fontSize: 20 
-          }}>
-            👨‍⚕️
+          <Hamburger onClick={toggle} />
+          <Box sx={{ width: { xs: 32, sm: 40 }, height: { xs: 32, sm: 40 }, borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "18px" }}>
+            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>
               Doctor Management
             </Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }}>
+            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">
               Manage doctors across all tenants
             </Typography>
           </Box>
@@ -833,8 +834,9 @@ export default function Doctors() {
         </Box>
 
         <GlassPanel>
-          <StyledTableContainer>
-            <Table>
+          <div className="table-responsive">
+            <StyledTableContainer>
+              <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Doctor</TableCell>
@@ -973,6 +975,7 @@ export default function Doctors() {
               </TableBody>
             </Table>
           </StyledTableContainer>
+          </div>
         </GlassPanel>
       </ContentWrapper>
 

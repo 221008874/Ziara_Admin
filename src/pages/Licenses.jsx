@@ -6,6 +6,9 @@ import {
   updateLicenseExpiry,
 } from "../services/firestoreService";
 import { createBilingual, getLang, BilingualInput } from "../lib/i18n";
+import { useSidebar } from "../App";
+import { Hamburger } from "../components/Sidebar";
+import logo from "../assets/logo.png";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
@@ -13,7 +16,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", position: "relative", overflow: "hidden" });
+const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", marginLeft: { xs: 0, md: "240px" }, position: "relative", overflow: "hidden" });
 
 const TopBar = styled(Box)({
   background: "linear-gradient(to right, #090f22, #0c1830)",
@@ -117,6 +120,7 @@ const LogoutButton = styled(Button)({
 });
 
 export default function Licenses() {
+  const { toggle } = useSidebar();
   const [licenses, setLicenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -206,19 +210,22 @@ export default function Licenses() {
 
       <TopBar>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ width: 40, height: 40, borderRadius: "10px", background: "linear-gradient(135deg, #0fb8a6, #2563eb)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 15px rgba(15,184,166,0.4)" }}>
-            <Typography sx={{ fontSize: "20px" }}>🔑</Typography>
+          <Hamburger onClick={toggle} />
+          <Box sx={{ width: { xs: 32, sm: 40 }, height: { xs: 32, sm: 40 }, borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "18px", letterSpacing: "0.3px" }}>License Management</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }}>Smart Clinic Admin Console v4.0</Typography>
+            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" }, letterSpacing: "0.3px" }}>License Management</Typography>
+            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Smart Clinic Admin Console</Typography>
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <UserPill><span>👋</span>{localStorage.getItem("clinic_admin_user") || "Admin"}</UserPill>
-          <LogoutButton variant="outlined" size="small" onClick={handleLogout}>Logout</LogoutButton>
-          <ActionButton variant="primary" size="small" onClick={() => setOpenDialog(true)}>+ New License</ActionButton>
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
+          <UserPill className="hide-on-mobile"><span>👋</span>{localStorage.getItem("clinic_admin_user") || "Admin"}</UserPill>
+          <LogoutButton variant="outlined" size="small" onClick={handleLogout} className="hide-on-mobile">Logout</LogoutButton>
+          <ActionButton variant="primary" size="small" onClick={() => setOpenDialog(true)} sx={{ fontSize: { xs: "11px", sm: "12px" } }}>
+            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>+ </Box>New License
+          </ActionButton>
         </Box>
       </TopBar>
 
@@ -230,8 +237,9 @@ export default function Licenses() {
         )}
 
         <GlassPanel>
-          <StyledTableContainer>
-            <Table>
+          <div className="table-responsive">
+            <StyledTableContainer>
+              <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>License Key</TableCell>
@@ -294,6 +302,7 @@ export default function Licenses() {
               </TableBody>
             </Table>
           </StyledTableContainer>
+          </div>
         </GlassPanel>
       </ContentWrapper>
 

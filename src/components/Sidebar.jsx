@@ -1,13 +1,15 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Box, Typography, Tooltip } from "@mui/material";
+import { Box, Typography, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import { Menu, X } from "lucide-react";
+import logo from "../assets/logo.png";
 
 // ─── Styled Components ───────────────────────────────────────────────────────
 
-const SidebarRoot = styled(Box)({
-  width: 220,
+const SidebarRoot = styled(Box)(({ $open }) => ({
+  width: 240,
   minHeight: "100vh",
   background: "linear-gradient(to bottom, #090f22, #060d1c)",
   borderRight: "1px solid rgba(15,184,166,0.10)",
@@ -19,32 +21,45 @@ const SidebarRoot = styled(Box)({
   bottom: 0,
   zIndex: 100,
   boxShadow: "4px 0 24px rgba(0,0,0,0.40)",
-});
+  transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+  "@media (max-width: 768px)": {
+    transform: $open ? "translateX(0)" : "translateX(-100%)",
+    width: 260,
+  },
+}));
 
 const Logo = styled(Box)({
-  padding: "20px 20px 16px",
+  padding: "16px 20px",
   borderBottom: "1px solid rgba(15,184,166,0.08)",
   display: "flex",
   alignItems: "center",
-  gap: 10,
+  gap: 12,
 });
 
-const LogoIcon = styled(Box)({
-  width: 36,
-  height: 36,
+const LogoIcon = styled("img")({
+  width: 40,
+  height: 40,
   borderRadius: "10px",
-  background: "linear-gradient(135deg, #0fb8a6, #2563eb)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  boxShadow: "0 4px 14px rgba(15,184,166,0.35)",
-  fontSize: 18,
+  objectFit: "contain",
   flexShrink: 0,
+});
+
+const CloseBtn = styled(IconButton)({
+  display: "none",
+  position: "absolute",
+  right: 12,
+  top: 16,
+  color: "#4a6a8a",
+  "@media (max-width: 768px)": {
+    display: "flex",
+  },
+  "&:hover": { backgroundColor: "rgba(15,184,166,0.10)" },
 });
 
 const NavSection = styled(Box)({
   padding: "12px 10px",
   flex: 1,
+  overflowY: "auto",
 });
 
 const SectionLabel = styled(Typography)({
@@ -59,8 +74,8 @@ const SectionLabel = styled(Typography)({
 const NavItem = styled(NavLink)({
   display: "flex",
   alignItems: "center",
-  gap: 10,
-  padding: "10px 12px",
+  gap: 12,
+  padding: "11px 14px",
   borderRadius: "10px",
   marginBottom: 2,
   textDecoration: "none",
@@ -152,13 +167,13 @@ const NAV_ITEMS = [
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export default function Sidebar() {
+export default function Sidebar({ onToggle }) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-    } catch (_) {
+    } catch {
       /* noop */
     }
     localStorage.removeItem("clinic_admin_logged");
@@ -169,16 +184,20 @@ export default function Sidebar() {
   const adminUser = localStorage.getItem("clinic_admin_user") || "Admin";
 
   return (
-    <SidebarRoot>
+    <SidebarRoot $open={true}>
+      <CloseBtn onClick={onToggle} size="small">
+        <X size={20} />
+      </CloseBtn>
+
       {/* Logo */}
       <Logo>
-        <LogoIcon>🏥</LogoIcon>
+        <LogoIcon src={logo} alt="Smart Clinic" />
         <Box>
-          <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "13px", lineHeight: 1.2 }}>
+          <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "14px", lineHeight: 1.2 }}>
             Smart Clinic
           </Typography>
           <Typography sx={{ color: "#2a3a52", fontSize: "10px", fontStyle: "italic" }}>
-            Admin v4.0
+            Admin Console
           </Typography>
         </Box>
       </Logo>
@@ -189,12 +208,10 @@ export default function Sidebar() {
           <Box key={group.section} sx={{ mb: 1 }}>
             <SectionLabel>{group.section}</SectionLabel>
             {group.items.map((item) => (
-              <Tooltip key={item.to} title="" placement="right" arrow>
-                <NavItem to={item.to} end={item.to === "/"}>
-                  <NavIcon>{item.icon}</NavIcon>
-                  {item.label}
-                </NavItem>
-              </Tooltip>
+              <NavItem key={item.to} to={item.to} end={item.to === "/"} onClick={() => window.innerWidth <= 768 && onToggle?.()}>
+                <NavIcon>{item.icon}</NavIcon>
+                {item.label}
+              </NavItem>
             ))}
           </Box>
         ))}
@@ -214,5 +231,24 @@ export default function Sidebar() {
         </LogoutBtn>
       </BottomSection>
     </SidebarRoot>
+  );
+}
+
+// ─── Hamburger Button (for pages to render) ────────────────────────────────
+
+export function Hamburger({ onClick }) {
+  return (
+    <IconButton
+      onClick={onClick}
+      sx={{
+        display: { xs: "flex", md: "none" },
+        color: "#eaf2ff",
+        mr: 1,
+        "&:hover": { backgroundColor: "rgba(15,184,166,0.12)" },
+      }}
+      size="small"
+    >
+      <Menu size={22} />
+    </IconButton>
   );
 }

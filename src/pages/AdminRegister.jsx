@@ -5,6 +5,7 @@ import {
   Stepper, Step, StepLabel, Paper
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import logo from '../assets/logo.png';
 
 // ─── Styled Components ─────────────────────────────────────────────────
 
@@ -205,7 +206,10 @@ export default function AdminRegister() {
   return (
     <RegisterWrapper>
       <RegisterCard elevation={0}>
-        <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1, textAlign: 'center' }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <img src={logo} alt="Smart Clinic" style={{ width: 48, height: 48, objectFit: "contain", borderRadius: 12 }} />
+        </Box>
+        <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1, textAlign: 'center', fontSize: { xs: "20px", sm: "24px" } }}>
           Register as Admin
         </Typography>
         <Typography sx={{ color: '#4a6080', mb: 3, textAlign: 'center' }}>

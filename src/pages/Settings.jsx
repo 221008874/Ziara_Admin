@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { createBilingual, BilingualInput } from "../lib/i18n";
+import { useSidebar } from "../App";
+import { Hamburger } from "../components/Sidebar";
+import logo from "../assets/logo.png";
 import {
   Box, Typography, TextField, Button, Switch,
   CircularProgress, Alert, Divider,
@@ -10,7 +13,7 @@ import { db } from "../firebase";
 
 // ─── Styled Components ────────────────────────────────────────────────────────
 
-const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", marginLeft: 220, position: "relative", overflow: "hidden" });
+const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", marginLeft: { xs: 0, md: "240px" }, position: "relative", overflow: "hidden" });
 
 const TopBar = styled(Box)({
   background: "linear-gradient(to right, #090f22, #0c1830)",
@@ -115,6 +118,7 @@ const DEFAULT = {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Settings() {
+  const { toggle: toggleSidebar } = useSidebar();
   const [settings, setSettings] = useState(DEFAULT);
   const [loading,  setLoading]  = useState(true);
   const [saving,   setSaving]   = useState(false);
@@ -163,13 +167,16 @@ export default function Settings() {
 
       <TopBar>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ width: 40, height: 40, borderRadius: "10px", background: "linear-gradient(135deg, #6366f1, #0fb8a6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>⚙️</Box>
+          <Hamburger onClick={toggleSidebar} />
+          <Box sx={{ width: { xs: 32, sm: 40 }, height: { xs: 32, sm: 40 }, borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+          </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "18px" }}>SaaS Settings</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }}>Global configuration for Smart Clinic platform</Typography>
+            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>SaaS Settings</Typography>
+            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Global configuration for Smart Clinic platform</Typography>
           </Box>
         </Box>
-        <SaveButton onClick={handleSave} disabled={saving}>
+        <SaveButton onClick={handleSave} disabled={saving} sx={{ fontSize: { xs: "12px", sm: "13px" }, px: { xs: 2, sm: 4 } }}>
           {saving ? <CircularProgress size={16} sx={{ color: "white", mr: 1 }} /> : null}
           {saving ? "Saving..." : "Save Settings"}
         </SaveButton>

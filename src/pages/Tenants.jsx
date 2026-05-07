@@ -7,6 +7,9 @@ import {
   deleteTenant,
 } from "../services/firestoreService";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
+import { useSidebar } from "../App";
+import { Hamburger } from "../components/Sidebar";
+import logo from "../assets/logo.png";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
@@ -15,14 +18,15 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-// ─── Design Tokens (same system as Licenses.jsx) ─────────────────────────────
+// ─── Design Tokens ────────────────────────────────────────────────────────────
 
 const PageContainer = styled(Box)({
   minHeight: "100vh",
   backgroundColor: "#04091a",
-  marginLeft: 220,             // sidebar width
+  marginLeft: { xs: 0, md: "240px" },
   position: "relative",
   overflow: "hidden",
+  transition: "margin-left 0.3s ease",
 });
 
 const TopBar = styled(Box)({
@@ -163,6 +167,7 @@ const BLANK = {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Tenants() {
+  const { toggle } = useSidebar();
   const [tenants, setTenants]         = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
@@ -276,13 +281,18 @@ export default function Tenants() {
 
       <TopBar>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ width: 40, height: 40, borderRadius: "10px", background: "linear-gradient(135deg, #0fb8a6, #2563eb)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 15px rgba(15,184,166,0.4)", fontSize: 20 }}>🏥</Box>
+          <Hamburger onClick={toggle} />
+          <Box sx={{ width: { xs: 32, sm: 40 }, height: { xs: 32, sm: 40 }, borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+          </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "18px" }}>Tenant Management</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }}>Manage clinics & organizations</Typography>
+            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>Tenant Management</Typography>
+            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Manage clinics & organizations</Typography>
           </Box>
         </Box>
-        <ActionButton variant="primary" onClick={() => setCreateOpen(true)}>+ New Tenant</ActionButton>
+        <ActionButton variant="primary" onClick={() => setCreateOpen(true)} sx={{ fontSize: { xs: "11px", sm: "12px" }, px: { xs: 2, sm: 3 } }}>
+          <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>+ </Box>New Tenant
+        </ActionButton>
       </TopBar>
 
       <ContentWrapper>
@@ -293,7 +303,7 @@ export default function Tenants() {
         )}
 
         {/* Stats Row */}
-        <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+        <Box className="stats-grid" sx={{ mb: 3 }}>
           {[
             { label: "Total Tenants", value: tenants.length, color: "#2dd4bf" },
             { label: "Active",        value: active,         color: "#34d399" },
@@ -308,8 +318,9 @@ export default function Tenants() {
         </Box>
 
         <GlassPanel>
-          <StyledTableContainer>
-            <Table>
+          <div className="table-responsive">
+            <StyledTableContainer>
+              <Table>
               <TableHead>
                 <TableRow>
                   <TableCell>Tenant Name</TableCell>
@@ -376,11 +387,12 @@ export default function Tenants() {
               </TableBody>
             </Table>
           </StyledTableContainer>
+          </div>
         </GlassPanel>
       </ContentWrapper>
 
       {/* ── Create Dialog ────────────────────────────────────────────────────── */}
-      <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth>
+      <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth fullScreen={false} sx={{ "& .MuiDialog-paper": { maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle>Create New Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
@@ -403,7 +415,7 @@ export default function Tenants() {
       </StyledDialog>
 
       {/* ── Edit Dialog ──────────────────────────────────────────────────────── */}
-      <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth>
+      <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth sx={{ "& .MuiDialog-paper": { maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle>Edit Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />

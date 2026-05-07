@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // ← Added Link
+import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import {
@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { keyframes } from "@mui/system";
+import logo from "../assets/logo.png";
 
 const pulseRing = keyframes`
   0% { transform: scale(0.8); opacity: 0.5; }
@@ -41,6 +42,9 @@ const LoginCard = styled(Box)({
   border: "1px solid rgba(15,184,166,0.13)",
   boxShadow: "0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(15,184,166,0.05)",
   overflow: "hidden",
+  "@media (max-width: 480px)": {
+    borderRadius: "16px",
+  },
 });
 
 const CardHeader = styled(Box)({
@@ -211,11 +215,9 @@ export default function Login() {
       <LoginCard>
         <CardHeader>
           <LogoRing>
-            <Typography sx={{ fontSize: "28px", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
-              🔐
-            </Typography>
+            <img src={logo} alt="Smart Clinic" style={{ width: 36, height: 36, objectFit: "contain", borderRadius: 8 }} />
           </LogoRing>
-          <Typography variant="h4" sx={{ color: "white", fontWeight: 700, fontSize: "24px", letterSpacing: "0.5px", mb: 0.5 }}>
+          <Typography variant="h4" sx={{ color: "white", fontWeight: 700, fontSize: { xs: "20px", sm: "24px" }, letterSpacing: "0.5px", mb: 0.5 }}>
             Admin Portal
           </Typography>
           <Typography sx={{ color: "rgba(255,255,255,0.6)", fontSize: "13px" }}>
