@@ -258,7 +258,7 @@ const SPECIALIZATIONS = [
 
 // ─── Image Upload Component ───────────────────────────────────────────────
 
-function ImageUploadField({ obj, set, error, setError }) {
+function ImageUploadField({ obj, set, setError }) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(obj.photoUrl || "");
 
@@ -552,7 +552,7 @@ export default function Doctors() {
     try {
       setError(null);
       // Remove confirmPassword before sending to backend
-      const { confirmPassword, ...doctorData } = formData;
+      const { confirmPassword: _cp, ...doctorData } = formData;
       await createDoctor(doctorData);
       setCreateOpen(false); 
       setFormData(BLANK); 

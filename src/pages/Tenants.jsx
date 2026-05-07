@@ -231,7 +231,7 @@ export default function Tenants() {
     try {
       await updateTenantStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE");
       load();
-    } catch (_) {
+    } catch {
       setError("Failed to update status");
     }
   };

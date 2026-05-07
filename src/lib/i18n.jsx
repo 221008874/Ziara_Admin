@@ -1,5 +1,7 @@
 import { Box, Typography } from "@mui/material";
 
+/* eslint-disable react-refresh/only-export-components */
+
 // ─── Bilingual field helpers (EN/AR) ──────────────────────────────────────
 
 export const createBilingual = (en = "", ar = "") => ({ en, ar });
@@ -27,7 +29,7 @@ export function BilingualInput({ label, labelAr, value, onChange, required, plac
   const handleAr = (e) => onChange(updateBilingual(value, "ar", e.target.value));
 
   return (
-    <Box sx={{ mt: margin === "normal" ? 2 : margin === "dense" ? 1 : 0, mb: 1 }}>
+    <Box sx={{ mt: 2, mb: 1 }}>
       <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
         <Box sx={{ flex: 1 }}>
           <Typography sx={{ color: "#3a5070", fontSize: "10px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>
