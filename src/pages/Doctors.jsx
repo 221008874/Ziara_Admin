@@ -883,7 +883,7 @@ export default function Doctors() {
                               display: "flex", alignItems: "center", justifyContent: "center", 
                               fontSize: 12, color: "#4a6080" 
                             }}>
-                              {d.name?.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase() || '?'}
+                              {getLang(d.name)?.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase() || '?'}
                             </Box>
                           )}
                           <Box>

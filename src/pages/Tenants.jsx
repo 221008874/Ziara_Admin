@@ -442,7 +442,7 @@ export default function Tenants() {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <Typography sx={{ color: "#dde6f0", mb: 1 }}>
-            Are you sure you want to delete <strong style={{ color: "#f87171" }}>{deleteConfirm?.name}</strong>?
+            Are you sure you want to delete <strong style={{ color: "#f87171" }}>{getLang(deleteConfirm?.name)}</strong>?
           </Typography>
           <Typography sx={{ color: "#4a6080", fontSize: "13px", mb: 3 }}>
             This will permanently remove the tenant record. Linked doctors and licenses will not be deleted.
