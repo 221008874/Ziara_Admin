@@ -46,9 +46,13 @@ function normalizeBilingual(raw, fallbackEn = "", fallbackAr = "") {
 
 // ─── PUBLIC-SAFE FIELD BUILDERS ─────────────────────────────────────────────
 function buildPublicDoctor(data, doctorId) {
+  const nameB = normalizeBilingual(data.name);
+  const specialtyB = normalizeBilingual(data.specialization || data.specialty);
   return {
-    name: normalizeBilingual(data.name),
-    specialty: normalizeBilingual(data.specialization || data.specialty),
+    name: nameB,
+    nameEn: nameB.en || '',
+    specialty: specialtyB,
+    specialtyEn: specialtyB.en || '',
     bio: normalizeBilingual(data.bio),
     photoUrl: data.photoUrl || "",
     tenantId: data.tenantId || data.clinicId || "",
@@ -383,7 +387,18 @@ export const updateDoctor = async (doctorId, updates) => {
     if (updates[f] !== undefined) publicUpdates[f] = updates[f];
   });
   if (updates.specialization !== undefined) {
-    publicUpdates.specialty = updates.specialization;
+    const specB = isBilingual(updates.specialization)
+      ? updates.specialization
+      : normalizeBilingual(updates.specialization);
+    publicUpdates.specialty = specB;
+    publicUpdates.specialtyEn = specB.en || '';
+  }
+  if (updates.name !== undefined) {
+    const nameB = isBilingual(updates.name)
+      ? updates.name
+      : normalizeBilingual(updates.name);
+    publicUpdates.name = nameB;
+    publicUpdates.nameEn = nameB.en || '';
   }
   if (Object.keys(publicUpdates).length > 0) {
     publicUpdates._syncedAt = serverTimestamp();
