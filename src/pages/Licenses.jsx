@@ -6,6 +6,7 @@ import {
   updateLicenseExpiry,
 } from "../services/firestoreService";
 import { createBilingual, getLang, BilingualInput } from "../lib/i18n";
+import { debug } from "../lib/debug";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
 import logo from "../assets/logo.png";
@@ -130,47 +131,58 @@ export default function Licenses() {
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({ licenseKey: "", doctorName: createBilingual(), phone: "", expiryDate: "" });
 
-  useEffect(() => { loadLicenses(); }, []);
+  useEffect(() => {
+    debug.component('Licenses', 'Mounted');
+    loadLicenses();
+    return () => debug.component('Licenses', 'Unmounted');
+  }, []);
 
   const loadLicenses = async () => {
+    debug.action('Licenses', 'Loading licenses...');
     try {
       setLoading(true); setError(null);
       const data = await getAllLicenses();
       setLicenses(data);
+      debug.action('Licenses', `Loaded ${data.length} licenses`);
     } catch (err) {
-      console.error("Failed to load licenses:", err);
+      debug.error('Licenses.load', err);
       setError("Failed to load licenses. Check console for details.");
     } finally { setLoading(false); }
   };
 
   const handleCreate = async () => {
+    debug.action('Licenses', 'Creating license', { key: formData.licenseKey });
     if (!formData.licenseKey || !formData.doctorName || !formData.expiryDate) {
       setError("Please fill all required fields"); return;
     }
     try {
       setError(null);
       await createLicense(formData);
+      debug.action('Licenses', 'License created', { key: formData.licenseKey });
       setOpenDialog(false);
       setFormData({ licenseKey: "", doctorName: createBilingual(), phone: "", expiryDate: "" });
       loadLicenses();
     } catch (err) {
-      console.error("Failed to create license:", err);
+      debug.error('Licenses.create', err);
       setError("Failed to create license: " + err.message);
     }
   };
 
   const toggleStatus = async (docId, currentStatus) => {
+    debug.action('Licenses', `Toggling status: ${docId} (${currentStatus} -> ${currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"})`);
     try {
       const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
       await updateLicenseStatus(docId, newStatus);
+      debug.action('Licenses', `Status updated: ${docId} -> ${newStatus}`);
       loadLicenses();
     } catch (err) {
-      console.error("Failed to update status:", err);
+      debug.error('Licenses.toggleStatus', err);
       setError("Failed to update license status");
     }
   };
 
   const handleEditOpen = (lic) => {
+    debug.action('Licenses', `Opening edit expiry dialog: ${lic.id}`, { key: lic.licenseKey, currentExpiry: lic.expiryDate });
     setEditLicense(lic);
     setNewExpiryDate(lic.expiryDate || "");
     setEditDialogOpen(true);
@@ -178,13 +190,15 @@ export default function Licenses() {
 
   const handleEditSave = async () => {
     if (!newExpiryDate || !editLicense) return;
+    debug.action('Licenses', `Saving expiry: ${editLicense.id} -> ${newExpiryDate}`);
     try {
       setError(null);
       await updateLicenseExpiry(editLicense.id, newExpiryDate);
+      debug.action('Licenses', `Expiry saved: ${editLicense.id} -> ${newExpiryDate}`);
       setEditDialogOpen(false);
       loadLicenses();
     } catch (err) {
-      console.error("Failed to update expiry:", err);
+      debug.error('Licenses.editExpiry', err);
       setError("Failed to update expiry: " + err.message);
     }
   };
@@ -271,7 +285,7 @@ export default function Licenses() {
                       <TableCell>
                         <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
                           <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
-                            {getLang(lic.doctorName) || lic.doctorName || "—"}
+                            {getLang(lic.doctorName) || "—"}
                           </Typography>
                           {(() => { const ar = getLang(lic.doctorName, "ar"); const en = getLang(lic.doctorName, "en"); return ar && ar !== en ? <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{ar}</Typography> : null; })()}
                         </Box>
@@ -326,7 +340,7 @@ export default function Licenses() {
         <DialogTitle>Edit License Expiry</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <Typography sx={{ color: "#6a8aaa", mb: 2 }}>License: {editLicense?.licenseKey}</Typography>
-          <Typography sx={{ color: "#6a8aaa", mb: 2 }}>Doctor: {editLicense?.doctorName}</Typography>
+          <Typography sx={{ color: "#6a8aaa", mb: 2 }}>Doctor: {getLang(editLicense?.doctorName) || "—"}</Typography>
           <StyledDialogField fullWidth label="New Expiry Date *" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={newExpiryDate} onChange={(e) => setNewExpiryDate(e.target.value)} />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</ActionButton>
