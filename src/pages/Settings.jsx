@@ -13,7 +13,17 @@ import { db } from "../firebase";
 
 // ─── Styled Components ────────────────────────────────────────────────────────
 
-const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", marginLeft: { xs: 0, md: "240px" }, position: "relative", overflow: "hidden" });
+const PageContainer = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: "#04091a",
+  marginLeft: 0,
+  position: "relative",
+  overflow: "hidden",
+  transition: "margin-left 0.3s ease",
+  [theme.breakpoints.up("md")]: {
+    marginLeft: "240px",
+  },
+}));
 
 const TopBar = styled(Box)({
   background: "linear-gradient(to right, #090f22, #0c1830)",
