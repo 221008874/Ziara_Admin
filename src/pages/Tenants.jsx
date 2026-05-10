@@ -414,6 +414,8 @@ export default function Tenants() {
           <BilingualInput label="Address" labelAr="العنوان" value={formData.address} onChange={v => setFormData(p => ({ ...p, address: v }))} />
           <BilingualInput label="City" labelAr="المدينة" value={formData.city} onChange={v => setFormData(p => ({ ...p, city: v }))} />
           <BilingualInput label="Description" labelAr="الوصف" value={formData.description} onChange={v => setFormData(p => ({ ...p, description: v }))} />
+          {field("License Key *", "licenseKey", formData, setFormData, { placeholder: "LIC-2026-001" })}
+          {field("Expiry Date", "expiryDate", formData, setFormData, { type: "date", InputLabelProps: { shrink: true } })}
           {field("Contact Email", "contactEmail", formData, setFormData, { type: "email" })}
           {field("Contact Phone", "contactPhone", formData, setFormData, { placeholder: "010xxxxxxxx" })}
           <FormControl fullWidth margin="normal">
@@ -436,6 +438,8 @@ export default function Tenants() {
           <BilingualInput label="Address" labelAr="العنوان" value={editData.address} onChange={v => setEditData(p => ({ ...p, address: v }))} />
           <BilingualInput label="City" labelAr="المدينة" value={editData.city} onChange={v => setEditData(p => ({ ...p, city: v }))} />
           <BilingualInput label="Description" labelAr="الوصف" value={editData.description} onChange={v => setEditData(p => ({ ...p, description: v }))} />
+          {field("License Key", "licenseKey", editData, setEditData, { disabled: true })}
+          {field("Expiry Date", "expiryDate", editData, setEditData, { type: "date", InputLabelProps: { shrink: true } })}
           {field("Contact Email", "contactEmail", editData, setEditData, { type: "email" })}
           {field("Contact Phone", "contactPhone", editData, setEditData)}
           <FormControl fullWidth margin="normal">

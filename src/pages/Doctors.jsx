@@ -1,5 +1,6 @@
 // src/pages/admin/Doctors.jsx
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   getAllDoctors,
   getAllTenants,
@@ -492,6 +493,8 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
 
 export default function Doctors() {
   const { toggle } = useSidebar();
+  const [searchParams] = useSearchParams();
+  const urlTenantId = searchParams.get("tenantId");
   const [doctors, setDoctors] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -510,6 +513,23 @@ export default function Doctors() {
     load();
     return () => debug.component('Doctors', 'Unmounted');
   }, []);
+
+  // Auto-select tenant from URL query param (e.g. from Tenants page "Add Doctor" button)
+  useEffect(() => {
+    if (urlTenantId && tenants.length > 0) {
+      const t = tenants.find(t => t.id === urlTenantId);
+      if (t) {
+        setFormData(p => ({
+          ...p,
+          tenantId: urlTenantId,
+          tenantName: isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name)),
+          licenseKey: t.licenseKey || "",
+        }));
+        setTenantFilter(urlTenantId);
+        setCreateOpen(true);
+      }
+    }
+  }, [urlTenantId, tenants]);
 
   const load = async () => {
     debug.action('Doctors', 'Loading doctors and tenants...');

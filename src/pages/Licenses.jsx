@@ -13,9 +13,20 @@ import logo from "../assets/logo.png";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
+  Select, MenuItem, FormControl, InputLabel,
   CircularProgress, Alert, Box, Typography, Chip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+
+const StyledSelect = styled(Select)({
+  backgroundColor: "#0f1e36", borderRadius: "10px",
+  "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
+  "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
+  "&.Mui-focused fieldset": { borderColor: "#0fb8a6", boxShadow: "0 0 0 3px rgba(15,184,166,0.15)" },
+  "& .MuiSelect-select": { color: "#dde6f0", fontSize: "14px" },
+  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
+  "& .MuiSvgIcon-root": { color: "#2dd4bf" },
+});
 
 const PageContainer = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
@@ -139,7 +150,7 @@ export default function Licenses() {
   const [editLicense, setEditLicense] = useState(null);
   const [newExpiryDate, setNewExpiryDate] = useState("");
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({ licenseKey: "", doctorName: createBilingual(), phone: "", expiryDate: "" });
+  const [formData, setFormData] = useState({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "" });
 
   useEffect(() => {
     debug.component('Licenses', 'Mounted');
@@ -161,20 +172,20 @@ export default function Licenses() {
   };
 
   const handleCreate = async () => {
-    debug.action('Licenses', 'Creating license', { key: formData.licenseKey });
-    if (!formData.licenseKey || !formData.doctorName || !formData.expiryDate) {
-      setError("Please fill all required fields"); return;
+    debug.action('Licenses', 'Creating license', { key: formData.licenseKey, category: formData.category });
+    if (!formData.licenseKey || !formData.expiryDate) {
+      setError("License key and expiry date are required"); return;
     }
     try {
       setError(null);
       await createLicense(formData);
       debug.action('Licenses', 'License created', { key: formData.licenseKey });
       setOpenDialog(false);
-      setFormData({ licenseKey: "", doctorName: createBilingual(), phone: "", expiryDate: "" });
+      setFormData({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "" });
       loadLicenses();
     } catch (err) {
       debug.error('Licenses.create', err);
-      setError("Failed to create license: " + err.message);
+      setError(err.message);
     }
   };
 
@@ -267,6 +278,7 @@ export default function Licenses() {
                 <TableHead>
                   <TableRow>
                     <TableCell>License Key</TableCell>
+                    <TableCell>Category</TableCell>
                     <TableCell>Doctor</TableCell>
                     <TableCell>Phone</TableCell>
                     <TableCell>Device MAC</TableCell>
@@ -278,7 +290,7 @@ export default function Licenses() {
                 <TableBody>
                   {licenses.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7}>
+                      <TableCell colSpan={8}>
                         <EmptyState>
                           <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>📋</Typography>
                           <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No licenses found</Typography>
@@ -291,6 +303,18 @@ export default function Licenses() {
                       <TableRow key={lic.id}>
                         <TableCell>
                           <Typography sx={{ fontFamily: "monospace", color: "#eaf2ff", fontWeight: 600, letterSpacing: "0.5px" }}>{lic.licenseKey}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={lic.category === "tenant" ? "Tenant" : lic.category === "doctor" ? "Doctor" : "—"}
+                            size="small"
+                            sx={{
+                              fontWeight: 600, fontSize: "10px",
+                              backgroundColor: lic.category === "tenant" ? "rgba(59,130,246,0.14)" : "rgba(15,184,166,0.14)",
+                              color: lic.category === "tenant" ? "#60a5fa" : "#2dd4bf",
+                              border: lic.category === "tenant" ? "1px solid rgba(59,130,246,0.28)" : "1px solid rgba(15,184,166,0.28)",
+                            }}
+                          />
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
@@ -341,9 +365,16 @@ export default function Licenses() {
             onChange={e => setFormData(p => ({ ...p, licenseKey: e.target.value }))}
             placeholder="LIC-2026-001"
           />
+          <FormControl fullWidth margin="normal">
+            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Category</InputLabel>
+            <StyledSelect label="Category" value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))}>
+              <MenuItem value="doctor" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Individual Doctor</MenuItem>
+              <MenuItem value="tenant" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Tenant / Organization</MenuItem>
+            </StyledSelect>
+          </FormControl>
           <BilingualInput
-            label="Doctor Name"
-            labelAr="اسم الطبيب"
+            label={formData.category === "tenant" ? "Tenant Name" : "Doctor Name"}
+            labelAr={formData.category === "tenant" ? "اسم المنشأة" : "اسم الطبيب"}
             value={formData.doctorName}
             onChange={v => setFormData(p => ({ ...p, doctorName: v }))}
           />
