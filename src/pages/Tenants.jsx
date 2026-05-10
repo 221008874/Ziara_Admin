@@ -21,14 +21,17 @@ import { styled } from "@mui/material/styles";
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 
-const PageContainer = styled(Box)({
+const PageContainer = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
   backgroundColor: "#04091a",
-  marginLeft: { xs: 0, md: "240px" },
+  marginLeft: 0,
   position: "relative",
   overflow: "hidden",
   transition: "margin-left 0.3s ease",
-});
+  [theme.breakpoints.up("md")]: {
+    marginLeft: "240px",
+  },
+}));
 
 const TopBar = styled(Box)({
   background: "linear-gradient(to right, #090f22, #0c1830)",
@@ -198,7 +201,6 @@ export default function Tenants() {
     } finally { setLoading(false); }
   };
 
-  // ── Create ────────────────────────────────────────────────────────────────
   const handleCreate = async () => {
     if (!formData.name.en) { setError("Tenant name (English) is required"); return; }
     debug.action('Tenants', 'Creating tenant', { name: getLang(formData.name) });
@@ -215,7 +217,6 @@ export default function Tenants() {
     }
   };
 
-  // ── Edit ─────────────────────────────────────────────────────────────────
   const openEdit = (t) => {
     debug.action('Tenants', `Opening edit: ${t.id}`);
     setEditTarget(t);
@@ -246,7 +247,6 @@ export default function Tenants() {
     }
   };
 
-  // ── Toggle Status ─────────────────────────────────────────────────────────
   const toggleStatus = async (id, current) => {
     debug.action('Tenants', `Toggling status: ${id} (${current} -> ${current === "ACTIVE" ? "INACTIVE" : "ACTIVE"})`);
     try {
@@ -258,7 +258,6 @@ export default function Tenants() {
     }
   };
 
-  // ── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!deleteConfirm) return;
     debug.action('Tenants', `Deleting tenant: ${deleteConfirm.id}`);
@@ -273,7 +272,6 @@ export default function Tenants() {
     }
   };
 
-  // ── Stats ─────────────────────────────────────────────────────────────────
   const active   = tenants.filter(t => t.status === "ACTIVE").length;
   const inactive = tenants.filter(t => t.status === "INACTIVE").length;
 
@@ -296,7 +294,6 @@ export default function Tenants() {
 
   return (
     <PageContainer>
-      {/* Background glows */}
       <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(15,184,166,0.05), transparent 70%)", top: -200, right: 0, filter: "blur(60px)", pointerEvents: "none" }} />
 
       <TopBar>
@@ -322,7 +319,6 @@ export default function Tenants() {
           </Alert>
         )}
 
-        {/* Stats Row */}
         <Box className="stats-grid" sx={{ mb: 3 }}>
           {[
             { label: "Total Tenants", value: tenants.length, color: "#2dd4bf" },
@@ -341,77 +337,76 @@ export default function Tenants() {
           <div className="table-responsive">
             <StyledTableContainer>
               <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tenant Name</TableCell>
-                  <TableCell>Contact Email</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Plan</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tenants.length === 0 ? (
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={7}>
-                      <EmptyState>
-                        <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>🏥</Typography>
-                        <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants yet</Typography>
-                        <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New Tenant" to onboard your first clinic</Typography>
-                      </EmptyState>
-                    </TableCell>
+                    <TableCell>Tenant Name</TableCell>
+                    <TableCell>Contact Email</TableCell>
+                    <TableCell>Phone</TableCell>
+                    <TableCell>Plan</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Created</TableCell>
+                    <TableCell align="right">Actions</TableCell>
                   </TableRow>
-                ) : (
-                  tenants.map(t => (
-                    <TableRow key={t.id}>
-                      <TableCell>
-                        <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
-                          {getLang(t.name)}
-                        </Typography>
-                        {getLang(t.name, "ar") && getLang(t.name, "ar") !== getLang(t.name, "en") && (
-                          <Typography sx={{ fontSize: "12px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
-                            {getLang(t.name, "ar")}
-                          </Typography>
-                        )}
-                        {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || t.address}</Typography>}
-                      </TableCell>
-                      <TableCell>{t.contactEmail || "—"}</TableCell>
-                      <TableCell>{t.contactPhone || "—"}</TableCell>
-                      <TableCell>
-                        <PlanBadge plan={t.plan} label={t.plan || "BASIC"} size="small" />
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge
-                          status={t.status}
-                          label={t.status}
-                          size="small"
-                          onClick={() => toggleStatus(t.id, t.status)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography sx={{ fontSize: "12px", color: "#4a6080" }}>
-                          {t.createdAt?.toDate?.().toLocaleDateString() || "—"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                          <ActionButton variant="warning" size="small" onClick={() => openEdit(t)}>Edit</ActionButton>
-                          <ActionButton variant="danger" size="small" onClick={() => setDeleteConfirm(t)}>Delete</ActionButton>
-                        </Box>
+                </TableHead>
+                <TableBody>
+                  {tenants.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7}>
+                        <EmptyState>
+                          <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>🏥</Typography>
+                          <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants yet</Typography>
+                          <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New Tenant" to onboard your first clinic</Typography>
+                        </EmptyState>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
+                  ) : (
+                    tenants.map(t => (
+                      <TableRow key={t.id}>
+                        <TableCell>
+                          <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                            {getLang(t.name)}
+                          </Typography>
+                          {getLang(t.name, "ar") && getLang(t.name, "ar") !== getLang(t.name, "en") && (
+                            <Typography sx={{ fontSize: "12px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
+                              {getLang(t.name, "ar")}
+                            </Typography>
+                          )}
+                          {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || t.address}</Typography>}
+                        </TableCell>
+                        <TableCell>{t.contactEmail || "—"}</TableCell>
+                        <TableCell>{t.contactPhone || "—"}</TableCell>
+                        <TableCell>
+                          <PlanBadge plan={t.plan} label={t.plan || "BASIC"} size="small" />
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge
+                            status={t.status}
+                            label={t.status}
+                            size="small"
+                            onClick={() => toggleStatus(t.id, t.status)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography sx={{ fontSize: "12px", color: "#4a6080" }}>
+                            {t.createdAt?.toDate?.().toLocaleDateString() || "—"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                            <ActionButton variant="warning" size="small" onClick={() => openEdit(t)}>Edit</ActionButton>
+                            <ActionButton variant="danger" size="small" onClick={() => setDeleteConfirm(t)}>Delete</ActionButton>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </StyledTableContainer>
           </div>
         </GlassPanel>
       </ContentWrapper>
 
-      {/* ── Create Dialog ────────────────────────────────────────────────────── */}
       <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth fullScreen={false} sx={{ "& .MuiDialog-paper": { maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle>Create New Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
@@ -434,7 +429,6 @@ export default function Tenants() {
         </DialogContent>
       </StyledDialog>
 
-      {/* ── Edit Dialog ──────────────────────────────────────────────────────── */}
       <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth sx={{ "& .MuiDialog-paper": { maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle>Edit Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
@@ -457,19 +451,18 @@ export default function Tenants() {
         </DialogContent>
       </StyledDialog>
 
-      {/* ── Delete Confirm Dialog ─────────────────────────────────────────────── */}
       <StyledDialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <Typography sx={{ color: "#dde6f0", mb: 1 }}>
-            Are you sure you want to delete <strong style={{ color: "#f87171" }}>{getLang(deleteConfirm?.name)}</strong>?
+            Delete <strong style={{ color: "#f87171" }}>{getLang(deleteConfirm?.name)}</strong>?
           </Typography>
           <Typography sx={{ color: "#4a6080", fontSize: "13px", mb: 3 }}>
-            This will permanently remove the tenant record. Linked doctors and licenses will not be deleted.
+            This action cannot be undone. All associated data will be permanently removed.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</ActionButton>
-            <ActionButton variant="danger" onClick={handleDelete}>Delete Tenant</ActionButton>
+            <ActionButton variant="danger" onClick={handleDelete}>Delete</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>

@@ -25,169 +25,172 @@ import { Eye, EyeOff } from 'lucide-react';
 
 // ─── Shared Styled Components ─────────────────────────────────────────────
 
-const PageContainer = styled(Box)({ 
-  minHeight: "100vh", 
-  backgroundColor: "#04091a", 
-  marginLeft: { xs: 0, md: "240px" },
-  position: "relative", 
+const PageContainer = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: "#04091a",
+  marginLeft: 0,
+  position: "relative",
   overflow: "hidden",
   transition: "margin-left 0.3s ease",
-});
+  [theme.breakpoints.up("md")]: {
+    marginLeft: "240px",
+  },
+}));
 
 const TopBar = styled(Box)({
   background: "linear-gradient(to right, #090f22, #0c1830)",
-  borderBottom: "1px solid rgba(15,184,166,0.12)", 
+  borderBottom: "1px solid rgba(15,184,166,0.12)",
   padding: "16px 28px",
-  display: "flex", 
-  justifyContent: "space-between", 
+  display: "flex",
+  justifyContent: "space-between",
   alignItems: "center",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.50)", 
+  boxShadow: "0 4px 20px rgba(0,0,0,0.50)",
   position: "relative",
-  "&::after": { 
-    content: '""', 
-    position: "absolute", 
-    bottom: 0, 
-    left: 0, 
-    right: 0, 
-    height: "2px", 
-    background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)", 
-    opacity: 0.45 
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "2px",
+    background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)",
+    opacity: 0.45,
   },
 });
 
-const ContentWrapper = styled(Box)({ 
-  padding: "24px 28px", 
-  position: "relative", 
-  zIndex: 1 
+const ContentWrapper = styled(Box)({
+  padding: "24px 28px",
+  position: "relative",
+  zIndex: 1,
 });
 
 const GlassPanel = styled(Box)({
-  background: "linear-gradient(to bottom, #0b1628, #081020)", 
+  background: "linear-gradient(to bottom, #0b1628, #081020)",
   borderRadius: "16px",
-  border: "1px solid rgba(15,184,166,0.12)", 
-  boxShadow: "0 8px 32px rgba(0,0,0,0.55)", 
+  border: "1px solid rgba(15,184,166,0.12)",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
   overflow: "hidden",
 });
 
 const StyledTableContainer = styled(Box)({
   "& .MuiTable-root": { backgroundColor: "transparent" },
   "& .MuiTableHead-root": { backgroundColor: "#0c1a30" },
-  "& .MuiTableCell-head": { 
-    color: "#2dd4bf", 
-    fontWeight: 700, 
-    fontSize: "11px", 
-    letterSpacing: "0.8px", 
-    textTransform: "uppercase", 
-    padding: "14px 20px", 
-    borderBottom: "1px solid rgba(15,184,166,0.12)" 
+  "& .MuiTableCell-head": {
+    color: "#2dd4bf",
+    fontWeight: 700,
+    fontSize: "11px",
+    letterSpacing: "0.8px",
+    textTransform: "uppercase",
+    padding: "14px 20px",
+    borderBottom: "1px solid rgba(15,184,166,0.12)",
   },
-  "& .MuiTableRow-root": { 
-    transition: "all 0.15s ease", 
-    borderBottom: "1px solid rgba(15,184,166,0.06)", 
-    "&:nth-of-type(odd)": { backgroundColor: "rgba(8,16,32,0.35)" }, 
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.09)" } 
+  "& .MuiTableRow-root": {
+    transition: "all 0.15s ease",
+    borderBottom: "1px solid rgba(15,184,166,0.06)",
+    "&:nth-of-type(odd)": { backgroundColor: "rgba(8,16,32,0.35)" },
+    "&:hover": { backgroundColor: "rgba(15,184,166,0.09)" },
   },
-  "& .MuiTableCell-body": { 
-    color: "#dde6f0", 
-    fontSize: "13px", 
-    padding: "14px 20px", 
-    borderBottom: "none" 
+  "& .MuiTableCell-body": {
+    color: "#dde6f0",
+    fontSize: "13px",
+    padding: "14px 20px",
+    borderBottom: "none",
   },
 });
 
 const StatusBadge = styled(Chip)(({ status }) => ({
-  borderRadius: "12px", 
-  fontSize: "10px", 
-  fontWeight: 700, 
-  height: "28px", 
-  minWidth: "80px", 
+  borderRadius: "12px",
+  fontSize: "10px",
+  fontWeight: 700,
+  height: "28px",
+  minWidth: "80px",
   cursor: "pointer",
-  ...(status === "ACTIVE" 
-    ? { 
-        backgroundColor: "rgba(52,211,153,0.14)", 
-        color: "#34d399", 
-        border: "1px solid rgba(52,211,153,0.28)" 
+  ...(status === "ACTIVE"
+    ? {
+        backgroundColor: "rgba(52,211,153,0.14)",
+        color: "#34d399",
+        border: "1px solid rgba(52,211,153,0.28)",
       }
-    : { 
-        backgroundColor: "rgba(248,113,113,0.14)", 
-        color: "#f87171", 
-        border: "1px solid rgba(248,113,113,0.28)" 
+    : {
+        backgroundColor: "rgba(248,113,113,0.14)",
+        color: "#f87171",
+        border: "1px solid rgba(248,113,113,0.28)",
       }),
   "&:hover": { filter: "brightness(1.2)" },
 }));
 
 const ActionButton = styled(Button)(({ variant: v }) => ({
-  borderRadius: "9px", 
-  textTransform: "none", 
-  fontWeight: 600, 
-  fontSize: "12px", 
-  padding: "8px 18px", 
+  borderRadius: "9px",
+  textTransform: "none",
+  fontWeight: 600,
+  fontSize: "12px",
+  padding: "8px 18px",
   transition: "all 0.2s ease",
-  ...(v === "primary" 
-    ? { 
-        background: "linear-gradient(to right, #0fb8a6, #0d9488)", 
-        color: "white", 
-        boxShadow: "0 4px 14px rgba(15,184,166,0.40)", 
-        "&:hover": { 
-          background: "linear-gradient(to right, #0d9488, #0b7a72)", 
-          transform: "translateY(-1px)" 
-        } 
+  ...(v === "primary"
+    ? {
+        background: "linear-gradient(to right, #0fb8a6, #0d9488)",
+        color: "white",
+        boxShadow: "0 4px 14px rgba(15,184,166,0.40)",
+        "&:hover": {
+          background: "linear-gradient(to right, #0d9488, #0b7a72)",
+          transform: "translateY(-1px)",
+        },
       }
-    : v === "warning" 
-      ? { 
-          backgroundColor: "rgba(245,158,11,0.12)", 
-          color: "#f59e0b", 
-          border: "1px solid rgba(245,158,11,0.30)", 
-          "&:hover": { backgroundColor: "#f59e0b", color: "white" } 
+    : v === "warning"
+      ? {
+          backgroundColor: "rgba(245,158,11,0.12)",
+          color: "#f59e0b",
+          border: "1px solid rgba(245,158,11,0.30)",
+          "&:hover": { backgroundColor: "#f59e0b", color: "white" },
         }
-      : v === "danger" 
-        ? { 
-            backgroundColor: "rgba(248,113,113,0.10)", 
-            color: "#f87171", 
-            border: "1px solid rgba(248,113,113,0.25)", 
-            "&:hover": { backgroundColor: "#f87171", color: "white" } 
+      : v === "danger"
+        ? {
+            backgroundColor: "rgba(248,113,113,0.10)",
+            color: "#f87171",
+            border: "1px solid rgba(248,113,113,0.25)",
+            "&:hover": { backgroundColor: "#f87171", color: "white" },
           }
-        : { 
-            backgroundColor: "rgba(15,184,166,0.07)", 
-            color: "#2dd4bf", 
-            border: "1px solid rgba(15,184,166,0.20)", 
-            "&:hover": { backgroundColor: "rgba(15,184,166,0.20)" } 
+        : {
+            backgroundColor: "rgba(15,184,166,0.07)",
+            color: "#2dd4bf",
+            border: "1px solid rgba(15,184,166,0.20)",
+            "&:hover": { backgroundColor: "rgba(15,184,166,0.20)" },
           }),
 }));
 
 const StyledDialog = styled(Dialog)({
-  "& .MuiDialog-paper": { 
-    backgroundColor: "#0b1628", 
-    borderRadius: "20px", 
-    border: "1px solid rgba(15,184,166,0.15)", 
-    boxShadow: "0 20px 60px rgba(0,0,0,0.80)" 
+  "& .MuiDialog-paper": {
+    backgroundColor: "#0b1628",
+    borderRadius: "20px",
+    border: "1px solid rgba(15,184,166,0.15)",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.80)",
   },
-  "& .MuiDialogTitle-root": { 
-    background: "linear-gradient(to right, #0d9488, #083040)", 
-    color: "white", 
-    fontSize: "18px", 
-    fontWeight: 700, 
-    padding: "20px 24px", 
-    position: "relative", 
-    "&::after": { 
-      content: '""', 
-      position: "absolute", 
-      bottom: 0, 
-      left: 0, 
-      right: 0, 
-      height: "1px", 
-      background: "linear-gradient(to right, transparent, rgba(15,184,166,0.5), transparent)" 
-    } 
+  "& .MuiDialogTitle-root": {
+    background: "linear-gradient(to right, #0d9488, #083040)",
+    color: "white",
+    fontSize: "18px",
+    fontWeight: 700,
+    padding: "20px 24px",
+    position: "relative",
+    "&::after": {
+      content: '""',
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: "1px",
+      background: "linear-gradient(to right, transparent, rgba(15,184,166,0.5), transparent)",
+    },
   },
 });
 
 const StyledField = styled(TextField)({
-  "& .MuiOutlinedInput-root": { 
-    backgroundColor: "#0f1e36", 
-    borderRadius: "10px", 
-    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" }, 
-    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" }, 
-    "&.Mui-focused fieldset": { borderColor: "#0fb8a6" } 
+  "& .MuiOutlinedInput-root": {
+    backgroundColor: "#0f1e36",
+    borderRadius: "10px",
+    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
+    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "#0fb8a6" },
   },
   "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
   "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
@@ -195,9 +198,9 @@ const StyledField = styled(TextField)({
 });
 
 const StyledSelect = styled(Select)({
-  backgroundColor: "#0f1e36", 
-  borderRadius: "10px", 
-  color: "#dde6f0", 
+  backgroundColor: "#0f1e36",
+  borderRadius: "10px",
+  color: "#dde6f0",
   fontSize: "14px",
   "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" },
   "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.35)" },
@@ -206,29 +209,29 @@ const StyledSelect = styled(Select)({
 });
 
 const StatCard = styled(Box)({
-  background: "linear-gradient(135deg, #0b1628, #081020)", 
+  background: "linear-gradient(135deg, #0b1628, #081020)",
   border: "1px solid rgba(15,184,166,0.10)",
-  borderRadius: "14px", 
-  padding: "18px 22px", 
-  flex: "1 1 0", 
+  borderRadius: "14px",
+  padding: "18px 22px",
+  flex: "1 1 0",
   minWidth: 0,
 });
 
-const EmptyState = styled(Box)({ 
-  textAlign: "center", 
-  padding: "48px 20px" 
+const EmptyState = styled(Box)({
+  textAlign: "center",
+  padding: "48px 20px",
 });
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
-const BLANK = { 
+const BLANK = {
   name: createBilingual(),
-  phone: "", 
-  email: "", 
-  specialization: "", 
-  tenantId: "", 
+  phone: "",
+  email: "",
+  specialization: "",
+  tenantId: "",
   tenantName: createBilingual(),
-  licenseKey: "", 
+  licenseKey: "",
   photoUrl: "",
   password: "",
   confirmPassword: "",
@@ -313,29 +316,29 @@ function ImageUploadField({ obj, set, setError }) {
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
         {preview ? (
           <Box sx={{ position: "relative" }}>
-            <img 
-              src={preview} 
-              alt="Preview" 
-              style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(15,184,166,0.3)" }} 
+            <img
+              src={preview}
+              alt="Preview"
+              style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(15,184,166,0.3)" }}
             />
             <button
               onClick={clearPhoto}
-              style={{ 
-                position: "absolute", top: -4, right: -4, 
-                background: "#f87171", color: "white", border: "none", 
-                borderRadius: "50%", width: 22, height: 22, 
-                cursor: "pointer", fontSize: 12, display: "flex", 
-                alignItems: "center", justifyContent: "center" 
+              style={{
+                position: "absolute", top: -4, right: -4,
+                background: "#f87171", color: "white", border: "none",
+                borderRadius: "50%", width: 22, height: 22,
+                cursor: "pointer", fontSize: 12, display: "flex",
+                alignItems: "center", justifyContent: "center",
               }}
               type="button"
             >×</button>
           </Box>
         ) : (
-          <Box sx={{ 
-            width: 80, height: 80, borderRadius: "50%", 
-            backgroundColor: "#0f1e36", border: "2px dashed rgba(15,184,166,0.2)", 
-            display: "flex", alignItems: "center", justifyContent: "center", 
-            color: "#4a6080", fontSize: 24 
+          <Box sx={{
+            width: 80, height: 80, borderRadius: "50%",
+            backgroundColor: "#0f1e36", border: "2px dashed rgba(15,184,166,0.2)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#4a6080", fontSize: 24,
           }}>
             👤
           </Box>
@@ -345,10 +348,10 @@ function ImageUploadField({ obj, set, setError }) {
             component="label"
             variant="outlined"
             disabled={uploading}
-            sx={{ 
-              borderColor: "rgba(15,184,166,0.3)", color: "#2dd4bf", 
+            sx={{
+              borderColor: "rgba(15,184,166,0.3)", color: "#2dd4bf",
               textTransform: "none", fontSize: "12px",
-              "&:hover": { borderColor: "#0fb8a6", backgroundColor: "rgba(15,184,166,0.08)" }
+              "&:hover": { borderColor: "#0fb8a6", backgroundColor: "rgba(15,184,166,0.08)" },
             }}
           >
             {uploading ? (
@@ -371,7 +374,7 @@ function ImageUploadField({ obj, set, setError }) {
 function PasswordField({ obj, set, isEdit = false, error, setError }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  
+
   const validatePassword = (pwd) => {
     if (!pwd) return null;
     if (pwd.length < 8) return "Password must be at least 8 characters";
@@ -383,7 +386,6 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
 
   const handlePasswordChange = (value) => {
     set(p => ({ ...p, password: value }));
-    // Clear error if password now meets requirements
     if (error && !validatePassword(value)) {
       setError(null);
     }
@@ -394,8 +396,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
       <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>
         {isEdit ? "Set New Password (optional)" : "Initial Password *"}
       </Typography>
-      
-      {/* Password Input */}
+
       <Box sx={{ position: "relative", mb: 1 }}>
         <StyledField
           fullWidth
@@ -405,27 +406,26 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
           onChange={(e) => handlePasswordChange(e.target.value)}
           error={!isEdit && obj.password && !!validatePassword(obj.password)}
           helperText={!isEdit && obj.password ? validatePassword(obj.password) : ""}
-          sx={{ 
-            "& .MuiOutlinedInput-root": { 
+          sx={{
+            "& .MuiOutlinedInput-root": {
               paddingRight: "40px !important",
-              backgroundColor: isEdit ? "#0a1525" : "#0f1e36"
-            }
+              backgroundColor: isEdit ? "#0a1525" : "#0f1e36",
+            },
           }}
         />
         <IconButton
           size="small"
           onClick={() => setShowPassword(!showPassword)}
-          sx={{ 
+          sx={{
             position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-            color: "#4a6080", "&:hover": { color: "#0fb8a6" }
+            color: "#4a6080", "&:hover": { color: "#0fb8a6" },
           }}
           type="button"
         >
           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
         </IconButton>
       </Box>
-      
-      {/* Password Requirements (only for create mode) */}
+
       {!isEdit && obj.password && (
         <Box sx={{ mb: 2, pl: 1 }}>
           {[
@@ -434,17 +434,17 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
             { test: (p) => /[a-z]/.test(p), label: "One lowercase letter (a-z)" },
             { test: (p) => /[0-9]/.test(p), label: "One number (0-9)" },
           ].map((req, i) => (
-            <Typography 
-              key={i} 
-              sx={{ 
-                fontSize: "10px", 
+            <Typography
+              key={i}
+              sx={{
+                fontSize: "10px",
                 color: req.test(obj.password) ? "#34d399" : "#4a6080",
                 display: "flex", alignItems: "center", gap: 0.5,
-                "&::before": { 
+                "&::before": {
                   content: req.test(obj.password) ? '"✓"' : '"○"',
                   color: req.test(obj.password) ? "#34d399" : "#4a6080",
-                  marginRight: "2px"
-                }
+                  marginRight: "2px",
+                },
               }}
             >
               {req.label}
@@ -452,8 +452,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
           ))}
         </Box>
       )}
-      
-      {/* Confirm Password (only for create mode) */}
+
       {!isEdit && (
         <Box sx={{ position: "relative", mt: 1 }}>
           <StyledField
@@ -469,9 +468,9 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
           <IconButton
             size="small"
             onClick={() => setShowConfirm(!showConfirm)}
-            sx={{ 
+            sx={{
               position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-              color: "#4a6080", "&:hover": { color: "#0fb8a6" }
+              color: "#4a6080", "&:hover": { color: "#0fb8a6" },
             }}
             type="button"
           >
@@ -479,8 +478,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
           </IconButton>
         </Box>
       )}
-      
-      {/* Edit mode hint */}
+
       {isEdit && (
         <Typography sx={{ color: "#283848", fontSize: "11px", mt: 0.5, fontStyle: "italic" }}>
           Leave blank to keep the current password. Enter a new password to change it.
@@ -516,26 +514,24 @@ export default function Doctors() {
   const load = async () => {
     debug.action('Doctors', 'Loading doctors and tenants...');
     try {
-      setLoading(true); 
+      setLoading(true);
       setError(null);
       const [docs, tens] = await Promise.all([getAllDoctors(), getAllTenants()]);
-      setDoctors(docs); 
+      setDoctors(docs);
       setTenants(tens);
       debug.action('Doctors', `Loaded ${docs.length} doctors, ${tens.length} tenants`);
-    } catch (e) { 
+    } catch (e) {
       debug.error('Doctors.load', e);
-      setError("Failed to load data."); 
-    } finally { 
-      setLoading(false); 
+      setError("Failed to load data.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ── Create ──────────────────────────────────────────────────────────────
   const handleCreate = async () => {
-    // Validation
-    if (!formData.name.en || !formData.tenantId) { 
-      setError("Doctor name and tenant are required"); 
-      return; 
+    if (!formData.name.en || !formData.tenantId) {
+      setError("Doctor name and tenant are required");
+      return;
     }
     if (!formData.email) {
       setError("Email is required for doctor login");
@@ -569,26 +565,25 @@ export default function Doctors() {
       const { confirmPassword: _cp, ...doctorData } = formData;
       await createDoctor(doctorData);
       debug.action('Doctors', 'Doctor created', { email: formData.email });
-      setCreateOpen(false); 
-      setFormData(BLANK); 
+      setCreateOpen(false);
+      setFormData(BLANK);
       load();
-    } catch (e) { 
+    } catch (e) {
       debug.error('Doctors.create', e);
-      setError("Failed to create doctor: " + e.message); 
-    } finally { 
-      setActionLoading(null); 
+      setError("Failed to create doctor: " + e.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  // ── Edit ────────────────────────────────────────────────────────────────
   const openEdit = (d) => {
     setEditTarget(d);
-    setEditData({ 
+    setEditData({
       name: isBilingual(d.name) ? d.name : createBilingual(d.name || ""),
-      phone: d.phone || "", 
-      email: d.email || "", 
-      specialization: d.specialization || "", 
-      tenantId: d.tenantId || "", 
+      phone: d.phone || "",
+      email: d.email || "",
+      specialization: d.specialization || "",
+      tenantId: d.tenantId || "",
       tenantName: isBilingual(d.tenantName) ? d.tenantName : createBilingual(d.tenantName || ""),
       licenseKey: d.licenseKey || "",
       photoUrl: d.photoUrl || "",
@@ -606,8 +601,7 @@ export default function Doctors() {
 
   const handleEdit = async () => {
     if (!editTarget || !editData.name.en) return;
-    
-    // If password is being changed, validate it
+
     if (editData.password) {
       if (editData.password !== editData.confirmPassword) {
         setError("New passwords do not match");
@@ -640,27 +634,26 @@ export default function Doctors() {
       }
       await updateDoctor(editTarget.id, updateData);
       debug.action('Doctors', 'Doctor updated', { id: editTarget.id });
-      setEditOpen(false); 
+      setEditOpen(false);
       load();
-    } catch (e) { 
+    } catch (e) {
       debug.error('Doctors.update', e);
-      setError("Failed to update doctor: " + e.message); 
-    } finally { 
-      setActionLoading(null); 
+      setError("Failed to update doctor: " + e.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  // ── Toggle Status ───────────────────────────────────────────────────────
   const toggleStatus = async (id, current) => {
     debug.action('Doctors', `Toggling status: ${id} (${current} -> ${current === "ACTIVE" ? "INACTIVE" : "ACTIVE"})`);
     setActionLoading(`status-${id}`);
-    try { 
-      await updateDoctorStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE"); 
+    try {
+      await updateDoctorStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE");
       debug.action('Doctors', `Status updated: ${id}`);
-      load(); 
-    } catch (e) { 
+      load();
+    } catch (e) {
       debug.error('Doctors.toggleStatus', e);
-      setError("Failed to update status"); 
+      setError("Failed to update status");
     } finally {
       setActionLoading(null);
     }
@@ -670,25 +663,23 @@ export default function Doctors() {
     if (!deleteConfirm) return;
     debug.action('Doctors', 'Deleting doctor', { id: deleteConfirm.id });
     setActionLoading('delete');
-    try { 
-      await deleteDoctor(deleteConfirm.id); 
+    try {
+      await deleteDoctor(deleteConfirm.id);
       debug.action('Doctors', 'Doctor deleted', { id: deleteConfirm.id });
-      setDeleteConfirm(null); 
-      load(); 
-    } catch (e) { 
+      setDeleteConfirm(null);
+      load();
+    } catch (e) {
       debug.error('Doctors.delete', e);
-      setError("Failed to delete doctor: " + e.message); 
-    } finally { 
-      setActionLoading(null); 
+      setError("Failed to delete doctor: " + e.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
-  // ── Filter ──────────────────────────────────────────────────────────────
-  const visible = tenantFilter === "ALL" 
-    ? doctors 
+  const visible = tenantFilter === "ALL"
+    ? doctors
     : doctors.filter(d => d.tenantId === tenantFilter);
 
-  // ── Stats ─────────────────────────────────────────────────────────────
   const active = doctors.filter(d => d.status === "ACTIVE").length;
 
   if (loading) {
@@ -700,13 +691,13 @@ export default function Doctors() {
   }
 
   const fieldEl = (label, key, obj, set, opts = {}) => (
-    <StyledField 
-      fullWidth 
-      label={label} 
-      margin="normal" 
-      value={obj[key]} 
-      onChange={e => set(p => ({ ...p, [key]: e.target.value }))} 
-      {...opts} 
+    <StyledField
+      fullWidth
+      label={label}
+      margin="normal"
+      value={obj[key]}
+      onChange={e => set(p => ({ ...p, [key]: e.target.value }))}
+      {...opts}
     />
   );
 
@@ -756,10 +747,10 @@ export default function Doctors() {
 
   return (
     <PageContainer>
-      <Box sx={{ 
-        position: "fixed", width: 600, height: 600, 
-        background: "radial-gradient(circle, rgba(59,130,246,0.04), transparent 70%)", 
-        top: -200, right: 0, filter: "blur(60px)", pointerEvents: "none" 
+      <Box sx={{
+        position: "fixed", width: 600, height: 600,
+        background: "radial-gradient(circle, rgba(59,130,246,0.04), transparent 70%)",
+        top: -200, right: 0, filter: "blur(60px)", pointerEvents: "none",
       }} />
 
       <TopBar>
@@ -779,10 +770,10 @@ export default function Doctors() {
         </Box>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <FormControl size="small" sx={{ minWidth: 180 }}>
-            <StyledSelect 
-              value={tenantFilter} 
-              onChange={e => setTenantFilter(e.target.value)} 
-              displayEmpty 
+            <StyledSelect
+              value={tenantFilter}
+              onChange={e => setTenantFilter(e.target.value)}
+              displayEmpty
               sx={{ height: 38, fontSize: "12px" }}
             >
               <MenuItem value="ALL" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
@@ -795,8 +786,8 @@ export default function Doctors() {
               ))}
             </StyledSelect>
           </FormControl>
-          <ActionButton 
-            variant="primary" 
+          <ActionButton
+            variant="primary"
             onClick={() => setCreateOpen(true)}
             disabled={actionLoading === 'create'}
           >
@@ -810,16 +801,16 @@ export default function Doctors() {
 
       <ContentWrapper>
         {error && (
-          <Alert 
-            severity="error" 
-            onClose={() => setError(null)} 
-            sx={{ 
-              mb: 3, 
-              backgroundColor: "rgba(248,113,113,0.1)", 
-              border: "1px solid rgba(248,113,113,0.25)", 
-              color: "#f87171", 
-              borderRadius: "12px", 
-              "& .MuiAlert-icon": { color: "#f87171" } 
+          <Alert
+            severity="error"
+            onClose={() => setError(null)}
+            sx={{
+              mb: 3,
+              backgroundColor: "rgba(248,113,113,0.1)",
+              border: "1px solid rgba(248,113,113,0.25)",
+              color: "#f87171",
+              borderRadius: "12px",
+              "& .MuiAlert-icon": { color: "#f87171" },
             }}
           >
             {error}
@@ -834,13 +825,13 @@ export default function Doctors() {
             { label: "Tenants", value: tenants.length, color: "#2dd4bf" },
           ].map(s => (
             <StatCard key={s.label}>
-              <Typography sx={{ 
-                color: "#4a6080", 
-                fontSize: "11px", 
-                fontWeight: 600, 
-                textTransform: "uppercase", 
-                letterSpacing: "0.6px", 
-                mb: 0.5 
+              <Typography sx={{
+                color: "#4a6080",
+                fontSize: "11px",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.6px",
+                mb: 0.5,
               }}>
                 {s.label}
               </Typography>
@@ -855,149 +846,148 @@ export default function Doctors() {
           <div className="table-responsive">
             <StyledTableContainer>
               <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Doctor</TableCell>
-                  <TableCell>Tenant</TableCell>
-                  <TableCell>Specialization</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>License Key</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {visible.length === 0 ? (
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={7}>
-                      <EmptyState>
-                        <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>👨‍⚕️</Typography>
-                        <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>
-                          No doctors found
-                        </Typography>
-                        <Typography sx={{ color: "#283848", fontSize: "13px" }}>
-                          {tenantFilter !== "ALL" 
-                            ? "No doctors for this tenant." 
-                            : "Click \"+ New Doctor\" to add one."}
-                        </Typography>
-                      </EmptyState>
-                    </TableCell>
+                    <TableCell>Doctor</TableCell>
+                    <TableCell>Tenant</TableCell>
+                    <TableCell>Specialization</TableCell>
+                    <TableCell>Phone</TableCell>
+                    <TableCell>License Key</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell align="right">Actions</TableCell>
                   </TableRow>
-                ) : (
-                  visible.map(d => (
-                    <TableRow key={d.id}>
-                      <TableCell>
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                          {d.photoUrl ? (
-                            <img 
-                              src={d.photoUrl} 
-                              alt="" 
-                              style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }} 
-                            />
-                          ) : (
-                            <Box sx={{ 
-                              width: 32, height: 32, borderRadius: "50%", 
-                              backgroundColor: "#0f1e36", 
-                              display: "flex", alignItems: "center", justifyContent: "center", 
-                              fontSize: 12, color: "#4a6080" 
-                            }}>
-                              {getLang(d.name)?.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase() || '?'}
-                            </Box>
-                          )}
-                          <Box>
-                            <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
-                              Dr. {getLang(d.name)}
-                            </Typography>
-                            {getLang(d.name, "ar") && getLang(d.name, "ar") !== getLang(d.name, "en") && (
-                              <Typography sx={{ fontSize: "11px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
-                                {getLang(d.name, "ar")}
-                              </Typography>
-                            )}
-                            {d.email && (
-                              <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>
-                                {d.email}
-                              </Typography>
-                            )}
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography sx={{ 
-                          fontSize: "12px", 
-                          color: "#9ecfca", 
-                          backgroundColor: "rgba(15,184,166,0.08)", 
-                          border: "1px solid rgba(15,184,166,0.12)", 
-                          borderRadius: 6, 
-                          px: 1, py: 0.25, 
-                          display: "inline-block" 
-                        }}>
-                          {getLang(d.tenantName) || d.tenantName || "—"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {(() => {
-                          const spec = SPECIALIZATIONS.find(s => s.value === d.specialization);
-                          if (spec) {
-                            return (
-                              <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-                                <Typography sx={{ fontSize: "13px", color: "#dde6f0" }}>{spec.en}</Typography>
-                                <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{spec.ar}</Typography>
-                              </Box>
-                            );
-                          }
-                          return d.specialization || "—";
-                        })()}
-                      </TableCell>
-                      <TableCell>{d.phone || "—"}</TableCell>
-                      <TableCell>
-                        <Typography sx={{ 
-                          fontFamily: "monospace", 
-                          fontSize: "12px", 
-                          color: d.licenseKey ? "#34d399" : "#4a6080" 
-                        }}>
-                          {d.licenseKey || "Not assigned"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge 
-                          status={d.status} 
-                          label={d.status} 
-                          size="small" 
-                          onClick={() => toggleStatus(d.id, d.status)}
-                          disabled={actionLoading === `status-${d.id}`}
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                          <ActionButton 
-                            variant="warning" 
-                            size="small" 
-                            onClick={() => openEdit(d)}
-                            disabled={actionLoading === 'edit' || actionLoading === 'delete'}
-                          >
-                            Edit
-                          </ActionButton>
-                          <ActionButton 
-                            variant="danger" 
-                            size="small" 
-                            onClick={() => setDeleteConfirm(d)}
-                            disabled={actionLoading === 'edit' || actionLoading === 'delete'}
-                          >
-                            Delete
-                          </ActionButton>
-                        </Box>
+                </TableHead>
+                <TableBody>
+                  {visible.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7}>
+                        <EmptyState>
+                          <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>👨‍⚕️</Typography>
+                          <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>
+                            No doctors found
+                          </Typography>
+                          <Typography sx={{ color: "#283848", fontSize: "13px" }}>
+                            {tenantFilter !== "ALL"
+                              ? "No doctors for this tenant."
+                              : "Click \"+ New Doctor\" to add one."}
+                          </Typography>
+                        </EmptyState>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
+                  ) : (
+                    visible.map(d => (
+                      <TableRow key={d.id}>
+                        <TableCell>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                            {d.photoUrl ? (
+                              <img
+                                src={d.photoUrl}
+                                alt=""
+                                style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover" }}
+                              />
+                            ) : (
+                              <Box sx={{
+                                width: 32, height: 32, borderRadius: "50%",
+                                backgroundColor: "#0f1e36",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: 12, color: "#4a6080",
+                              }}>
+                                {getLang(d.name)?.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?'}
+                              </Box>
+                            )}
+                            <Box>
+                              <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                                Dr. {getLang(d.name)}
+                              </Typography>
+                              {getLang(d.name, "ar") && getLang(d.name, "ar") !== getLang(d.name, "en") && (
+                                <Typography sx={{ fontSize: "11px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
+                                  {getLang(d.name, "ar")}
+                                </Typography>
+                              )}
+                              {d.email && (
+                                <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>
+                                  {d.email}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography sx={{
+                            fontSize: "12px",
+                            color: "#9ecfca",
+                            backgroundColor: "rgba(15,184,166,0.08)",
+                            border: "1px solid rgba(15,184,166,0.12)",
+                            borderRadius: 6,
+                            px: 1, py: 0.25,
+                            display: "inline-block",
+                          }}>
+                            {getLang(d.tenantName) || d.tenantName || "—"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {(() => {
+                            const spec = SPECIALIZATIONS.find(s => s.value === d.specialization);
+                            if (spec) {
+                              return (
+                                <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+                                  <Typography sx={{ fontSize: "13px", color: "#dde6f0" }}>{spec.en}</Typography>
+                                  <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{spec.ar}</Typography>
+                                </Box>
+                              );
+                            }
+                            return d.specialization || "—";
+                          })()}
+                        </TableCell>
+                        <TableCell>{d.phone || "—"}</TableCell>
+                        <TableCell>
+                          <Typography sx={{
+                            fontFamily: "monospace",
+                            fontSize: "12px",
+                            color: d.licenseKey ? "#34d399" : "#4a6080",
+                          }}>
+                            {d.licenseKey || "Not assigned"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge
+                            status={d.status}
+                            label={d.status}
+                            size="small"
+                            onClick={() => toggleStatus(d.id, d.status)}
+                            disabled={actionLoading === `status-${d.id}`}
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                            <ActionButton
+                              variant="warning"
+                              size="small"
+                              onClick={() => openEdit(d)}
+                              disabled={actionLoading === 'edit' || actionLoading === 'delete'}
+                            >
+                              Edit
+                            </ActionButton>
+                            <ActionButton
+                              variant="danger"
+                              size="small"
+                              onClick={() => setDeleteConfirm(d)}
+                              disabled={actionLoading === 'edit' || actionLoading === 'delete'}
+                            >
+                              Delete
+                            </ActionButton>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </StyledTableContainer>
           </div>
         </GlassPanel>
       </ContentWrapper>
 
-      {/* ── Create Dialog ─────────────────────────────────────────────────── */}
       <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Add New Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
@@ -1012,30 +1002,30 @@ export default function Doctors() {
           {fieldEl("Phone", "phone", formData, setFormData, { placeholder: "010xxxxxxxx" })}
           {fieldEl("Email *", "email", formData, setFormData, { type: "email" })}
           {fieldEl("Years of Experience", "yearsOfExperience", formData, setFormData, { type: "number" })}
-          
-          <PasswordField 
-            obj={formData} 
-            set={setFormData} 
-            isEdit={false} 
-            error={error} 
-            setError={setError} 
+
+          <PasswordField
+            obj={formData}
+            set={setFormData}
+            isEdit={false}
+            error={error}
+            setError={setError}
           />
-          
-          {fieldEl("License Key (optional)", "licenseKey", formData, setFormData, { 
-            helperText: "Link to an existing license key", 
-            placeholder: "LIC-2026-001" 
+
+          {fieldEl("License Key (optional)", "licenseKey", formData, setFormData, {
+            helperText: "Link to an existing license key",
+            placeholder: "LIC-2026-001",
           })}
-          
+
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton 
-              variant="secondary" 
+            <ActionButton
+              variant="secondary"
               onClick={() => { setCreateOpen(false); setError(null); }}
               disabled={actionLoading === 'create'}
             >
               Cancel
             </ActionButton>
-            <ActionButton 
-              variant="primary" 
+            <ActionButton
+              variant="primary"
               onClick={handleCreate}
               disabled={actionLoading === 'create'}
             >
@@ -1050,7 +1040,6 @@ export default function Doctors() {
         </DialogContent>
       </StyledDialog>
 
-      {/* ── Edit Dialog ───────────────────────────────────────────────────── */}
       <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Edit Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
@@ -1065,27 +1054,27 @@ export default function Doctors() {
           {fieldEl("Phone", "phone", editData, setEditData)}
           {fieldEl("Email", "email", editData, setEditData, { type: "email" })}
           {fieldEl("Years of Experience", "yearsOfExperience", editData, setEditData, { type: "number" })}
-          
-          <PasswordField 
-            obj={editData} 
-            set={setEditData} 
-            isEdit={true} 
-            error={error} 
-            setError={setError} 
+
+          <PasswordField
+            obj={editData}
+            set={setEditData}
+            isEdit={true}
+            error={error}
+            setError={setError}
           />
-          
+
           {fieldEl("License Key", "licenseKey", editData, setEditData)}
-          
+
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton 
-              variant="secondary" 
+            <ActionButton
+              variant="secondary"
               onClick={() => setEditOpen(false)}
               disabled={actionLoading === 'edit'}
             >
               Cancel
             </ActionButton>
-            <ActionButton 
-              variant="primary" 
+            <ActionButton
+              variant="primary"
               onClick={handleEdit}
               disabled={actionLoading === 'edit'}
             >
@@ -1100,7 +1089,6 @@ export default function Doctors() {
         </DialogContent>
       </StyledDialog>
 
-      {/* ── Delete Confirm ────────────────────────────────────────────────── */}
       <StyledDialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
@@ -1111,15 +1099,15 @@ export default function Doctors() {
             This action cannot be undone.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton 
-              variant="secondary" 
+            <ActionButton
+              variant="secondary"
               onClick={() => setDeleteConfirm(null)}
               disabled={actionLoading === 'delete'}
             >
               Cancel
             </ActionButton>
-            <ActionButton 
-              variant="danger" 
+            <ActionButton
+              variant="danger"
               onClick={handleDelete}
               disabled={actionLoading === 'delete'}
             >

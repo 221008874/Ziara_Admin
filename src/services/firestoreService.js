@@ -131,10 +131,16 @@ function buildPublicTenant(data, tenantId) {
 // ─── LICENSES ───────────────────────────────────────────────────────────────
 export const createLicense = async (licenseData) => {
   const { licenseKey, ...data } = licenseData;
+  // Check uniqueness first
+  const existing = await getDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey));
+  if (existing.exists()) {
+    throw new Error(`License key "${licenseKey}" already exists`);
+  }
   await setDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey), {
     ...data,
     licenseKey,
-    status: "ACTIVE",
+    category: data.category || "doctor",
+    status: data.status || "ACTIVE",
     expired: false,
     deviceId: null,
     createdAt: serverTimestamp(),
@@ -166,16 +172,32 @@ export const updateLicenseExpiry = async (licenseKey, newExpiryDate) => {
 
 // ─── TENANTS (SaaS + COMM dual-write) ─────────────────────────────────────
 export const createTenant = async (tenantData) => {
+  const { licenseKey, expiryDate, ...tenantFields } = tenantData;
+
+  // Create or validate license for the tenant
+  if (licenseKey) {
+    const licSnap = await getDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey));
+    if (!licSnap.exists()) {
+      await createLicense({
+        licenseKey,
+        category: "tenant",
+        expiryDate: expiryDate || "",
+        status: "ACTIVE",
+      });
+    }
+  }
+
   // 1. Write to saas_tenants
   const saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_TENANTS), {
-    ...tenantData,
+    ...tenantFields,
+    licenseKey: licenseKey || "",
     status: "ACTIVE",
     createdAt: serverTimestamp(),
   });
 
   // 2. Mirror to comm_tenants
   const publicTenant = buildPublicTenant(
-    { ...tenantData, status: "ACTIVE" },
+    { ...tenantFields, licenseKey, status: "ACTIVE" },
     saasRef.id
   );
   await setDoc(doc(db, COLLECTIONS.COMM_TENANTS, saasRef.id), publicTenant);
@@ -255,16 +277,39 @@ export const deleteTenant = async (tenantId) => {
 
 // ─── DOCTORS (SaaS + COMM dual-write) ─────────────────────────────────────
 export const createDoctor = async (doctorData) => {
-  const { password, confirmPassword, ...doctorPublicData } = doctorData;
+  const { password, confirmPassword, licenseKey, ...doctorPublicData } = doctorData;
+
+  // If individual doctor (no tenantId) and licenseKey provided, create license
+  if (licenseKey && !doctorPublicData.tenantId) {
+    const licSnap = await getDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey));
+    if (!licSnap.exists()) {
+      await createLicense({
+        licenseKey,
+        category: "doctor",
+        doctorName: doctorPublicData.name || doctorData.name,
+        phone: doctorPublicData.phone || "",
+        expiryDate: "",
+      });
+    }
+  }
+
+  // If doctor belongs to tenant, validate tenant's license exists
+  if (licenseKey && doctorPublicData.tenantId) {
+    const licSnap = await getDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey));
+    if (!licSnap.exists()) {
+      throw new Error(`License key "${licenseKey}" not found. Create the tenant license first.`);
+    }
+  }
 
   // 1. Write to saas_doctors (internal admin data)
   const saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_DOCTORS), {
     ...doctorPublicData,
+    licenseKey: licenseKey || "",
     status: "ACTIVE",
     createdAt: serverTimestamp(),
   });
 
-  // 2. Create Firebase Auth account via server API (client SDK can't create users while logged in)
+  // 2. Create Firebase Auth account via server API
   if (doctorData.email && password) {
     try {
       const apiBase = import.meta.env.VITE_API_BASE || "";
@@ -280,7 +325,7 @@ export const createDoctor = async (doctorData) => {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Failed to create doctor account");
 
-      // 3. Create mapping in comm_doctor_users with firstLogin flag
+      // 3. Create mapping in comm_doctor_users
       await setDoc(
         doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email.toLowerCase()),
         {
@@ -298,9 +343,9 @@ export const createDoctor = async (doctorData) => {
     }
   }
 
-  // 4. Mirror to comm_doctors (public-safe, NO password field)
+  // 4. Mirror to comm_doctors
   const publicDoctor = buildPublicDoctor(
-    { ...doctorPublicData, status: "ACTIVE" },
+    { ...doctorPublicData, licenseKey, status: "ACTIVE" },
     saasRef.id
   );
   try {
@@ -315,7 +360,7 @@ export const createDoctor = async (doctorData) => {
     throw commErr;
   }
 
-  // 5. Ensure tenant exists in comm_tenants
+  // 5. Ensure tenant exists in comm_tenants (only if belongs to a tenant)
   if (doctorData.tenantId) {
     const tenantRef = doc(
       db,

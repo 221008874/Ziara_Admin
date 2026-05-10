@@ -13,11 +13,21 @@ import logo from "../assets/logo.png";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
-  CircularProgress, Alert, Box, Typography, Chip
+  CircularProgress, Alert, Box, Typography, Chip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#04091a", marginLeft: { xs: 0, md: "240px" }, position: "relative", overflow: "hidden" });
+const PageContainer = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: "#04091a",
+  marginLeft: 0,
+  position: "relative",
+  overflow: "hidden",
+  transition: "margin-left 0.3s ease",
+  [theme.breakpoints.up("md")]: {
+    marginLeft: "240px",
+  },
+}));
 
 const TopBar = styled(Box)({
   background: "linear-gradient(to right, #090f22, #0c1830)",
@@ -254,97 +264,130 @@ export default function Licenses() {
           <div className="table-responsive">
             <StyledTableContainer>
               <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>License Key</TableCell>
-                  <TableCell>Doctor</TableCell>
-                  <TableCell>Phone</TableCell>
-                  <TableCell>Device MAC</TableCell>
-                  <TableCell>Expiry</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {licenses.length === 0 ? (
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={7}>
-                      <EmptyState>
-                        <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>📋</Typography>
-                        <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No licenses found</Typography>
-                        <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New License" to create your first license</Typography>
-                      </EmptyState>
-                    </TableCell>
+                    <TableCell>License Key</TableCell>
+                    <TableCell>Doctor</TableCell>
+                    <TableCell>Phone</TableCell>
+                    <TableCell>Device MAC</TableCell>
+                    <TableCell>Expiry</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell align="right">Actions</TableCell>
                   </TableRow>
-                ) : (
-                  licenses.map((lic) => (
-                    <TableRow key={lic.id}>
-                      <TableCell>
-                        <Typography sx={{ fontFamily: "monospace", color: "#eaf2ff", fontWeight: 600, letterSpacing: "0.5px" }}>{lic.licenseKey}</Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-                          <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
-                            {getLang(lic.doctorName) || "—"}
-                          </Typography>
-                          {(() => { const ar = getLang(lic.doctorName, "ar"); const en = getLang(lic.doctorName, "en"); return ar && ar !== en ? <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{ar}</Typography> : null; })()}
-                        </Box>
-                      </TableCell>
-                      <TableCell>{lic.phone || "—"}</TableCell>
-                      <TableCell>
-                        <Typography sx={{ fontFamily: "monospace", color: lic.deviceId ? "#34d399" : "#6a8aaa", fontSize: "12px" }}>
-                          {lic.deviceId || "Not bound"}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>{lic.expiryDate}</TableCell>
-                      <TableCell>
-                        <StatusBadge
-                          status={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
-                          label={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
-                          onClick={() => lic.status !== "EXPIRED" && toggleStatus(lic.id, lic.status)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <ActionButton variant="warning" size="small" onClick={() => handleEditOpen(lic)} sx={{ mr: 1 }}>
-                          Edit Expiry
-                        </ActionButton>
+                </TableHead>
+                <TableBody>
+                  {licenses.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7}>
+                        <EmptyState>
+                          <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>📋</Typography>
+                          <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No licenses found</Typography>
+                          <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New License" to create your first license</Typography>
+                        </EmptyState>
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
+                  ) : (
+                    licenses.map((lic) => (
+                      <TableRow key={lic.id}>
+                        <TableCell>
+                          <Typography sx={{ fontFamily: "monospace", color: "#eaf2ff", fontWeight: 600, letterSpacing: "0.5px" }}>{lic.licenseKey}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+                            <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                              {getLang(lic.doctorName) || "—"}
+                            </Typography>
+                            {(() => { const ar = getLang(lic.doctorName, "ar"); const en = getLang(lic.doctorName, "en"); return ar && ar !== en ? <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{ar}</Typography> : null; })()}
+                          </Box>
+                        </TableCell>
+                        <TableCell>{lic.phone || "—"}</TableCell>
+                        <TableCell>
+                          <Typography sx={{ fontFamily: "monospace", color: lic.deviceId ? "#34d399" : "#6a8aaa", fontSize: "12px" }}>
+                            {lic.deviceId || "Not bound"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{lic.expiryDate}</TableCell>
+                        <TableCell>
+                          <StatusBadge
+                            status={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
+                            label={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
+                            onClick={() => lic.status !== "EXPIRED" && toggleStatus(lic.id, lic.status)}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <ActionButton variant="warning" size="small" onClick={() => handleEditOpen(lic)} sx={{ mr: 1 }}>
+                            Edit Expiry
+                          </ActionButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </StyledTableContainer>
           </div>
         </GlassPanel>
       </ContentWrapper>
 
-      {/* Create Dialog */}
       <StyledDialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Create New License</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <StyledDialogField fullWidth label="License Key *" margin="normal" value={formData.licenseKey} onChange={(e) => setFormData({ ...formData, licenseKey: e.target.value })} helperText="Use a unique key (e.g., LIC-2026-001)" placeholder="LIC-2026-001" />
-          <BilingualInput label="Doctor Name" labelAr="اسم الطبيب" value={formData.doctorName} onChange={v => setFormData(p => ({ ...p, doctorName: v }))} />
-          <StyledDialogField fullWidth label="Phone" margin="normal" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="010xxxxxxxx" />
-          <StyledDialogField fullWidth label="Expiry Date *" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={formData.expiryDate} onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })} />
+          <StyledDialogField
+            fullWidth
+            label="License Key"
+            margin="normal"
+            value={formData.licenseKey}
+            onChange={e => setFormData(p => ({ ...p, licenseKey: e.target.value }))}
+            placeholder="LIC-2026-001"
+          />
+          <BilingualInput
+            label="Doctor Name"
+            labelAr="اسم الطبيب"
+            value={formData.doctorName}
+            onChange={v => setFormData(p => ({ ...p, doctorName: v }))}
+          />
+          <StyledDialogField
+            fullWidth
+            label="Phone"
+            margin="normal"
+            value={formData.phone}
+            onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))}
+            placeholder="010xxxxxxxx"
+          />
+          <StyledDialogField
+            fullWidth
+            label="Expiry Date"
+            margin="normal"
+            type="date"
+            value={formData.expiryDate}
+            onChange={e => setFormData(p => ({ ...p, expiryDate: e.target.value }))}
+            InputLabelProps={{ shrink: true }}
+          />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => { setOpenDialog(false); setError(null); }}>Cancel</ActionButton>
+            <ActionButton variant="secondary" onClick={() => setOpenDialog(false)}>Cancel</ActionButton>
             <ActionButton variant="primary" onClick={handleCreate}>Create License</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>
 
-      {/* Edit Expiry Dialog */}
-      <StyledDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit License Expiry</DialogTitle>
+      <StyledDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Edit Expiry Date</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <Typography sx={{ color: "#6a8aaa", mb: 2 }}>License: {editLicense?.licenseKey}</Typography>
-          <Typography sx={{ color: "#6a8aaa", mb: 2 }}>Doctor: {getLang(editLicense?.doctorName) || "—"}</Typography>
-          <StyledDialogField fullWidth label="New Expiry Date *" type="date" margin="normal" InputLabelProps={{ shrink: true }} value={newExpiryDate} onChange={(e) => setNewExpiryDate(e.target.value)} />
+          <Typography sx={{ color: "#dde6f0", mb: 2 }}>
+            License: <strong>{editLicense?.licenseKey}</strong>
+          </Typography>
+          <StyledDialogField
+            fullWidth
+            label="New Expiry Date"
+            type="date"
+            value={newExpiryDate}
+            onChange={e => setNewExpiryDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleEditSave}>Save Changes</ActionButton>
+            <ActionButton variant="primary" onClick={handleEditSave}>Save</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>
