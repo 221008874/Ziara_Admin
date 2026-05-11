@@ -191,6 +191,7 @@ export const createTenant = async (tenantData) => {
   const saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_TENANTS), {
     ...tenantFields,
     licenseKey: licenseKey || "",
+    expiryDate: expiryDate || "",
     status: "ACTIVE",
     createdAt: serverTimestamp(),
   });

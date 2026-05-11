@@ -549,8 +549,12 @@ export default function Doctors() {
   };
 
   const handleCreate = async () => {
-    if (!formData.name.en || !formData.tenantId) {
-      setError("Doctor name and tenant are required");
+    if (!formData.name.en) {
+      setError("Doctor name is required");
+      return;
+    }
+    if (!formData.tenantId && !formData.licenseKey) {
+      setError("License key is required for individual doctors");
       return;
     }
     if (!formData.email) {
@@ -724,16 +728,19 @@ export default function Doctors() {
   const renderTenantSelect = (obj, set) => (
     <FormControl fullWidth margin="normal">
       <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>
-        Tenant (Clinic) *
+        Tenant (Clinic)
       </InputLabel>
       <StyledSelect
-        label="Tenant (Clinic) *"
-        value={obj.tenantId}
+        label="Tenant (Clinic)"
+        value={obj.tenantId || ""}
         onChange={e => {
           const t = tenants.find(t => t.id === e.target.value);
-          set(p => ({ ...p, tenantId: e.target.value, tenantName: t ? (isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name))) : createBilingual() }));
+          set(p => ({ ...p, tenantId: e.target.value || "", tenantName: t ? (isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name))) : createBilingual(), licenseKey: t?.licenseKey || "" }));
         }}
       >
+        <MenuItem value="" sx={{ backgroundColor: "#0f1e36", color: "#6b7e9b", fontStyle: "italic" }}>
+          — No Tenant (Individual) —
+        </MenuItem>
         {tenants.map(t => (
           <MenuItem key={t.id} value={t.id} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
             {getLang(t.name) || t.name}
@@ -1031,10 +1038,20 @@ export default function Doctors() {
             setError={setError}
           />
 
-          {fieldEl("License Key (optional)", "licenseKey", formData, setFormData, {
-            helperText: "Link to an existing license key",
-            placeholder: "LIC-2026-001",
-          })}
+          {formData.tenantId ? (
+            <TextField
+              fullWidth
+              margin="normal"
+              label="License Key (from tenant)"
+              value={formData.licenseKey}
+              disabled
+              sx={{ "& .MuiInputBase-root": { backgroundColor: "#0d1a2e", color: "#34d399" }, "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 }, "& .Mui-disabled": { WebkitTextFillColor: "#34d399 !important" } }}
+            />
+          ) : (
+            fieldEl("License Key *", "licenseKey", formData, setFormData, {
+              placeholder: "LIC-2026-001",
+            })
+          )}
 
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton

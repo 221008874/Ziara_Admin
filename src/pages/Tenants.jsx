@@ -9,6 +9,7 @@ import {
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
 import { useSidebar } from "../App";
+import { useNavigate } from "react-router-dom";
 import { Hamburger } from "../components/Sidebar";
 import logo from "../assets/logo.png";
 import {
@@ -166,12 +167,15 @@ const BLANK = {
   city: createBilingual(),
   description: createBilingual(),
   plan: "BASIC",
+  licenseKey: "",
+  expiryDate: "",
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Tenants() {
   const { toggle } = useSidebar();
+  const navigate = useNavigate();
   const [tenants, setTenants]         = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
@@ -203,6 +207,7 @@ export default function Tenants() {
 
   const handleCreate = async () => {
     if (!formData.name.en) { setError("Tenant name (English) is required"); return; }
+    if (!formData.licenseKey) { setError("License key is required"); return; }
     debug.action('Tenants', 'Creating tenant', { name: getLang(formData.name) });
     try {
       setError(null);
@@ -228,6 +233,8 @@ export default function Tenants() {
       city: isBilingual(t.city) ? t.city : createBilingual(t.city || ""),
       description: isBilingual(t.description) ? t.description : createBilingual(t.description || ""),
       plan: t.plan || "BASIC",
+      licenseKey: t.licenseKey || "",
+      expiryDate: t.expiryDate || "",
     });
     setEditOpen(true);
   };
@@ -340,6 +347,7 @@ export default function Tenants() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Tenant Name</TableCell>
+                    <TableCell>License Key</TableCell>
                     <TableCell>Contact Email</TableCell>
                     <TableCell>Phone</TableCell>
                     <TableCell>Plan</TableCell>
@@ -351,7 +359,7 @@ export default function Tenants() {
                 <TableBody>
                   {tenants.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7}>
+                      <TableCell colSpan={8}>
                         <EmptyState>
                           <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>🏥</Typography>
                           <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants yet</Typography>
@@ -373,6 +381,11 @@ export default function Tenants() {
                           )}
                           {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || t.address}</Typography>}
                         </TableCell>
+                        <TableCell>
+                          <Typography sx={{ color: t.licenseKey ? "#34d399" : "#4a6080", fontSize: "13px", fontFamily: "monospace" }}>
+                            {t.licenseKey || "—"}
+                          </Typography>
+                        </TableCell>
                         <TableCell>{t.contactEmail || "—"}</TableCell>
                         <TableCell>{t.contactPhone || "—"}</TableCell>
                         <TableCell>
@@ -393,6 +406,7 @@ export default function Tenants() {
                         </TableCell>
                         <TableCell align="right">
                           <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                            <ActionButton variant="primary" size="small" onClick={() => navigate(`/doctors?tenantId=${t.id}`)}>Add Doctor</ActionButton>
                             <ActionButton variant="warning" size="small" onClick={() => openEdit(t)}>Edit</ActionButton>
                             <ActionButton variant="danger" size="small" onClick={() => setDeleteConfirm(t)}>Delete</ActionButton>
                           </Box>
