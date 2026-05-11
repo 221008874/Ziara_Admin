@@ -228,6 +228,7 @@ export default function Settings() {
             { key: "allowSelfRegistration",  label: "Allow Self Registration",   desc: "Let new clinics sign up without admin approval" },
             { key: "maintenanceMode",        label: "Maintenance Mode",          desc: "Prevent all local clients from connecting" },
           ].map(row => (
+            
             <ToggleRow key={row.key}>
               <Box>
                 <Typography sx={{ color: "#dde6f0", fontSize: "14px", fontWeight: 600 }}>{row.label}</Typography>
