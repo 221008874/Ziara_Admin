@@ -379,7 +379,7 @@ export default function Tenants() {
                               {getLang(t.name, "ar")}
                             </Typography>
                           )}
-                          {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || t.address}</Typography>}
+                          {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || "—"}</Typography>}
                         </TableCell>
                         <TableCell>
                           <Typography sx={{ color: t.licenseKey ? "#34d399" : "#4a6080", fontSize: "13px", fontFamily: "monospace" }}>

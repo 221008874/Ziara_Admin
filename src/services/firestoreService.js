@@ -142,6 +142,7 @@ export const createLicense = async (licenseData) => {
     category: data.category || "doctor",
     status: data.status || "ACTIVE",
     expired: false,
+    onlineBooking: Boolean(data.onlineBooking),
     deviceId: null,
     createdAt: serverTimestamp(),
   });
@@ -167,6 +168,12 @@ export const updateLicenseExpiry = async (licenseKey, newExpiryDate) => {
     expiryDate: newExpiryDate,
     status: "ACTIVE",
     expired: false,
+  });
+};
+
+export const updateLicenseOnlineBooking = async (licenseKey, enabled) => {
+  await updateDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey), {
+    onlineBooking: Boolean(enabled),
   });
 };
 

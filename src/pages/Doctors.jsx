@@ -949,7 +949,7 @@ export default function Doctors() {
                             px: 1, py: 0.25,
                             display: "inline-block",
                           }}>
-                            {getLang(d.tenantName) || d.tenantName || "—"}
+                            {getLang(d.tenantName) || "—"}
                           </Typography>
                         </TableCell>
                         <TableCell>

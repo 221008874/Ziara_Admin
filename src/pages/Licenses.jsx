@@ -150,7 +150,7 @@ export default function Licenses() {
   const [editLicense, setEditLicense] = useState(null);
   const [newExpiryDate, setNewExpiryDate] = useState("");
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "" });
+  const [formData, setFormData] = useState({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "", onlineBooking: false });
 
   useEffect(() => {
     debug.component('Licenses', 'Mounted');
@@ -181,7 +181,7 @@ export default function Licenses() {
       await createLicense(formData);
       debug.action('Licenses', 'License created', { key: formData.licenseKey });
       setOpenDialog(false);
-      setFormData({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "" });
+      setFormData({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "", onlineBooking: false });
       loadLicenses();
     } catch (err) {
       debug.error('Licenses.create', err);
@@ -284,6 +284,7 @@ export default function Licenses() {
                     <TableCell>Device MAC</TableCell>
                     <TableCell>Expiry</TableCell>
                     <TableCell>Status</TableCell>
+                    <TableCell align="center">Online Booking</TableCell>
                     <TableCell align="right">Actions</TableCell>
                   </TableRow>
                 </TableHead>
