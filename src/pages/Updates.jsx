@@ -20,7 +20,17 @@ import {
 import { styled } from "@mui/material/styles";
 import { Edit, Trash2, History, PauseCircle, CloudUpload } from "lucide-react";
 
-const PageContainer = styled(Box)({ minHeight: "100vh", backgroundColor: "#070f1e", position: "relative", overflow: "hidden" });
+const PageContainer = styled(Box)(({ theme }) => ({
+  minHeight: "100vh",
+  backgroundColor: "#070f1e",
+  marginLeft: 0,
+  position: "relative",
+  overflow: "hidden",
+  transition: "margin-left 0.3s ease",
+  [theme.breakpoints.up("md")]: {
+    marginLeft: "240px",
+  },
+}));
 const TopBar = styled(Box)({ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: "1px solid rgba(15,184,166,0.12)" });
 const ContentWrapper = styled(Box)({ padding: "24px", maxWidth: 1400, margin: "0 auto" });
 const GlassPanel = styled(Box)({ backgroundColor: "rgba(11,22,40,0.6)", borderRadius: "16px", border: "1px solid rgba(15,184,166,0.12)", backdropFilter: "blur(12px)", overflow: "hidden" });
