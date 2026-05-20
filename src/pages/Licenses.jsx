@@ -4,6 +4,7 @@ import {
   createLicense,
   updateLicenseStatus,
   updateLicenseExpiry,
+  updateLicenseOnlineBooking,
 } from "../services/firestoreService";
 import { createBilingual, getLang, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
@@ -15,6 +16,7 @@ import {
   Button, TextField, Dialog, DialogTitle, DialogContent,
   Select, MenuItem, FormControl, InputLabel,
   CircularProgress, Alert, Box, Typography, Chip,
+  Checkbox, FormControlLabel,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
@@ -202,6 +204,18 @@ export default function Licenses() {
     }
   };
 
+  const toggleOnlineBooking = async (docId, currentEnabled) => {
+    debug.action('Licenses', `Toggling online booking: ${docId} (${currentEnabled} -> ${!currentEnabled})`);
+    try {
+      await updateLicenseOnlineBooking(docId, !currentEnabled);
+      debug.action('Licenses', `Online booking updated: ${docId} -> ${!currentEnabled}`);
+      loadLicenses();
+    } catch (err) {
+      debug.error('Licenses.toggleOnlineBooking', err);
+      setError("Failed to update online booking");
+    }
+  };
+
   const handleEditOpen = (lic) => {
     debug.action('Licenses', `Opening edit expiry dialog: ${lic.id}`, { key: lic.licenseKey, currentExpiry: lic.expiryDate });
     setEditLicense(lic);
@@ -340,6 +354,19 @@ export default function Licenses() {
                             size="small"
                           />
                         </TableCell>
+                        <TableCell align="center">
+                          <Chip
+                            label={lic.onlineBooking ? "Enabled" : "Disabled"}
+                            size="small"
+                            onClick={() => toggleOnlineBooking(lic.id, lic.onlineBooking)}
+                            sx={{
+                              fontWeight: 600, fontSize: "10px", cursor: "pointer",
+                              backgroundColor: lic.onlineBooking ? "rgba(34,197,94,0.14)" : "rgba(100,116,139,0.14)",
+                              color: lic.onlineBooking ? "#22c55e" : "#64748b",
+                              border: lic.onlineBooking ? "1px solid rgba(34,197,94,0.28)" : "1px solid rgba(100,116,139,0.28)",
+                            }}
+                          />
+                        </TableCell>
                         <TableCell align="right">
                           <ActionButton variant="warning" size="small" onClick={() => handleEditOpen(lic)} sx={{ mr: 1 }}>
                             Edit Expiry
@@ -395,6 +422,17 @@ export default function Licenses() {
             value={formData.expiryDate}
             onChange={e => setFormData(p => ({ ...p, expiryDate: e.target.value }))}
             InputLabelProps={{ shrink: true }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.onlineBooking}
+                onChange={e => setFormData(p => ({ ...p, onlineBooking: e.target.checked }))}
+                sx={{ color: "#4a6080", "&.Mui-checked": { color: "#0fb8a6" } }}
+              />
+            }
+            label={<Typography sx={{ color: "#9ecfca", fontSize: "13px" }}>Enable Online Booking</Typography>}
+            sx={{ mt: 1 }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => setOpenDialog(false)}>Cancel</ActionButton>

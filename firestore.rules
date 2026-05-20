@@ -111,6 +111,13 @@ service cloud.firestore {
     }
 
     // ─── NEW: License System Collections ────────────────────────────────
+    match /app_versions/{appId} {
+      allow read, write: if isAnyAdmin();
+      match /releases/{versionId} {
+        allow read, write: if isAnyAdmin();
+      }
+    }
+
     match /licenses/{licenseId} {
       allow read: if isAnyAdmin();
       allow create, update, delete: if isAnyAdmin();

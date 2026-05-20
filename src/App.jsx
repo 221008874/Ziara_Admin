@@ -7,6 +7,7 @@ import Licenses from "./pages/Licenses";
 import Tenants from "./pages/Tenants";
 import Doctors from "./pages/Doctors";
 import Settings from "./pages/Settings";
+import Updates from "./pages/Updates";
 import Login from "./pages/Login";
 import Sidebar, { Hamburger } from "./components/Sidebar";
 
@@ -82,6 +83,7 @@ export default function App() {
           <Route path="/tenants" element={<Tenants />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/licenses" element={<Licenses />} />
+          <Route path="/updates" element={<Updates />} />
           <Route path="/settings" element={<Settings />} />
           <Route index element={<Navigate to="/tenants" replace />} />
           <Route path="/" element={<Navigate to="/tenants" replace />} />

@@ -155,6 +155,7 @@ const NAV_ITEMS = [
       { to: "/tenants",  icon: "🏥", label: "Tenants"  },
       { to: "/doctors",  icon: "👨‍⚕️", label: "Doctors"  },
       { to: "/licenses", icon: "🔑", label: "Licenses" },
+      { to: "/updates",  icon: "📦", label: "Updates"  },
     ],
   },
   {
