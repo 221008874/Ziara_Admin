@@ -55,7 +55,7 @@ function SidebarLayout() {
       <div
         className={`sidebar-overlay ${sideOpen ? "active" : ""}`}
         onClick={toggle}
-        style={{ display: { xs: sideOpen ? "block" : "none", md: "none" } }}
+        style={{ display: sideOpen ? "block" : "none" }}
       />
 
       <Outlet />

@@ -5,6 +5,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Menu, X } from "lucide-react";
 import logo from "../assets/logo.png";
+import { useSidebar } from "../App";
 
 // ─── Styled Components ───────────────────────────────────────────────────────
 
@@ -169,6 +170,7 @@ const NAV_ITEMS = [
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Sidebar({ onToggle }) {
+  const { open } = useSidebar();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -185,7 +187,7 @@ export default function Sidebar({ onToggle }) {
   const adminUser = localStorage.getItem("clinic_admin_user") || "Admin";
 
   return (
-    <SidebarRoot $open={true}>
+    <SidebarRoot $open={open}>
       <CloseBtn onClick={onToggle} size="small">
         <X size={20} />
       </CloseBtn>
