@@ -741,3 +741,12 @@ export const getReleaseHistory = async (appId, limitCount = 20) => {
 export const deleteRelease = async (appId, version) => {
   await deleteDoc(doc(db, COLLECTIONS.APP_VERSIONS, appId, "releases", version));
 };
+
+export const getClinicServers = async () => {
+  const q = query(
+    collection(db, COLLECTIONS.SERVERS),
+    orderBy("lastSeen", "desc")
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+};

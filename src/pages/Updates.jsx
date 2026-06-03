@@ -5,6 +5,7 @@ import {
   unpublishVersion,
   getReleaseHistory,
   deleteRelease,
+  getClinicServers,
 } from "../services/firestoreService";
 import { debug } from "../lib/debug";
 import { useSidebar } from "../App";
@@ -65,6 +66,7 @@ const APP_META = {
 export default function Updates() {
   const { toggle } = useSidebar();
   const [versions, setVersions] = useState([]);
+  const [servers, setServers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -78,7 +80,7 @@ export default function Updates() {
     status: "published", fileSize: "", checksum: "",
   });
 
-  useEffect(() => { loadVersions(); }, []);
+  useEffect(() => { loadVersions(); loadServers(); }, []);
 
   const loadVersions = async () => {
     try {
@@ -89,6 +91,15 @@ export default function Updates() {
       debug.error('Updates.load', err);
       setError("Failed to load versions");
     } finally { setLoading(false); }
+  };
+
+  const loadServers = async () => {
+    try {
+      const data = await getClinicServers();
+      setServers(data);
+    } catch (err) {
+      debug.error('Updates.servers', err);
+    }
   };
 
   const handleOpenCreate = (appId) => {
@@ -248,17 +259,33 @@ export default function Updates() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {versions.filter(v => v.appId === "server").length > 0 ? (
+                {servers.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} sx={{ color: "#4a6080", textAlign: "center", py: 3 }}>
-                      Server instances are tracked in Firestore under `clinic_servers` collection.
+                      No server instances found.
                       <br />
                       <Typography component="span" sx={{ color: "#0fb8a6", fontSize: "12px" }}>
-                        View in Firebase Console → Firestore → clinic_servers
+                        Servers appear here automatically when they connect online.
                       </Typography>
                     </TableCell>
                   </TableRow>
-                ) : null}
+                ) : (
+                  servers.map(s => (
+                    <TableRow key={s.id}>
+                      <TableCell sx={{ color: "#eaf2ff", fontFamily: "monospace", fontSize: "12px" }}>{s.macAddress || s.id || "—"}</TableCell>
+                      <TableCell sx={{ color: "#6a8aaa" }}>{s.ipAddress || "—"}</TableCell>
+                      <TableCell sx={{ color: "#6a8aaa" }}>{s.port || "—"}</TableCell>
+                      <TableCell sx={{ color: "#34d399", fontFamily: "monospace", fontSize: "12px" }}>{s.licenseKey || "—"}</TableCell>
+                      <TableCell sx={{ color: "#6a8aaa" }}>{s.version || "—"}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={s.status || "offline"}>{(s.status || "offline").toUpperCase()}</StatusBadge>
+                      </TableCell>
+                      <TableCell sx={{ color: "#4a6080", fontSize: "12px" }}>
+                        {s.lastSeen?.toDate?.().toLocaleString() || s.lastSeen || "—"}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </Box>
