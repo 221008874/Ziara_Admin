@@ -13,6 +13,7 @@ out/
 .vercel/
 
 # Build/cache files
+dist/
 *.tsbuildinfo
 .cache/
 .DS_Store
