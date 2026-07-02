@@ -26,3 +26,4 @@ service-account.json
 *.p12
 *.pem
 .vercel
+.env*.local
