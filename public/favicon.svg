@@ -1,11 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
   <rect width="32" height="32" rx="6" fill="#020617"/>
-  <g transform="translate(3,2) scale(0.185)">
-    <path d="M126,14 C126,14 76,30 32,44 L32,168 C32,240 72,276 126,310 C180,276 220,240 220,168 L220,44 C176,30 126,14 126,14Z" fill="#0F172A" stroke="#0EA5E9" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
-    <path d="M60,96 L192,96 L60,222 L192,222" fill="none" stroke="#38BDF8" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="60" cy="96" r="6" fill="#7DD3FC"/>
-    <circle cx="192" cy="96" r="6" fill="#7DD3FC"/>
-    <circle cx="60" cy="222" r="6" fill="#7DD3FC"/>
-    <circle cx="192" cy="222" r="6" fill="#7DD3FC"/>
+  <g transform="translate(3,2) scale(0.193)">
+    <path d="M60,10 C60,10 34,20 10,30 L10,86 C10,126 32,146 60,156 C88,146 110,126 110,86 L110,30 C86,20 60,10 60,10Z" fill="#0F172A" stroke="#22D3EE" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M30,62 L90,62 L30,118 L90,118" fill="none" stroke="#67E8F9" stroke-width="12" stroke-linejoin="round" stroke-linecap="round"/>
   </g>
 </svg>
