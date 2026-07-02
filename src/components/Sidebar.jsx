@@ -151,12 +151,20 @@ const LogoutBtn = styled(Box)({
 
 const NAV_ITEMS = [
   {
+    section: "ERP Integration",
+    items: [
+      { to: "/erp-settings", icon: "\u26A1", label: "ERP Settings" },
+    ],
+  },
+  {
     section: "Management",
     items: [
-      { to: "/tenants",  icon: "🏥", label: "Tenants"  },
-      { to: "/doctors",  icon: "👨‍⚕️", label: "Doctors"  },
-      { to: "/licenses", icon: "🔑", label: "Licenses" },
-      { to: "/updates",  icon: "📦", label: "Updates"  },
+      { to: "/tenants",   icon: "🏥", label: "Tenants"   },
+      { to: "/doctors",   icon: "👨‍⚕️", label: "Doctors"   },
+      { to: "/licenses",  icon: "🔑", label: "Licenses"  },
+      { to: "/updates",   icon: "📦", label: "Updates"   },
+      { to: "/inventory",   icon: "📦", label: "Inventory"   },
+      { to: "/procurement", icon: "📋", label: "Procurement" },
     ],
   },
   {

@@ -73,7 +73,9 @@ clinic-admin/
 │   │       └── ProtectedRoute.jsx      # UNUSED - uses localStorage check (App.jsx uses RequireAuth instead)
 │   │
 │   ├── services/
-│   │   └── firestoreService.js         # ALL Firestore operations (558 lines)
+│   │   └── firestoreService.js         # ALL Firestore operations (942 lines
+	\t\t\t\t\t\t# Dual-write for tenants/doctors, rollback on error
+	\t\t\t\t\t\t# ERP SaaS integration: getTenantById, updateTenantERPFields, getLicenseByKey, updateLicenseERPFields, migrateERPFields, getERPEnrichedTenants)
 │   │                                   # Dual-write for tenants/doctors, rollback on error
 │   │
 │   ├── lib/
@@ -245,6 +247,7 @@ gynecology, general_surgery, urology, anesthesia, radiology, pathology, other
 /doctors        → Doctors.jsx                  (protected)
 /licenses       → Licenses.jsx                 (protected)
 /settings       → Settings.jsx                 (protected)
+/erp-settings    ? ERPSettings.jsx              (protected, ERP integration config)
 *               → Navigate to /login           (catch-all)
 ```
 
@@ -563,3 +566,64 @@ When working with this codebase:
 5. **Changing colors:** Edit CSS variables in `index.css` or component styled definitions
 6. **Adding responsive behavior:** Use MUI `sx={{ xs: ..., sm: ..., md: ... }}` or CSS utility classes (`.hide-on-mobile`, `.hide-on-tablet`, `.stats-grid`)
 7. **API route:** Add `.js` file in `api/admin/`, follow CORS pattern + JSON parsing from existing routes
+
+---
+
+## 19. ERP INTEGRATION (Phase 17C)
+
+### Purpose
+Extend the Admin Panel with ERP SaaS metadata configuration UI. The ERP system reads tenant/license data from smartclinicadmin Firestore to enforce login, user limits, and doctor limits.
+
+### Key Principle
+**Additive only** — no field removal, collection rename, document ID change, or API break.
+
+### Collections (additive fields only)
+| Collection | Additive Fields | Purpose |
+|---|---|---|
+| saas_tenants | erpEnabled (default: false) | ERP opt-in per tenant |
+| saas_licenses | 	enantId, plan, maxUsers, maxDoctors, enabledModules | ERP limit enforcement |
+
+### Plan Templates (src/lib/licenseTemplates.js)
+| Plan | maxUsers | maxDoctors | enabledModules |
+|---|---|---|---|
+| BASIC | 5 | 2 | patients, appointments |
+| PRO | 20 | 10 | patients, appointments, payments, reports |
+| ENTERPRISE | -1 (unlimited) | -1 (unlimited) | * (all) |
+
+### New Files
+| File | Purpose |
+|---|---|
+| src/pages/ERPSettings.jsx | ERP config page: tenant table, configure dialog, migration |
+| src/lib/licenseTemplates.js | Plan definitions, getPlanTemplate(), applyPlanTemplate(), ALL_MODULES, MODULE_LABELS |
+| src/lib/erpValidation.js | Validation: validateExpiryDate, validateLimit, validatePlan, validateModules, validateERPSettings |
+
+### Modified Files
+| File | Changes |
+|---|---|
+| src/services/firestoreService.js | Added getTenantById, updateTenantERPFields, getLicenseByKey, updateLicenseERPFields, migrateERPFields, getERPEnrichedTenants |
+| src/components/Sidebar.jsx | Added "ERP Integration" section with "/erp-settings" nav item |
+| src/App.jsx | Added import + Route for ERPSettings |
+
+### ERPSettings Page Features
+- Stats row: Total Tenants, ERP Enabled, ERP Disabled, Active
+- Tenant table: Name, Plan, Status, ERP Enabled, User Limit, Doctor Limit, Modules, Configure
+- Configure Dialog: Tenant Status, ERP toggle, Plan (auto-populates limits), License Status, Expiration, User/Doctor limits (manual override), Module toggles
+- Migration button (idempotent — adds missing fields only)
+- Full validation via erpValidation.js
+
+### Sidebar NAV_ITEMS
+`js
+{
+  section: "ERP Integration",
+  items: [
+    { to: "/erp-settings", icon: "⚡", label: "ERP Settings" },
+  ],
+}
+`
+
+### Related ERP Project (Ziara_WEP_ERP)
+The ERP project reads smartclinicadmin Firestore collections (read-only, community Admin SDK):
+- saas_tenants: tenant status, plan, erpEnabled
+- saas_licenses: plan, maxUsers, maxDoctors, enabledModules, status, expiresAt
+- Enforces limits via LimitEnforcer, validates login via auth.service.ts
+

@@ -157,4 +157,5 @@ clinic-admin/
 | 2026-05-07 | Doctors form: added `bio`, `education`, `city`, `address`, `yearsOfExperience` bilingual fields | `Doctors.jsx` |
 | 2026-05-07 | Specializations converted to EN/AR lookup table (18 items) | `Doctors.jsx` |
 | 2026-05-07 | Tenant stats: replaced unused "Enterprise" with "Pro" count | `Tenants.jsx` |
+| 2026-06-23 | Phase 17C: ERP Integration (additive fields, ERPSettings page, plan templates, validation) | ERPSettings.jsx (new), licenseTemplates.js (new), erpValidation.js (new), irestoreService.js, Sidebar.jsx, App.jsx |
 | 2026-05-07 | Dual-write builders updated for `{en, ar}` structure | `firestoreService.js` |

@@ -156,6 +156,74 @@ service cloud.firestore {
       allow read, write: if isAnyAdmin();
     }
 
+    // ─── Procurement Collections (admin-only) ────────────────────────────
+    match /suppliers/{supplierId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /purchase_orders/{poId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /purchase_order_items/{itemId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /goods_receipts/{receiptId} {
+      allow read: if isAnyAdmin();
+      allow create: if isAnyAdmin();
+      allow update: if isAnyAdmin();
+      allow delete: if false;
+    }
+
+    match /goods_receipt_items/{itemId} {
+      allow read: if isAnyAdmin();
+      allow create: if isAnyAdmin();
+      allow update, delete: if false;
+    }
+
+    match /procurement_audit_log/{logId} {
+      allow read: if isAnyAdmin();
+      allow create: if isAnyAdmin();
+      allow update, delete: if false;
+    }
+
+    match /procurement_meta/{tenantId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    // ─── Inventory Collections (admin-only) ──────────────────────────────
+    match /inventory_categories/{categoryId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /inventory_items/{itemId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /inventory_movements/{movementId} {
+      allow read: if isAnyAdmin();
+      allow create: if isAnyAdmin();
+      allow update, delete: if false;
+    }
+
+    match /inventory_adjustments/{adjustmentId} {
+      allow read: if isAnyAdmin();
+      allow create: if isAnyAdmin();
+      allow update: if isAnyAdmin();
+      allow delete: if false;
+    }
+
+    match /inventory_stock_counts/{countId} {
+      allow read, write: if isAnyAdmin();
+    }
+
+    match /inventory_audit_log/{logId} {
+      allow read: if isAnyAdmin();
+      allow create: if isAnyAdmin();
+      allow update, delete: if false;
+    }
+
     // ─── Deny everything else by default ─────────────────────────────────
     match /{document=**} {
       allow read, write: if false;
