@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { keyframes } from "@mui/system";
-import logo from "../assets/logo.png";
+const logo = "/favicon.svg";
 
 const pulseRing = keyframes`
   0% { transform: scale(0.8); opacity: 0.5; }

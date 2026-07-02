@@ -9,7 +9,7 @@ import { getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
-import logo from "../assets/logo.png";
+const logo = "/favicon.svg";
 import {
   Table, TableBody, TableCell, TableHead, TableRow, TableContainer,
   Button, TextField, Dialog, DialogTitle, DialogContent,

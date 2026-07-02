@@ -5,7 +5,7 @@ import {
   Stepper, Step, StepLabel, Paper
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import logo from '../assets/logo.png';
+const logo = "/favicon.svg";
 
 // ─── Styled Components ─────────────────────────────────────────────────
 

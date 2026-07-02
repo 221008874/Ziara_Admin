@@ -9,7 +9,7 @@ import {
 import { getLang } from "../lib/i18n";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
-import logo from "../assets/logo.png";
+const logo = "/favicon.svg";
 import { PLANS, getPlanTemplate, applyPlanTemplate, ALL_MODULES, MODULE_LABELS } from "../lib/licenseTemplates";
 import { validateERPSettings } from "../lib/erpValidation";
 import { debug } from "../lib/debug";

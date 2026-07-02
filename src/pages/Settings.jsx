@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createBilingual, BilingualInput } from "../lib/i18n";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
-import logo from "../assets/logo.png";
+const logo = "/favicon.svg";
 import {
   Box, Typography, TextField, Button, Switch,
   CircularProgress, Alert, Divider,

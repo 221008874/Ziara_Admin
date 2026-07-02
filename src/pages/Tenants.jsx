@@ -11,7 +11,7 @@ import { debug } from "../lib/debug";
 import { useSidebar } from "../App";
 import { useNavigate } from "react-router-dom";
 import { Hamburger } from "../components/Sidebar";
-import logo from "../assets/logo.png";
+const logo = "/favicon.svg";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,

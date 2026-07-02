@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { Menu, X } from "lucide-react";
-import logo from "../assets/logo.png";
+const logo = "/favicon.svg";
 import { useSidebar } from "../App";
 
 // ─── Styled Components ───────────────────────────────────────────────────────
