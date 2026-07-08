@@ -7,9 +7,6 @@ import Licenses from "./pages/Licenses";
 import Tenants from "./pages/Tenants";
 import Doctors from "./pages/Doctors";
 import Settings from "./pages/Settings";
-import ERPSettings from "./pages/ERPSettings";
-import Inventory from "./pages/Inventory";
-import Procurement from "./pages/Procurement";
 
 import Updates from "./pages/Updates";
 import Login from "./pages/Login";
@@ -89,13 +86,10 @@ export default function App() {
           <Route path="/licenses" element={<Licenses />} />
           <Route path="/updates" element={<Updates />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/procurement" element={<Procurement />} />
           <Route index element={<Navigate to="/tenants" replace />} />
           <Route path="/" element={<Navigate to="/tenants" replace />} />
         </Route>
         {/* Catch-all */}
-                  <Route path="/erp-settings" element={<ERPSettings />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

@@ -1,6 +1,7 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { verifyAdminAuth } from '../../src/lib/auth-middleware';
 
 if (!getApps().length) {
   try {
@@ -33,6 +34,18 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    await verifyAdminAuth(req);
+  } catch (err) {
+    if (err.message === 'AUTH_REQUIRED') {
+      return res.status(401).json({ error: 'Authorization required' });
+    }
+    if (err.message === 'ADMIN_REQUIRED') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    return res.status(401).json({ error: 'Invalid or expired token' });
   }
 
   const { email, password, uid } = req.body;

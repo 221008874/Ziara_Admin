@@ -56,6 +56,12 @@ service cloud.firestore {
     }
 
     // ─── comm_appointments ───────────────────────────────────────────────
+    // SECURITY: CREATE is admin-only to prevent client-controlled
+    // routing fields (providerId, licenseKey, doctorId, tenantId).
+    // The Community App calls POST /api/community/bookings on Ziara ERP,
+    // which validates the doctor and injects trusted routing fields.
+    // UPDATE permits patients/staff but enforces immutable routing fields
+    // so forged providerId/licenseKey/doctorId cannot be injected post-creation.
     match /comm_appointments/{appointmentId} {
       allow read: if request.auth != null && (
         isAnonymous() ||
@@ -63,12 +69,18 @@ service cloud.firestore {
         isTenantStaff(resource.data.tenantId) ||
         isAnyAdmin()
       );
-      allow create: if request.auth != null &&
-        isValidPhone(request.resource.data.patientPhone);
-      allow update: if isAnonymous() ||
+      allow create: if isAnyAdmin();
+      allow update: if request.auth != null && (
+        isAnonymous() ||
         request.auth.token.phone_number == resource.data.patientPhone ||
         isTenantStaff(resource.data.tenantId) ||
-        isAnyAdmin();
+        isAnyAdmin()
+      )
+        && request.resource.data.providerId == resource.data.providerId
+        && request.resource.data.licenseKey == resource.data.licenseKey
+        && request.resource.data.doctorId == resource.data.doctorId
+        && request.resource.data.tenantId == resource.data.tenantId
+        && request.resource.data.providerType == resource.data.providerType;
       allow delete: if isAnyAdmin();
     }
 

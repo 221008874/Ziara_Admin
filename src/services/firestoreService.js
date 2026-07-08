@@ -111,6 +111,7 @@ function buildPublicDoctor(data, doctorId) {
     bio: normalizeBilingual(data.bio),
     photoUrl: data.photoUrl || "",
     tenantId: data.tenantId || data.clinicId || "",
+    providerId: data.providerId || data.tenantId || "",
     clinicName: normalizeBilingual(data.tenantName || data.clinicName),
     city: normalizeBilingual(data.city),
     address: normalizeBilingual(data.address),
@@ -132,6 +133,7 @@ function buildPublicTenant(data, tenantId) {
   return {
     id: tenantId,
     name: normalizeBilingual(data.name || data.clinicName),
+    providerType: data.providerType || "CLINIC",
     city: normalizeBilingual(data.city),
     address: normalizeBilingual(data.address),
     logoUrl: data.logoUrl || "",
@@ -267,6 +269,7 @@ export const updateTenant = async (tenantId, updates) => {
     "address",
     "logoUrl",
     "description",
+    "providerType",
   ].forEach((f) => {
     if (updates[f] !== undefined) publicUpdates[f] = updates[f];
   });
@@ -529,6 +532,7 @@ export const updateDoctor = async (doctorId, updates) => {
     "bio",
     "photoUrl",
     "tenantId",
+    "providerId",
     "clinicId",
     "clinicName",
     "tenantName",

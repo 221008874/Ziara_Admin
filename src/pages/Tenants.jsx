@@ -167,6 +167,7 @@ const BLANK = {
   city: createBilingual(),
   description: createBilingual(),
   plan: "BASIC",
+  providerType: "CLINIC",
   licenseKey: "",
   expiryDate: "",
 };
@@ -233,6 +234,7 @@ export default function Tenants() {
       city: isBilingual(t.city) ? t.city : createBilingual(t.city || ""),
       description: isBilingual(t.description) ? t.description : createBilingual(t.description || ""),
       plan: t.plan || "BASIC",
+      providerType: t.providerType || "CLINIC",
       licenseKey: t.licenseKey || "",
       expiryDate: t.expiryDate || "",
     });
@@ -438,6 +440,13 @@ export default function Tenants() {
               {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>{p}</MenuItem>)}
             </StyledSelect>
           </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Provider Type</InputLabel>
+            <StyledSelect label="Provider Type" value={formData.providerType} onChange={e => setFormData(p => ({ ...p, providerType: e.target.value }))}>
+              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>🏥 Clinic (Multi-Doctor)</MenuItem>
+              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👨‍⚕️ Individual Doctor</MenuItem>
+            </StyledSelect>
+          </FormControl>
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => { setCreateOpen(false); setError(null); }}>Cancel</ActionButton>
             <ActionButton variant="primary" onClick={handleCreate}>Create Tenant</ActionButton>
@@ -460,6 +469,13 @@ export default function Tenants() {
             <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Plan</InputLabel>
             <StyledSelect label="Plan" value={editData.plan} onChange={e => setEditData(p => ({ ...p, plan: e.target.value }))}>
               {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>{p}</MenuItem>)}
+            </StyledSelect>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Provider Type</InputLabel>
+            <StyledSelect label="Provider Type" value={editData.providerType} onChange={e => setEditData(p => ({ ...p, providerType: e.target.value }))}>
+              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>🏥 Clinic (Multi-Doctor)</MenuItem>
+              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👨‍⚕️ Individual Doctor</MenuItem>
             </StyledSelect>
           </FormControl>
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>

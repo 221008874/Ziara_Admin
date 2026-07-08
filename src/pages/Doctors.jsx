@@ -231,6 +231,7 @@ const BLANK = {
   email: "",
   specialization: "",
   tenantId: "",
+  providerId: "",
   tenantName: createBilingual(),
   licenseKey: "",
   photoUrl: "",
@@ -522,6 +523,7 @@ export default function Doctors() {
         setFormData(p => ({
           ...p,
           tenantId: urlTenantId,
+          providerId: urlTenantId,
           tenantName: isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name)),
           licenseKey: t.licenseKey || "",
         }));
@@ -608,6 +610,7 @@ export default function Doctors() {
       email: d.email || "",
       specialization: d.specialization || "",
       tenantId: d.tenantId || "",
+      providerId: d.providerId || d.tenantId || "",
       tenantName: isBilingual(d.tenantName) ? d.tenantName : createBilingual(d.tenantName || ""),
       licenseKey: d.licenseKey || "",
       photoUrl: d.photoUrl || "",
@@ -735,7 +738,7 @@ export default function Doctors() {
         value={obj.tenantId || ""}
         onChange={e => {
           const t = tenants.find(t => t.id === e.target.value);
-          set(p => ({ ...p, tenantId: e.target.value || "", tenantName: t ? (isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name))) : createBilingual(), licenseKey: t?.licenseKey || "" }));
+          set(p => ({ ...p, tenantId: e.target.value || "", providerId: e.target.value || "", tenantName: t ? (isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name))) : createBilingual(), licenseKey: t?.licenseKey || "" }));
         }}
       >
         <MenuItem value="" sx={{ backgroundColor: "#0f1e36", color: "#6b7e9b", fontStyle: "italic" }}>
