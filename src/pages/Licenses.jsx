@@ -345,7 +345,7 @@ export default function Licenses() {
                             {lic.deviceId || "Not bound"}
                           </Typography>
                         </TableCell>
-                        <TableCell>{lic.expiryDate}</TableCell>
+                        <TableCell>{lic.expiryDate?.toDate ? lic.expiryDate.toDate().toLocaleDateString() : lic.expiryDate || "—"}</TableCell>
                         <TableCell>
                           <StatusBadge
                             status={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
