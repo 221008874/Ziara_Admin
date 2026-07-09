@@ -3,7 +3,7 @@ import { Box, Typography, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Building2, Stethoscope, Key, Cloud, Settings } from "lucide-react";
 const logo = "/favicon.svg";
 import { useSidebar } from "../App";
 
@@ -153,16 +153,16 @@ const NAV_ITEMS = [
   {
     section: "Management",
     items: [
-      { to: "/tenants",   icon: "??", label: "Tenants"   },
-      { to: "/doctors",   icon: "??�??", label: "Doctors"   },
-      { to: "/licenses",  icon: "??", label: "Licenses"  },
-      { to: "/updates",   icon: "??", label: "Updates"   },
+      { to: "/tenants",   icon: <Building2 size={16} />, label: "Tenants"   },
+      { to: "/doctors",   icon: <Stethoscope size={16} />, label: "Doctors"   },
+      { to: "/licenses",  icon: <Key size={16} />, label: "Licenses"  },
+      { to: "/updates",   icon: <Cloud size={16} />, label: "Updates"   },
     ],
   },
   {
     section: "System",
     items: [
-      { to: "/settings", icon: "?", label: "SaaS Settings" },
+      { to: "/settings", icon: <Settings size={16} />, label: "SaaS Settings" },
     ],
   },
 ];

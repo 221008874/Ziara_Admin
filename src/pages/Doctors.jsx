@@ -509,6 +509,23 @@ export default function Doctors() {
   const [tenantFilter, setTenantFilter] = useState("ALL");
   const [actionLoading, setActionLoading] = useState(null);
 
+  const load = async () => {
+    debug.action('Doctors', 'Loading doctors and tenants...');
+    try {
+      setLoading(true);
+      setError(null);
+      const [docs, tens] = await Promise.all([getAllDoctors(), getAllTenants()]);
+      setDoctors(docs);
+      setTenants(tens);
+      debug.action('Doctors', `Loaded ${docs.length} doctors, ${tens.length} tenants`);
+    } catch (e) {
+      debug.error('Doctors.load', e);
+      setError("Failed to load data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     debug.component('Doctors', 'Mounted');
     load();
@@ -532,23 +549,6 @@ export default function Doctors() {
       }
     }
   }, [urlTenantId, tenants]);
-
-  const load = async () => {
-    debug.action('Doctors', 'Loading doctors and tenants...');
-    try {
-      setLoading(true);
-      setError(null);
-      const [docs, tens] = await Promise.all([getAllDoctors(), getAllTenants()]);
-      setDoctors(docs);
-      setTenants(tens);
-      debug.action('Doctors', `Loaded ${docs.length} doctors, ${tens.length} tenants`);
-    } catch (e) {
-      debug.error('Doctors.load', e);
-      setError("Failed to load data.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCreate = async () => {
     if (!formData.name.en) {

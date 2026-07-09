@@ -343,7 +343,7 @@ export const deleteTenant = async (tenantId) => {
 
 // ─── DOCTORS (SaaS + COMM dual-write) ─────────────────────────────────────
 export const createDoctor = async (doctorData) => {
-  const { password, confirmPassword, licenseKey, ...doctorPublicData } = doctorData;
+  const { password, licenseKey, ...doctorPublicData } = doctorData;
 
   // If individual doctor (no tenantId) and licenseKey provided, create license
   if (licenseKey && !doctorPublicData.tenantId) {
@@ -506,14 +506,7 @@ export const updateDoctorStatus = async (doctorId, newStatus) => {
 export const updateDoctor = async (doctorId, updates) => {
   // 🔑 If password is being updated, handle Firebase Auth separately
   if (updates.password) {
-    const auth = getAuth();
-    // Note: Password updates should be done via useDoctorAuth.changePassword()
-    // This is just for admin-initiated password resets
-    console.warn(
-      "Password updates via updateDoctor are deprecated. Use changePassword() instead."
-    );
-    // Remove password from Firestore updates (never store in Firestore)
-    const { password, ...updatesWithoutPassword } = updates;
+    const { password: _password, ...updatesWithoutPassword } = updates;
     updates = updatesWithoutPassword;
   }
 
@@ -1733,7 +1726,7 @@ export const cancelPO = async (poId, reason, adminUid) => {
   });
 };
 
-async function recalcPOStatus(poId, tenantId) {
+async function recalcPOStatus(poId, _tenantId) {
   const itemsSnap = await getDocs(query(
     collection(db, COLLECTIONS.PURCHASE_ORDER_ITEMS),
     where("poId", "==", poId)

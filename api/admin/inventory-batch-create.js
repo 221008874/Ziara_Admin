@@ -1,6 +1,5 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
 import { verifyAdminAuth } from '../../src/lib/auth-middleware';
 
 if (!getApps().length) {
@@ -20,7 +19,6 @@ if (!getApps().length) {
   }
 }
 
-const auth = getAuth();
 const firestore = getFirestore();
 
 const VALID_UNITS = ["piece", "box", "bottle", "pack", "kg", "liter", "meter", "strip", "vial", "other"];
@@ -67,7 +65,7 @@ export default async function handler(req, res) {
     const item = items[i];
     const itemErrors = [];
 
-    if (!item.SKU || !/^[A-Za-z0-9\-]+$/.test(item.SKU)) {
+    if (!item.SKU || !/^[A-Za-z0-9-]+$/.test(item.SKU)) {
       itemErrors.push('SKU must be alphanumeric with hyphens only');
     }
     if (!item.name?.en?.trim() || !item.name?.ar?.trim()) {

@@ -187,12 +187,6 @@ export default function Tenants() {
   const [editData, setEditData]       = useState(BLANK);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-  useEffect(() => {
-    debug.component('Tenants', 'Mounted');
-    load();
-    return () => debug.component('Tenants', 'Unmounted');
-  }, []);
-
   const load = async () => {
     debug.action('Tenants', 'Loading tenants...');
     try {
@@ -205,6 +199,12 @@ export default function Tenants() {
       setError("Failed to load tenants.");
     } finally { setLoading(false); }
   };
+
+  useEffect(() => {
+    debug.component('Tenants', 'Mounted');
+    load();
+    return () => debug.component('Tenants', 'Unmounted');
+  }, []);
 
   const handleCreate = async () => {
     if (!formData.name.en) { setError("Tenant name (English) is required"); return; }

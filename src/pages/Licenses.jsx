@@ -154,12 +154,6 @@ export default function Licenses() {
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "", onlineBooking: false });
 
-  useEffect(() => {
-    debug.component('Licenses', 'Mounted');
-    loadLicenses();
-    return () => debug.component('Licenses', 'Unmounted');
-  }, []);
-
   const loadLicenses = async () => {
     debug.action('Licenses', 'Loading licenses...');
     try {
@@ -172,6 +166,12 @@ export default function Licenses() {
       setError("Failed to load licenses. Check console for details.");
     } finally { setLoading(false); }
   };
+
+  useEffect(() => {
+    debug.component('Licenses', 'Mounted');
+    loadLicenses();
+    return () => debug.component('Licenses', 'Unmounted');
+  }, []);
 
   const handleCreate = async () => {
     debug.action('Licenses', 'Creating license', { key: formData.licenseKey, category: formData.category });

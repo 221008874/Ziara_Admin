@@ -70,7 +70,7 @@ export default function Updates() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editAppId, setEditAppId] = useState(null);
+  const [, setEditAppId] = useState(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyAppId, setHistoryAppId] = useState(null);
   const [history, setHistory] = useState([]);
@@ -79,8 +79,6 @@ export default function Updates() {
     releaseNotes: "", releaseDate: "", minVersion: "", forceUpdate: false,
     status: "published", fileSize: "", checksum: "",
   });
-
-  useEffect(() => { loadVersions(); loadServers(); }, []);
 
   const loadVersions = async () => {
     try {
@@ -97,10 +95,12 @@ export default function Updates() {
     try {
       const data = await getClinicServers();
       setServers(data);
-    } catch (err) {
-      debug.error('Updates.servers', err);
+    } catch {
+      // silently ignore
     }
   };
+
+  useEffect(() => { loadVersions(); loadServers(); }, []);
 
   const handleOpenCreate = (appId) => {
     setEditAppId(appId);
@@ -138,7 +138,7 @@ export default function Updates() {
     try {
       await unpublishVersion(appId);
       loadVersions();
-    } catch (err) {
+    } catch {
       setError("Failed to unpublish");
     }
   };
@@ -148,7 +148,7 @@ export default function Updates() {
     try {
       const data = await getReleaseHistory(appId);
       setHistory(data);
-    } catch (err) {
+    } catch {
       setHistory([]);
     }
     setHistoryOpen(true);
@@ -159,7 +159,7 @@ export default function Updates() {
     try {
       await deleteRelease(historyAppId, version);
       setHistory(h => h.filter(r => r.id !== version));
-    } catch (err) {
+    } catch {
       setError("Failed to delete release");
     }
   };

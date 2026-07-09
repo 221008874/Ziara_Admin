@@ -1,6 +1,5 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
 import { verifyAdminAuth } from '../../src/lib/auth-middleware';
 
 if (!getApps().length) {
@@ -20,7 +19,6 @@ if (!getApps().length) {
   }
 }
 
-const auth = getAuth();
 const firestore = getFirestore();
 
 const VALID_REASONS = ["DAMAGE", "LOSS", "FOUND", "EXPIRY", "MANUAL"];
