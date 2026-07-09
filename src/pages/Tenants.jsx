@@ -72,7 +72,7 @@ const StyledTableContainer = styled(Box)({
   "& .MuiTableCell-body": { color: "#dde6f0", fontSize: "13px", padding: "14px 20px", borderBottom: "none" },
 });
 
-const StatusBadge = styled(Chip)(({ status }) => ({
+const StatusBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "status" })(({ status }) => ({
   borderRadius: "12px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", height: "28px", minWidth: "80px",
   cursor: "pointer",
   ...(status === "ACTIVE" ? {
@@ -85,7 +85,7 @@ const StatusBadge = styled(Chip)(({ status }) => ({
   "&:hover": { filter: "brightness(1.2)" },
 }));
 
-const PlanBadge = styled(Chip)(({ plan }) => ({
+const PlanBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "plan" })(({ plan }) => ({
   borderRadius: "8px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", height: "24px",
   ...(plan === "ENTERPRISE" ? {
     backgroundColor: "rgba(139,92,246,0.14)", color: "#a78bfa",
@@ -186,6 +186,7 @@ export default function Tenants() {
   const [formData, setFormData]       = useState(BLANK);
   const [editData, setEditData]       = useState(BLANK);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
 
   const load = async () => {
     debug.action('Tenants', 'Loading tenants...');
@@ -210,6 +211,7 @@ export default function Tenants() {
     if (!formData.name.en) { setError("Tenant name (English) is required"); return; }
     if (!formData.licenseKey) { setError("License key is required"); return; }
     debug.action('Tenants', 'Creating tenant', { name: getLang(formData.name) });
+    setActionLoading('create');
     try {
       setError(null);
       await createTenant(formData);
@@ -220,6 +222,8 @@ export default function Tenants() {
     } catch (e) {
       debug.error('Tenants.create', e);
       setError("Failed to create tenant: " + e.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -244,6 +248,7 @@ export default function Tenants() {
   const handleEdit = async () => {
     if (!editTarget || !editData.name.en) return;
     debug.action('Tenants', `Updating tenant: ${editTarget.id}`);
+    setActionLoading('edit');
     try {
       setError(null);
       await updateTenant(editTarget.id, editData);
@@ -253,6 +258,8 @@ export default function Tenants() {
     } catch (e) {
       debug.error('Tenants.update', e);
       setError("Failed to update tenant: " + e.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -270,6 +277,7 @@ export default function Tenants() {
   const handleDelete = async () => {
     if (!deleteConfirm) return;
     debug.action('Tenants', `Deleting tenant: ${deleteConfirm.id}`);
+    setActionLoading('delete');
     try {
       await deleteTenant(deleteConfirm.id);
       debug.action('Tenants', `Tenant deleted: ${deleteConfirm.id}`);
@@ -278,6 +286,8 @@ export default function Tenants() {
     } catch (e) {
       debug.error('Tenants.delete', e);
       setError("Failed to delete tenant: " + e.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -448,8 +458,8 @@ export default function Tenants() {
             </StyledSelect>
           </FormControl>
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => { setCreateOpen(false); setError(null); }}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleCreate}>Create Tenant</ActionButton>
+            <ActionButton variant="secondary" onClick={() => { setCreateOpen(false); setError(null); }} disabled={actionLoading === 'create'}>Cancel</ActionButton>
+            <ActionButton variant="primary" onClick={handleCreate} disabled={actionLoading === 'create'}>{actionLoading === 'create' ? 'Creating...' : 'Create Tenant'}</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>
@@ -479,8 +489,8 @@ export default function Tenants() {
             </StyledSelect>
           </FormControl>
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setEditOpen(false)}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleEdit}>Save Changes</ActionButton>
+            <ActionButton variant="secondary" onClick={() => setEditOpen(false)} disabled={actionLoading === 'edit'}>Cancel</ActionButton>
+            <ActionButton variant="primary" onClick={handleEdit} disabled={actionLoading === 'edit'}>{actionLoading === 'edit' ? 'Saving...' : 'Save Changes'}</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>
@@ -495,8 +505,8 @@ export default function Tenants() {
             This action cannot be undone. All associated data will be permanently removed.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</ActionButton>
-            <ActionButton variant="danger" onClick={handleDelete}>Delete</ActionButton>
+            <ActionButton variant="secondary" onClick={() => setDeleteConfirm(null)} disabled={actionLoading === 'delete'}>Cancel</ActionButton>
+            <ActionButton variant="danger" onClick={handleDelete} disabled={actionLoading === 'delete'}>{actionLoading === 'delete' ? 'Deleting...' : 'Delete'}</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>

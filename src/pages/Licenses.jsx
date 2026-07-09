@@ -75,7 +75,7 @@ const StyledTableContainer = styled(Box)({
   "& .MuiTableCell-body": { color: "#dde6f0", fontSize: "13px", padding: "14px 20px", borderBottom: "none" },
 });
 
-const StatusBadge = styled(Chip)(({ status }) => ({
+const StatusBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "status" })(({ status }) => ({
   borderRadius: "12px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", height: "28px", minWidth: "80px",
   ...(status === "ACTIVE" ? {
     backgroundColor: "rgba(52,211,153,0.14)", color: "#34d399",
@@ -153,6 +153,7 @@ export default function Licenses() {
   const [newExpiryDate, setNewExpiryDate] = useState("");
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "", onlineBooking: false });
+  const [actionLoading, setActionLoading] = useState(null);
 
   const loadLicenses = async () => {
     debug.action('Licenses', 'Loading licenses...');
@@ -178,6 +179,7 @@ export default function Licenses() {
     if (!formData.licenseKey || !formData.expiryDate) {
       setError("License key and expiry date are required"); return;
     }
+    setActionLoading('create');
     try {
       setError(null);
       await createLicense(formData);
@@ -188,6 +190,8 @@ export default function Licenses() {
     } catch (err) {
       debug.error('Licenses.create', err);
       setError(err.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -226,6 +230,7 @@ export default function Licenses() {
   const handleEditSave = async () => {
     if (!newExpiryDate || !editLicense) return;
     debug.action('Licenses', `Saving expiry: ${editLicense.id} -> ${newExpiryDate}`);
+    setActionLoading('edit');
     try {
       setError(null);
       await updateLicenseExpiry(editLicense.id, newExpiryDate);
@@ -235,6 +240,8 @@ export default function Licenses() {
     } catch (err) {
       debug.error('Licenses.editExpiry', err);
       setError("Failed to update expiry: " + err.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -435,8 +442,8 @@ export default function Licenses() {
             sx={{ mt: 1 }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setOpenDialog(false)}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleCreate}>Create License</ActionButton>
+            <ActionButton variant="secondary" onClick={() => setOpenDialog(false)} disabled={actionLoading === 'create'}>Cancel</ActionButton>
+            <ActionButton variant="primary" onClick={handleCreate} disabled={actionLoading === 'create'}>{actionLoading === 'create' ? 'Creating...' : 'Create License'}</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>
@@ -456,8 +463,8 @@ export default function Licenses() {
             InputLabelProps={{ shrink: true }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleEditSave}>Save</ActionButton>
+            <ActionButton variant="secondary" onClick={() => setEditDialogOpen(false)} disabled={actionLoading === 'edit'}>Cancel</ActionButton>
+            <ActionButton variant="primary" onClick={handleEditSave} disabled={actionLoading === 'edit'}>{actionLoading === 'edit' ? 'Saving...' : 'Save'}</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>

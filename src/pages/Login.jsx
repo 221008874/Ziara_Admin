@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import {
@@ -182,6 +182,8 @@ export default function Login() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const successMessage = location.state?.message;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -192,7 +194,12 @@ export default function Login() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       await userCredential.user.getIdToken(true);
       const tokenClaims = await userCredential.user.getIdTokenResult();
-      console.log("🎫 Token claims:", tokenClaims.claims);
+      const isAdmin = tokenClaims.claims?.admin === true || tokenClaims.claims?.role === "admin";
+      if (!isAdmin) {
+        setError("Access denied. Only admin accounts can access this portal.");
+        setLoading(false);
+        return;
+      }
       navigate("/");
     } catch (err) {
       console.error("Login error:", err);
@@ -226,6 +233,11 @@ export default function Login() {
         </CardHeader>
 
         <Box sx={{ p: "28px 32px 32px", display: "flex", flexDirection: "column", gap: 2.5 }}>
+          {successMessage && (
+            <Alert severity="success" sx={{ backgroundColor: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", borderRadius: "10px" }}>
+              {successMessage}
+            </Alert>
+          )}
           {error && (
             <Alert 
               severity="error" 

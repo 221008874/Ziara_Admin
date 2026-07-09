@@ -15,6 +15,7 @@ import {
   startAfter,
   getDoc,
   writeBatch,
+  Timestamp,
 } from "firebase/firestore";
 
 // ─── CRITICAL: db must be from the SAME modular SDK instance ──────────────
@@ -318,9 +319,12 @@ export const deleteTenant = async (tenantId) => {
     const snap = await getDocs(
       query(collection(db, collectionName), where("tenantId", "==", tenantId))
     );
-    const batch = writeBatch(db);
-    snap.docs.forEach((d) => batch.delete(d.ref));
-    if (snap.docs.length > 0) await batch.commit();
+    const docs = snap.docs;
+    for (let i = 0; i < docs.length; i += 500) {
+      const batch = writeBatch(db);
+      docs.slice(i, i + 500).forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
   };
   await deleteCollectionByTenant(COLLECTIONS.SUPPLIERS);
   await deleteCollectionByTenant(COLLECTIONS.PURCHASE_ORDERS);
@@ -684,11 +688,12 @@ export const markSyncComplete = async (queueItemId) => {
 };
 
 export const markSyncFailed = async (queueItemId, error, retryCount) => {
+  const delayMs = Math.min(5 * 60 * 1000 * Math.pow(2, retryCount || 0), 24 * 60 * 60 * 1000);
   await updateDoc(doc(db, COLLECTIONS.SYNC_QUEUE, queueItemId), {
     status: "FAILED",
     lastError: error,
-    retryCount,
-    nextRetry: serverTimestamp(),
+    retryCount: (retryCount || 0) + 1,
+    nextRetry: Timestamp.fromMillis(Date.now() + delayMs),
   });
 };
 
@@ -1161,12 +1166,11 @@ export const deleteItem = async (itemId, auditData = null) => {
   }
 };
 
-export const getLowStockItems = async (tenantId) => {
+export const getLowStockItems = async (tenantId, _threshold = 0) => {
   const q = query(
     collection(db, COLLECTIONS.INVENTORY_ITEMS),
     where("tenantId", "==", tenantId),
-    where("status", "==", "ACTIVE"),
-    where("currentStock", "<=", "reorderLevel") // intentional: client-side filter after query
+    where("status", "==", "ACTIVE")
   );
   const snapshot = await getDocs(q);
   const all = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));

@@ -19,7 +19,7 @@ import {
   Checkbox, FormControlLabel, IconButton, Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Edit, Trash2, History, PauseCircle, CloudUpload } from "lucide-react";
+import { Trash2, History, PauseCircle, CloudUpload } from "lucide-react";
 
 const PageContainer = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
@@ -70,7 +70,6 @@ export default function Updates() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [, setEditAppId] = useState(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyAppId, setHistoryAppId] = useState(null);
   const [history, setHistory] = useState([]);
@@ -103,7 +102,6 @@ export default function Updates() {
   useEffect(() => { loadVersions(); loadServers(); }, []);
 
   const handleOpenCreate = (appId) => {
-    setEditAppId(appId);
     const existing = versions.find(v => v.appId === appId);
     setFormData({
       appId,

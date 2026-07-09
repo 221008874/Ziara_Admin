@@ -1,5 +1,5 @@
 // src/pages/admin/Doctors.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   getAllDoctors,
@@ -99,7 +99,7 @@ const StyledTableContainer = styled(Box)({
   },
 });
 
-const StatusBadge = styled(Chip)(({ status }) => ({
+const StatusBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "status" })(({ status }) => ({
   borderRadius: "12px",
   fontSize: "10px",
   fontWeight: 700,
@@ -508,6 +508,7 @@ export default function Doctors() {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [tenantFilter, setTenantFilter] = useState("ALL");
   const [actionLoading, setActionLoading] = useState(null);
+  const autoOpened = useRef(false);
 
   const load = async () => {
     debug.action('Doctors', 'Loading doctors and tenants...');
@@ -534,9 +535,11 @@ export default function Doctors() {
 
   // Auto-select tenant from URL query param (e.g. from Tenants page "Add Doctor" button)
   useEffect(() => {
+    if (autoOpened.current) return;
     if (urlTenantId && tenants.length > 0) {
       const t = tenants.find(t => t.id === urlTenantId);
       if (t) {
+        autoOpened.current = true;
         setFormData(p => ({
           ...p,
           tenantId: urlTenantId,

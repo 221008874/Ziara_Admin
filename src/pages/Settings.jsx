@@ -156,7 +156,8 @@ export default function Settings() {
     } finally { setSaving(false); }
   };
 
-  const set = (key) => (e) => setSettings(s => ({ ...s, [key]: e.target.value }));
+  const numericKeys = ["defaultLicenseDays", "maxDevicesPerLicense", "graceperiodDays", "smtpPort"];
+  const set = (key) => (e) => setSettings(s => ({ ...s, [key]: numericKeys.includes(key) ? Number(e.target.value) : e.target.value }));
   const toggle = (key) => () => setSettings(s => ({ ...s, [key]: !s[key] }));
 
   const field = (label, key, opts = {}) => (
