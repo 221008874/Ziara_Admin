@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
 import {
   getAllLicenses,
   createLicense,
@@ -8,6 +11,8 @@ import {
 } from "../services/firestoreService";
 import { createBilingual, getLang, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
+import { normalizeError } from "../lib/errorHandler";
+import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
 const logo = "/favicon.svg";
@@ -143,8 +148,25 @@ const LogoutButton = styled(Button)({
   "&:hover": { backgroundColor: "#f87171", color: "white", borderColor: "#f87171", boxShadow: "0 4px 12px rgba(248,113,113,0.35)" },
 });
 
+function getEffectiveStatus(lic) {
+  if (!lic.expiryDate) return lic.status || "INACTIVE";
+  let expiry;
+  if (lic.expiryDate?.toDate) {
+    expiry = lic.expiryDate.toDate();
+  } else if (typeof lic.expiryDate === "string") {
+    expiry = new Date(lic.expiryDate);
+  } else if (lic.expiryDate instanceof Date) {
+    expiry = lic.expiryDate;
+  } else {
+    return lic.status || "INACTIVE";
+  }
+  if (expiry < new Date()) return "EXPIRED";
+  return lic.status || "INACTIVE";
+}
+
 export default function Licenses() {
   const { toggle } = useSidebar();
+  const { showNotification } = useNotification();
   const [licenses, setLicenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -164,7 +186,8 @@ export default function Licenses() {
       debug.action('Licenses', `Loaded ${data.length} licenses`);
     } catch (err) {
       debug.error('Licenses.load', err);
-      setError("Failed to load licenses. Check console for details.");
+      const n = normalizeError(err);
+      setError(n.message);
     } finally { setLoading(false); }
   };
 
@@ -184,12 +207,14 @@ export default function Licenses() {
       setError(null);
       await createLicense(formData);
       debug.action('Licenses', 'License created', { key: formData.licenseKey });
+      showNotification("License created successfully", "success");
       setOpenDialog(false);
       setFormData({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "", onlineBooking: false });
       loadLicenses();
     } catch (err) {
       debug.error('Licenses.create', err);
-      setError(err.message);
+      const n = normalizeError(err);
+      setError(n.message);
     } finally {
       setActionLoading(null);
     }
@@ -197,26 +222,36 @@ export default function Licenses() {
 
   const toggleStatus = async (docId, currentStatus) => {
     debug.action('Licenses', `Toggling status: ${docId} (${currentStatus} -> ${currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE"})`);
+    setActionLoading(`status-${docId}`);
     try {
       const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
       await updateLicenseStatus(docId, newStatus);
       debug.action('Licenses', `Status updated: ${docId} -> ${newStatus}`);
+      showNotification(`License ${newStatus === "ACTIVE" ? "activated" : "deactivated"}`, "success");
       loadLicenses();
     } catch (err) {
       debug.error('Licenses.toggleStatus', err);
-      setError("Failed to update license status");
+      const n = normalizeError(err);
+      setError(n.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const toggleOnlineBooking = async (docId, currentEnabled) => {
     debug.action('Licenses', `Toggling online booking: ${docId} (${currentEnabled} -> ${!currentEnabled})`);
+    setActionLoading(`booking-${docId}`);
     try {
       await updateLicenseOnlineBooking(docId, !currentEnabled);
       debug.action('Licenses', `Online booking updated: ${docId} -> ${!currentEnabled}`);
+      showNotification(`Online booking ${currentEnabled ? "disabled" : "enabled"}`, "success");
       loadLicenses();
     } catch (err) {
       debug.error('Licenses.toggleOnlineBooking', err);
-      setError("Failed to update online booking");
+      const n = normalizeError(err);
+      setError(n.message);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -235,20 +270,26 @@ export default function Licenses() {
       setError(null);
       await updateLicenseExpiry(editLicense.id, newExpiryDate);
       debug.action('Licenses', `Expiry saved: ${editLicense.id} -> ${newExpiryDate}`);
+      showNotification("License expiry updated", "success");
       setEditDialogOpen(false);
       loadLicenses();
     } catch (err) {
       debug.error('Licenses.editExpiry', err);
-      setError("Failed to update expiry: " + err.message);
+      const n = normalizeError(err);
+      setError(n.message);
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleLogout = () => {
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch { /* noop */ }
     localStorage.removeItem("clinic_admin_logged");
     localStorage.removeItem("clinic_admin_user");
-    window.location.href = "/login";
+    navigate("/login");
   };
 
   if (loading) {
@@ -349,15 +390,15 @@ export default function Licenses() {
                         <TableCell>{lic.phone || "—"}</TableCell>
                         <TableCell>
                           <Typography sx={{ fontFamily: "monospace", color: lic.deviceId ? "#34d399" : "#6a8aaa", fontSize: "12px" }}>
-                            {lic.deviceId || "Not bound"}
+                            {lic.deviceFingerprint || "Not bound"}
                           </Typography>
                         </TableCell>
                         <TableCell>{lic.expiryDate?.toDate ? lic.expiryDate.toDate().toLocaleDateString() : lic.expiryDate || "—"}</TableCell>
                         <TableCell>
                           <StatusBadge
-                            status={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
-                            label={lic.status === "EXPIRED" ? "EXPIRED" : lic.status}
-                            onClick={() => lic.status !== "EXPIRED" && toggleStatus(lic.id, lic.status)}
+                            status={getEffectiveStatus(lic)}
+                            label={getEffectiveStatus(lic)}
+                            onClick={() => getEffectiveStatus(lic) !== "EXPIRED" && actionLoading !== `status-${lic.id}` && toggleStatus(lic.id, lic.status)}
                             size="small"
                           />
                         </TableCell>
@@ -365,7 +406,7 @@ export default function Licenses() {
                           <Chip
                             label={lic.onlineBooking ? "Enabled" : "Disabled"}
                             size="small"
-                            onClick={() => toggleOnlineBooking(lic.id, lic.onlineBooking)}
+                            onClick={() => actionLoading !== `booking-${lic.id}` && toggleOnlineBooking(lic.id, lic.onlineBooking)}
                             sx={{
                               fontWeight: 600, fontSize: "10px", cursor: "pointer",
                               backgroundColor: lic.onlineBooking ? "rgba(34,197,94,0.14)" : "rgba(100,116,139,0.14)",

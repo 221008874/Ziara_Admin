@@ -8,6 +8,8 @@ import {
 } from "../services/firestoreService";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
+import { normalizeError } from "../lib/errorHandler";
+import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
 import { useNavigate } from "react-router-dom";
 import { Hamburger } from "../components/Sidebar";
@@ -176,6 +178,7 @@ const BLANK = {
 
 export default function Tenants() {
   const { toggle } = useSidebar();
+  const { showNotification } = useNotification();
   const navigate = useNavigate();
   const [tenants, setTenants]         = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -197,7 +200,7 @@ export default function Tenants() {
       debug.action('Tenants', `Loaded ${data.length} tenants`);
     } catch (e) {
       debug.error('Tenants.load', e);
-      setError("Failed to load tenants.");
+      setError(normalizeError(e).message);
     } finally { setLoading(false); }
   };
 
@@ -216,12 +219,13 @@ export default function Tenants() {
       setError(null);
       await createTenant(formData);
       debug.action('Tenants', 'Tenant created');
+      showNotification("Tenant created successfully", "success");
       setCreateOpen(false);
       setFormData(BLANK);
       load();
     } catch (e) {
       debug.error('Tenants.create', e);
-      setError("Failed to create tenant: " + e.message);
+      setError(normalizeError(e).message);
     } finally {
       setActionLoading(null);
     }
@@ -253,11 +257,12 @@ export default function Tenants() {
       setError(null);
       await updateTenant(editTarget.id, editData);
       debug.action('Tenants', `Tenant updated: ${editTarget.id}`);
+      showNotification("Tenant updated successfully", "success");
       setEditOpen(false);
       load();
     } catch (e) {
       debug.error('Tenants.update', e);
-      setError("Failed to update tenant: " + e.message);
+      setError(normalizeError(e).message);
     } finally {
       setActionLoading(null);
     }
@@ -268,9 +273,10 @@ export default function Tenants() {
     try {
       await updateTenantStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE");
       debug.action('Tenants', `Status updated: ${id}`);
+      showNotification("Status updated", "success");
       load();
-    } catch {
-      setError("Failed to update status");
+    } catch (e) {
+      setError(normalizeError(e).message);
     }
   };
 
@@ -281,11 +287,12 @@ export default function Tenants() {
     try {
       await deleteTenant(deleteConfirm.id);
       debug.action('Tenants', `Tenant deleted: ${deleteConfirm.id}`);
+      showNotification("Tenant deleted", "success");
       setDeleteConfirm(null);
       load();
     } catch (e) {
       debug.error('Tenants.delete', e);
-      setError("Failed to delete tenant: " + e.message);
+      setError(normalizeError(e).message);
     } finally {
       setActionLoading(null);
     }

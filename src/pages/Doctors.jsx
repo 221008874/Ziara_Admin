@@ -12,6 +12,8 @@ import {
 import { uploadImageToCloudinary } from "../lib/cloudinary";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
+import { normalizeError } from "../lib/errorHandler";
+import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
 const logo = "/favicon.svg";
@@ -494,6 +496,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
 
 export default function Doctors() {
   const { toggle } = useSidebar();
+  const { showNotification } = useNotification();
   const [searchParams] = useSearchParams();
   const urlTenantId = searchParams.get("tenantId");
   const [doctors, setDoctors] = useState([]);
@@ -521,7 +524,7 @@ export default function Doctors() {
       debug.action('Doctors', `Loaded ${docs.length} doctors, ${tens.length} tenants`);
     } catch (e) {
       debug.error('Doctors.load', e);
-      setError("Failed to load data.");
+      setError(normalizeError(e).message);
     } finally {
       setLoading(false);
     }
@@ -594,12 +597,13 @@ export default function Doctors() {
       const { confirmPassword: _cp, ...doctorData } = formData;
       await createDoctor(doctorData);
       debug.action('Doctors', 'Doctor created', { email: formData.email });
+      showNotification("Doctor created successfully", "success");
       setCreateOpen(false);
       setFormData(BLANK);
       load();
     } catch (e) {
       debug.error('Doctors.create', e);
-      setError("Failed to create doctor: " + e.message);
+      setError(normalizeError(e).message);
     } finally {
       setActionLoading(null);
     }
@@ -664,11 +668,12 @@ export default function Doctors() {
       }
       await updateDoctor(editTarget.id, updateData);
       debug.action('Doctors', 'Doctor updated', { id: editTarget.id });
+      showNotification("Doctor updated successfully", "success");
       setEditOpen(false);
       load();
     } catch (e) {
       debug.error('Doctors.update', e);
-      setError("Failed to update doctor: " + e.message);
+      setError(normalizeError(e).message);
     } finally {
       setActionLoading(null);
     }
@@ -680,10 +685,11 @@ export default function Doctors() {
     try {
       await updateDoctorStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE");
       debug.action('Doctors', `Status updated: ${id}`);
+      showNotification("Status updated", "success");
       load();
     } catch (e) {
       debug.error('Doctors.toggleStatus', e);
-      setError("Failed to update status");
+      setError(normalizeError(e).message);
     } finally {
       setActionLoading(null);
     }
@@ -696,11 +702,12 @@ export default function Doctors() {
     try {
       await deleteDoctor(deleteConfirm.id);
       debug.action('Doctors', 'Doctor deleted', { id: deleteConfirm.id });
+      showNotification("Doctor deleted", "success");
       setDeleteConfirm(null);
       load();
     } catch (e) {
       debug.error('Doctors.delete', e);
-      setError("Failed to delete doctor: " + e.message);
+      setError(normalizeError(e).message);
     } finally {
       setActionLoading(null);
     }

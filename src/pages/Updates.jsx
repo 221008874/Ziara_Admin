@@ -8,6 +8,8 @@ import {
   getClinicServers,
 } from "../services/firestoreService";
 import { debug } from "../lib/debug";
+import { normalizeError } from "../lib/errorHandler";
+import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
 const logo = "/favicon.svg";
@@ -65,11 +67,14 @@ const APP_META = {
 
 export default function Updates() {
   const { toggle } = useSidebar();
+  const { showNotification } = useNotification();
   const [versions, setVersions] = useState([]);
   const [servers, setServers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyAppId, setHistoryAppId] = useState(null);
   const [history, setHistory] = useState([]);
@@ -86,7 +91,7 @@ export default function Updates() {
       setVersions(data);
     } catch (err) {
       debug.error('Updates.load', err);
-      setError("Failed to load versions");
+      setError(normalizeError(err).message);
     } finally { setLoading(false); }
   };
 
@@ -94,8 +99,8 @@ export default function Updates() {
     try {
       const data = await getClinicServers();
       setServers(data);
-    } catch {
-      // silently ignore
+    } catch (err) {
+      debug.error('Updates.loadServers', err);
     }
   };
 
@@ -122,22 +127,27 @@ export default function Updates() {
 
   const handlePublish = async () => {
     if (!formData.version) { setError("Version is required"); return; }
+    setPublishLoading(true);
     try {
       setError(null);
       await publishVersion(formData.appId, formData);
+      showNotification("Update published successfully", "success");
       setOpenDialog(false);
       loadVersions();
     } catch (err) {
-      setError(err.message);
+      setError(normalizeError(err).message);
+    } finally {
+      setPublishLoading(false);
     }
   };
 
   const handleUnpublish = async (appId) => {
     try {
       await unpublishVersion(appId);
+      showNotification("Update unpublished", "success");
       loadVersions();
-    } catch {
-      setError("Failed to unpublish");
+    } catch (err) {
+      setError(normalizeError(err).message);
     }
   };
 
@@ -146,19 +156,21 @@ export default function Updates() {
     try {
       const data = await getReleaseHistory(appId);
       setHistory(data);
-    } catch {
+    } catch (err) {
+      debug.error('Updates.loadHistory', err);
       setHistory([]);
     }
     setHistoryOpen(true);
   };
 
   const handleDeleteRelease = async (version) => {
-    if (!confirm(`Delete release ${historyAppId} v${version}?`)) return;
     try {
       await deleteRelease(historyAppId, version);
+      showNotification("Release deleted", "success");
       setHistory(h => h.filter(r => r.id !== version));
-    } catch {
-      setError("Failed to delete release");
+      setDeleteConfirm(null);
+    } catch (err) {
+      setError(normalizeError(err).message);
     }
   };
 
@@ -271,7 +283,7 @@ export default function Updates() {
                   servers.map(s => (
                     <TableRow key={s.id}>
                       <TableCell sx={{ color: "#eaf2ff", fontFamily: "monospace", fontSize: "12px" }}>{s.macAddress || s.id || "—"}</TableCell>
-                      <TableCell sx={{ color: "#6a8aaa" }}>{s.ipAddress || "—"}</TableCell>
+                      <TableCell sx={{ color: "#6a8aaa" }}>{s.localIp || s.ipAddress || "—"}</TableCell>
                       <TableCell sx={{ color: "#6a8aaa" }}>{s.port || "—"}</TableCell>
                       <TableCell sx={{ color: "#34d399", fontFamily: "monospace", fontSize: "12px" }}>{s.licenseKey || "—"}</TableCell>
                       <TableCell sx={{ color: "#6a8aaa" }}>{s.version || "—"}</TableCell>
@@ -327,8 +339,10 @@ export default function Updates() {
           />
 
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setOpenDialog(false)}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handlePublish}>Publish</ActionButton>
+            <ActionButton variant="secondary" onClick={() => setOpenDialog(false)} disabled={publishLoading}>Cancel</ActionButton>
+            <ActionButton variant="primary" onClick={handlePublish} disabled={publishLoading}>
+              {publishLoading ? "Publishing…" : "Publish"}
+            </ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>
@@ -361,7 +375,7 @@ export default function Updates() {
                     <TableCell><StatusBadge status={r.status || "archived"}>{(r.status || "archived").toUpperCase()}</StatusBadge></TableCell>
                     <TableCell align="right">
                       <Tooltip title="Delete">
-                        <IconButton size="small" onClick={() => handleDeleteRelease(r.id)} sx={{ color: "#f87171" }}>
+                        <IconButton size="small" onClick={() => setDeleteConfirm(r.id)} sx={{ color: "#f87171" }}>
                           <Trash2 size={16} />
                         </IconButton>
                       </Tooltip>
@@ -373,6 +387,19 @@ export default function Updates() {
           )}
           <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => setHistoryOpen(false)}>Close</ActionButton>
+          </Box>
+        </DialogContent>
+      </StyledDialog>
+      {/* Delete Confirm Dialog */}
+      <StyledDialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ color: "#eaf2ff", backgroundColor: "#0b1628" }}>Delete Release</DialogTitle>
+        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+          <Typography sx={{ color: "#dde6f0", mb: 3 }}>
+            Delete <strong style={{ color: "#f87171" }}>{historyAppId} v{deleteConfirm}</strong>? This cannot be undone.
+          </Typography>
+          <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
+            <ActionButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</ActionButton>
+            <ActionButton variant="danger" onClick={() => handleDeleteRelease(deleteConfirm)}>Delete</ActionButton>
           </Box>
         </DialogContent>
       </StyledDialog>

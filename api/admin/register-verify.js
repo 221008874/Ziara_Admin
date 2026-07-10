@@ -69,8 +69,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid email format' });
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
   }
 
   try {
@@ -170,7 +170,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'This email is already registered' });
     }
     if (error.code === 'auth/invalid-password') {
-      return res.status(400).json({ error: 'Password is too weak. Use at least 6 characters.' });
+      return res.status(400).json({ error: 'Password is too weak. Use at least 8 characters.' });
     }
     
     return res.status(500).json({ error: 'Failed to create account. Please try again.' });

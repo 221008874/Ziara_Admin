@@ -25,5 +25,12 @@ firebase-service-account.json
 service-account.json
 *.p12
 *.pem
-.vercel
 .env*.local
+
+# Runtime data (never commit)
+*.db
+*.trace.db
+clinic_server_license.json
+error-log.txt
+jwt-secret.key
+*.mv.db
