@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import {
   getAllTenants,
   createTenant,
   updateTenant,
   updateTenantStatus,
   deleteTenant,
+  triggerERPSync,
+  getAllLicenses,
+  getAllDoctors,
 } from "../services/firestoreService";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
@@ -18,11 +21,11 @@ import {
   Table, TableBody, TableCell, TableHead, TableRow,
   Button, TextField, Dialog, DialogTitle, DialogContent,
   Select, MenuItem, FormControl, InputLabel,
-  CircularProgress, Alert, Box, Typography, Chip,
+  CircularProgress, Alert, Box, Typography, Chip, Checkbox, FormControlLabel, FormGroup,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Design Tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const PageContainer = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
@@ -101,6 +104,23 @@ const PlanBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "plan" })
   }),
 }));
 
+const PLAN_LIMITS = {
+  BASIC: "5 users, 2 doctors",
+  PRO: "20 users, 10 doctors",
+  ENTERPRISE: "Unlimited users, unlimited doctors",
+};
+
+const FeatureChip = styled(Chip, { shouldForwardProp: (prop) => prop !== "feature" })(({ feature }) => ({
+  borderRadius: "6px", fontSize: "10px", fontWeight: 600, height: "22px",
+  ...(feature === "erp" ? {
+    backgroundColor: "rgba(59,130,246,0.14)", color: "#60a5fa",
+    border: "1px solid rgba(59,130,246,0.28)",
+  } : {
+    backgroundColor: "rgba(15,184,166,0.10)", color: "#2dd4bf",
+    border: "1px solid rgba(15,184,166,0.20)",
+  }),
+}));
+
 const ActionButton = styled(Button)(({ variant: v }) => ({
   borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px", transition: "all 0.2s ease",
   ...(v === "primary" ? {
@@ -159,7 +179,7 @@ const StatCard = styled(Box)({
   padding: "18px 22px", flex: "1 1 0", minWidth: 0,
 });
 
-// ─── Blank form state ────────────────────────────────────────────────────────
+// â”€â”€â”€ Blank form state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const BLANK = {
   name: createBilingual(),
@@ -172,15 +192,17 @@ const BLANK = {
   providerType: "CLINIC",
   licenseKey: "",
   expiryDate: "",
+  features: ["desktop"],
 };
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export default function Tenants() {
   const { toggle } = useSidebar();
   const { showNotification } = useNotification();
   const navigate = useNavigate();
   const [tenants, setTenants]         = useState([]);
+  const [doctors, setDoctors]         = useState([]);
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [createOpen, setCreateOpen]   = useState(false);
@@ -190,14 +212,25 @@ export default function Tenants() {
   const [editData, setEditData]       = useState(BLANK);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
+  const [allLicenses, setAllLicenses] = useState([]);
+
+  const loadAvailableLicenses = async () => {
+    try {
+      const data = await getAllLicenses();
+      setAllLicenses(data);
+    } catch (e) {
+      debug.error('Tenants.loadLicenses', e);
+    }
+  };
 
   const load = async () => {
     debug.action('Tenants', 'Loading tenants...');
     try {
       setLoading(true); setError(null);
-      const data = await getAllTenants();
+      const [data, docData] = await Promise.all([getAllTenants(), getAllDoctors()]);
       setTenants(data);
-      debug.action('Tenants', `Loaded ${data.length} tenants`);
+      setDoctors(docData);
+      debug.action('Tenants', `Loaded ${data.length} tenants, ${docData.length} doctors`);
     } catch (e) {
       debug.error('Tenants.load', e);
       setError(normalizeError(e).message);
@@ -220,6 +253,9 @@ export default function Tenants() {
       await createTenant(formData);
       debug.action('Tenants', 'Tenant created');
       showNotification("Tenant created successfully", "success");
+      triggerERPSync().then(r => {
+        if (!r.success) showNotification(r.message, "warning");
+      });
       setCreateOpen(false);
       setFormData(BLANK);
       load();
@@ -245,6 +281,7 @@ export default function Tenants() {
       providerType: t.providerType || "CLINIC",
       licenseKey: t.licenseKey || "",
       expiryDate: t.expiryDate || "",
+      features: t.features || ["desktop"],
     });
     setEditOpen(true);
   };
@@ -258,6 +295,9 @@ export default function Tenants() {
       await updateTenant(editTarget.id, editData);
       debug.action('Tenants', `Tenant updated: ${editTarget.id}`);
       showNotification("Tenant updated successfully", "success");
+      triggerERPSync().then(r => {
+        if (!r.success) showNotification(r.message, "warning");
+      });
       setEditOpen(false);
       load();
     } catch (e) {
@@ -300,6 +340,12 @@ export default function Tenants() {
 
   const active   = tenants.filter(t => t.status === "ACTIVE").length;
   const inactive = tenants.filter(t => t.status === "INACTIVE").length;
+  const doctorCountByTenant = {};
+  doctors.forEach(d => {
+    if (d.tenantId) doctorCountByTenant[d.tenantId] = (doctorCountByTenant[d.tenantId] || 0) + 1;
+  });
+
+  const getPlanDoctorLimit = (plan) => ({ BASIC: 2, PRO: 10, ENTERPRISE: Infinity }[plan] || Infinity);
 
   if (loading) {
     return (
@@ -333,7 +379,7 @@ export default function Tenants() {
             <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Manage clinics & organizations</Typography>
           </Box>
         </Box>
-        <ActionButton variant="primary" onClick={() => setCreateOpen(true)} sx={{ fontSize: { xs: "11px", sm: "12px" }, px: { xs: 2, sm: 3 } }}>
+        <ActionButton variant="primary" onClick={() => { setCreateOpen(true); loadAvailableLicenses(); }} sx={{ fontSize: { xs: "11px", sm: "12px" }, px: { xs: 2, sm: 3 } }}>
           <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>+ </Box>New Tenant
         </ActionButton>
       </TopBar>
@@ -370,6 +416,7 @@ export default function Tenants() {
                     <TableCell>Contact Email</TableCell>
                     <TableCell>Phone</TableCell>
                     <TableCell>Plan</TableCell>
+                    <TableCell>Features</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Created</TableCell>
                     <TableCell align="right">Actions</TableCell>
@@ -378,9 +425,9 @@ export default function Tenants() {
                 <TableBody>
                   {tenants.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8}>
+                      <TableCell colSpan={9}>
                         <EmptyState>
-                          <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>🏥</Typography>
+                          <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>ًںڈ¥</Typography>
                           <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants yet</Typography>
                           <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New Tenant" to onboard your first clinic</Typography>
                         </EmptyState>
@@ -398,17 +445,42 @@ export default function Tenants() {
                               {getLang(t.name, "ar")}
                             </Typography>
                           )}
-                          {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || "—"}</Typography>}
+                          {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || "â€”"}</Typography>}
                         </TableCell>
                         <TableCell>
-                          <Typography sx={{ color: t.licenseKey ? "#34d399" : "#4a6080", fontSize: "13px", fontFamily: "monospace" }}>
-                            {t.licenseKey || "—"}
-                          </Typography>
+                          <Box sx={{ display: "flex", flexDirection: "column" }}>
+                            <Typography sx={{ color: t.licenseKey ? "#34d399" : "#4a6080", fontSize: "13px", fontFamily: "monospace" }}>
+                              {t.licenseKey || "—"}
+                            </Typography>
+                            {t.expiryDate && (
+                              <Typography sx={{ fontSize: "10px", color: "#4a6080", fontFamily: "monospace" }}>
+                                expires {typeof t.expiryDate === "string" ? t.expiryDate : t.expiryDate?.toDate?.().toLocaleDateString() || ""}
+                              </Typography>
+                            )}
+                          </Box>
                         </TableCell>
-                        <TableCell>{t.contactEmail || "—"}</TableCell>
-                        <TableCell>{t.contactPhone || "—"}</TableCell>
+                        <TableCell>{t.contactEmail || "â€”"}</TableCell>
+                        <TableCell>{t.contactPhone || "â€”"}</TableCell>
                         <TableCell>
                           <PlanBadge plan={t.plan} label={t.plan || "BASIC"} size="small" />
+                          {(() => {
+                            const used = doctorCountByTenant[t.id] || 0;
+                            const limit = getPlanDoctorLimit(t.plan);
+                            const isOver = limit !== Infinity && used > limit;
+                            return (
+                              <Typography sx={{ fontSize: "10px", color: isOver ? "#f87171" : "#4a6080", mt: 0.25 }}>
+                                {used}/{limit === Infinity ? "∞" : limit} doctors
+                              </Typography>
+                            );
+                          })()}
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: "flex", gap: 0.5 }}>
+                            {(t.features || ["desktop"]).map(f => (
+                              <FeatureChip key={f} feature={f} label={f === "erp" ? "ERP" : "Desktop"} size="small" />
+                            ))}
+                            {(!t.features || t.features.length === 0) && <Typography sx={{ color: "#4a6080", fontSize: "11px" }}>—</Typography>}
+                          </Box>
                         </TableCell>
                         <TableCell>
                           <StatusBadge
@@ -420,7 +492,7 @@ export default function Tenants() {
                         </TableCell>
                         <TableCell>
                           <Typography sx={{ fontSize: "12px", color: "#4a6080" }}>
-                            {t.createdAt?.toDate?.().toLocaleDateString() || "—"}
+                            {t.createdAt?.toDate?.().toLocaleDateString() || "â€”"}
                           </Typography>
                         </TableCell>
                         <TableCell align="right">
@@ -443,12 +515,47 @@ export default function Tenants() {
       <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth fullScreen={false} sx={{ "& .MuiDialog-paper": { maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle>Create New Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
-          <BilingualInput label="Address" labelAr="العنوان" value={formData.address} onChange={v => setFormData(p => ({ ...p, address: v }))} />
-          <BilingualInput label="City" labelAr="المدينة" value={formData.city} onChange={v => setFormData(p => ({ ...p, city: v }))} />
-          <BilingualInput label="Description" labelAr="الوصف" value={formData.description} onChange={v => setFormData(p => ({ ...p, description: v }))} />
-          {field("License Key *", "licenseKey", formData, setFormData, { placeholder: "LIC-2026-001" })}
-          {field("Expiry Date", "expiryDate", formData, setFormData, { type: "date", InputLabelProps: { shrink: true } })}
+          <BilingualInput label="Clinic / Organization Name" labelAr="ط§ط³ظ… ط§ظ„ط¹ظٹط§ط¯ط© / ط§ظ„ظ…ظ†ط¸ظ…ط©" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
+          <BilingualInput label="Address" labelAr="ط§ظ„ط¹ظ†ظˆط§ظ†" value={formData.address} onChange={v => setFormData(p => ({ ...p, address: v }))} />
+          <BilingualInput label="City" labelAr="ط§ظ„ظ…ط¯ظٹظ†ط©" value={formData.city} onChange={v => setFormData(p => ({ ...p, city: v }))} />
+          <BilingualInput label="Description" labelAr="ط§ظ„ظˆطµظپ" value={formData.description} onChange={v => setFormData(p => ({ ...p, description: v }))} />
+          <FormControl fullWidth margin="normal">
+            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>License Key *</InputLabel>
+            <StyledSelect
+              label="License Key *"
+              value={formData.licenseKey}
+              onChange={e => {
+                const key = e.target.value;
+                const lic = allLicenses.find(l => l.licenseKey === key);
+                setFormData(p => ({
+                  ...p,
+                  licenseKey: key,
+                  expiryDate: lic?.expiryDate || p.expiryDate,
+                }));
+              }}
+            >
+              <MenuItem value="" sx={{ backgroundColor: "#0f1e36", color: "#4a6080", fontStyle: "italic" }}>
+                — Select a license —
+              </MenuItem>
+              {allLicenses
+                .filter(l => l.category === "tenant" || !tenants.some(t => t.licenseKey === l.licenseKey))
+                .map(l => (
+                  <MenuItem key={l.licenseKey} value={l.licenseKey} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", gap: 2 }}>
+                      <span style={{ fontFamily: "monospace" }}>{l.licenseKey}</span>
+                      <span style={{ color: "#4a6080", fontSize: "12px" }}>
+                        {l.status} {l.expiryDate ? `· ${l.expiryDate}` : ""}
+                      </span>
+                    </Box>
+                  </MenuItem>
+                ))}
+              {allLicenses.length === 0 && (
+                <MenuItem disabled sx={{ backgroundColor: "#0f1e36", color: "#4a6080" }}>
+                  No licenses available — create one in Licenses first
+                </MenuItem>
+              )}
+            </StyledSelect>
+          </FormControl>
           {field("Contact Email", "contactEmail", formData, setFormData, { type: "email" })}
           {field("Contact Phone", "contactPhone", formData, setFormData, { placeholder: "010xxxxxxxx" })}
           <FormControl fullWidth margin="normal">
@@ -456,13 +563,29 @@ export default function Tenants() {
             <StyledSelect label="Plan" value={formData.plan} onChange={e => setFormData(p => ({ ...p, plan: e.target.value }))}>
               {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>{p}</MenuItem>)}
             </StyledSelect>
+            <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 0.5, ml: 1 }}>
+              {formData.plan}: {PLAN_LIMITS[formData.plan]}
+            </Typography>
           </FormControl>
           <FormControl fullWidth margin="normal">
             <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Provider Type</InputLabel>
             <StyledSelect label="Provider Type" value={formData.providerType} onChange={e => setFormData(p => ({ ...p, providerType: e.target.value }))}>
-              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>🏥 Clinic (Multi-Doctor)</MenuItem>
-              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👨‍⚕️ Individual Doctor</MenuItem>
+              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>ًںڈ¥ Clinic (Multi-Doctor)</MenuItem>
+              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>ًں‘¨â€چâڑ•ï¸ڈ Individual Doctor</MenuItem>
             </StyledSelect>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>Features</Typography>
+            <FormGroup row>
+              <FormControlLabel
+                control={<Checkbox checked={formData.features?.includes('desktop') || false} onChange={e => { const a = formData.features || []; setFormData(p => ({ ...p, features: e.target.checked ? [...a, 'desktop'] : a.filter(x => x !== 'desktop') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
+                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>Desktop App</Typography>}
+              />
+              <FormControlLabel
+                control={<Checkbox checked={formData.features?.includes('erp') || false} onChange={e => { const a = formData.features || []; setFormData(p => ({ ...p, features: e.target.checked ? [...a, 'erp'] : a.filter(x => x !== 'erp') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
+                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>ERP Web</Typography>}
+              />
+            </FormGroup>
           </FormControl>
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => { setCreateOpen(false); setError(null); }} disabled={actionLoading === 'create'}>Cancel</ActionButton>
@@ -474,10 +597,10 @@ export default function Tenants() {
       <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth sx={{ "& .MuiDialog-paper": { maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle>Edit Tenant</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />
-          <BilingualInput label="Address" labelAr="العنوان" value={editData.address} onChange={v => setEditData(p => ({ ...p, address: v }))} />
-          <BilingualInput label="City" labelAr="المدينة" value={editData.city} onChange={v => setEditData(p => ({ ...p, city: v }))} />
-          <BilingualInput label="Description" labelAr="الوصف" value={editData.description} onChange={v => setEditData(p => ({ ...p, description: v }))} />
+          <BilingualInput label="Clinic / Organization Name" labelAr="ط§ط³ظ… ط§ظ„ط¹ظٹط§ط¯ط© / ط§ظ„ظ…ظ†ط¸ظ…ط©" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />
+          <BilingualInput label="Address" labelAr="ط§ظ„ط¹ظ†ظˆط§ظ†" value={editData.address} onChange={v => setEditData(p => ({ ...p, address: v }))} />
+          <BilingualInput label="City" labelAr="ط§ظ„ظ…ط¯ظٹظ†ط©" value={editData.city} onChange={v => setEditData(p => ({ ...p, city: v }))} />
+          <BilingualInput label="Description" labelAr="ط§ظ„ظˆطµظپ" value={editData.description} onChange={v => setEditData(p => ({ ...p, description: v }))} />
           {field("License Key", "licenseKey", editData, setEditData, { disabled: true })}
           {field("Expiry Date", "expiryDate", editData, setEditData, { type: "date", InputLabelProps: { shrink: true } })}
           {field("Contact Email", "contactEmail", editData, setEditData, { type: "email" })}
@@ -487,13 +610,29 @@ export default function Tenants() {
             <StyledSelect label="Plan" value={editData.plan} onChange={e => setEditData(p => ({ ...p, plan: e.target.value }))}>
               {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>{p}</MenuItem>)}
             </StyledSelect>
+            <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 0.5, ml: 1 }}>
+              {editData.plan}: {PLAN_LIMITS[editData.plan]}
+            </Typography>
           </FormControl>
           <FormControl fullWidth margin="normal">
             <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Provider Type</InputLabel>
             <StyledSelect label="Provider Type" value={editData.providerType} onChange={e => setEditData(p => ({ ...p, providerType: e.target.value }))}>
-              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>🏥 Clinic (Multi-Doctor)</MenuItem>
-              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👨‍⚕️ Individual Doctor</MenuItem>
+              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>ًںڈ¥ Clinic (Multi-Doctor)</MenuItem>
+              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>ًں‘¨â€چâڑ•ï¸ڈ Individual Doctor</MenuItem>
             </StyledSelect>
+          </FormControl>
+          <FormControl fullWidth margin="normal">
+            <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>Features</Typography>
+            <FormGroup row>
+              <FormControlLabel
+                control={<Checkbox checked={editData.features?.includes('desktop') || false} onChange={e => { const a = editData.features || []; setEditData(p => ({ ...p, features: e.target.checked ? [...a, 'desktop'] : a.filter(x => x !== 'desktop') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
+                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>Desktop App</Typography>}
+              />
+              <FormControlLabel
+                control={<Checkbox checked={editData.features?.includes('erp') || false} onChange={e => { const a = editData.features || []; setEditData(p => ({ ...p, features: e.target.checked ? [...a, 'erp'] : a.filter(x => x !== 'erp') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
+                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>ERP Web</Typography>}
+              />
+            </FormGroup>
           </FormControl>
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => setEditOpen(false)} disabled={actionLoading === 'edit'}>Cancel</ActionButton>

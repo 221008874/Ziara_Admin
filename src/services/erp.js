@@ -154,6 +154,36 @@ export const migrateERPFields = async () => {
 };
 
 // ──────────────────────────────────────────────
+// ERP: Trigger cache reconciliation
+// ──────────────────────────────────────────────
+
+/**
+ * Trigger ERP sync to propagate changes immediately instead of waiting
+ * for the 5-minute cache TTL.
+ * Returns { success: boolean, message: string }
+ */
+export const triggerERPSync = async () => {
+  try {
+    // The ERP sync endpoint URL should be configured in settings/environment.
+    // This is a fire-and-forget call — we don't wait for a full sync cycle.
+    const syncUrl =
+      import.meta.env.VITE_ERP_SYNC_URL || "http://localhost:3001/api/integration/sync";
+    const response = await fetch(`${syncUrl}?reconcile=true`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) {
+      return { success: false, message: `ERP sync returned ${response.status}` };
+    }
+    return { success: true, message: "ERP cache refreshed" };
+  } catch {
+    // ERP may not be reachable from Admin Panel; this is non-critical
+    return { success: false, message: "ERP not reachable — cache will refresh in ~5 min" };
+  }
+};
+
+// ──────────────────────────────────────────────
 // ERP: Get all ERP settings for all tenants (admin view)
 // ──────────────────────────────────────────────
 

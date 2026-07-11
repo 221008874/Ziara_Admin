@@ -17,7 +17,11 @@ Admin source of truth for clinic/tenant accounts.
   licenseKey:      string,
   expiryDate:      string,          // "YYYY-MM-DD"
   status:          "ACTIVE" | "INACTIVE",
+  features:        string[],        // ["desktop"], ["erp"], or ["desktop","erp"]
+  providerType:    "CLINIC" | "INDIVIDUAL_DOCTOR",
+  erpEnabled:      boolean,         // ERP sync flag (set by migration)
   createdAt:       Timestamp,
+  updatedAt:       Timestamp,       // present after any update
 }
 
 Queries: getAllTenants() ordered by createdAt desc
@@ -127,7 +131,13 @@ Document ID: License key string (e.g. "LIC-2026-001")
   expired:         boolean,
   onlineBooking:   boolean,
   deviceId:        string | null,    // MAC address when bound
+  tenantId:        string,           // linked tenant ID (ERP integration)
+  plan:            "BASIC" | "PRO" | "ENTERPRISE",  // plan copied from tenant
+  maxUsers:        number,           // user limit (BASIC=5, PRO=20, ENTERPRISE=-1)
+  maxDoctors:      number,           // doctor limit (BASIC=2, PRO=10, ENTERPRISE=-1)
+  enabledModules:  string[],         // modules enabled for ERP
   createdAt:       Timestamp,
+  updatedAt:       Timestamp,
 }
 
 Queries: getAllLicenses() ordered by createdAt desc

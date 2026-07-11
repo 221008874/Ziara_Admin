@@ -8,6 +8,7 @@ import {
   updateLicenseStatus,
   updateLicenseExpiry,
   updateLicenseOnlineBooking,
+  getAllTenants,
 } from "../services/firestoreService";
 import { createBilingual, getLang, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
@@ -168,6 +169,7 @@ export default function Licenses() {
   const { toggle } = useSidebar();
   const { showNotification } = useNotification();
   const [licenses, setLicenses] = useState([]);
+  const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -181,9 +183,10 @@ export default function Licenses() {
     debug.action('Licenses', 'Loading licenses...');
     try {
       setLoading(true); setError(null);
-      const data = await getAllLicenses();
+      const [data, tenantData] = await Promise.all([getAllLicenses(), getAllTenants()]);
       setLicenses(data);
-      debug.action('Licenses', `Loaded ${data.length} licenses`);
+      setTenants(tenantData);
+      debug.action('Licenses', `Loaded ${data.length} licenses, ${tenantData.length} tenants`);
     } catch (err) {
       debug.error('Licenses.load', err);
       const n = normalizeError(err);
@@ -300,6 +303,12 @@ export default function Licenses() {
     );
   }
 
+  // Build license → tenant lookup
+  const licenseTenantMap = {};
+  tenants.forEach(t => {
+    if (t.licenseKey) licenseTenantMap[t.licenseKey] = t;
+  });
+
   return (
     <PageContainer>
       <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(15,184,166,0.05), transparent 70%)", top: -200, right: -200, filter: "blur(60px)", pointerEvents: "none" }} />
@@ -341,6 +350,7 @@ export default function Licenses() {
                   <TableRow>
                     <TableCell>License Key</TableCell>
                     <TableCell>Category</TableCell>
+                    <TableCell>Tenant</TableCell>
                     <TableCell>Doctor</TableCell>
                     <TableCell>Phone</TableCell>
                     <TableCell>Device MAC</TableCell>
@@ -353,7 +363,7 @@ export default function Licenses() {
                 <TableBody>
                   {licenses.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9}>
+                      <TableCell colSpan={10}>
                         <EmptyState>
                           <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>📋</Typography>
                           <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No licenses found</Typography>
@@ -378,6 +388,20 @@ export default function Licenses() {
                               border: lic.category === "tenant" ? "1px solid rgba(59,130,246,0.28)" : "1px solid rgba(15,184,166,0.28)",
                             }}
                           />
+                        </TableCell>
+                        <TableCell>
+                          {licenseTenantMap[lic.licenseKey] ? (
+                            <Box sx={{ display: "flex", flexDirection: "column" }}>
+                              <Typography sx={{ fontWeight: 600, color: "#eaf2ff", fontSize: "13px" }}>
+                                {getLang(licenseTenantMap[lic.licenseKey].name)}
+                              </Typography>
+                              <Typography sx={{ fontSize: "10px", color: licenseTenantMap[lic.licenseKey].status === "ACTIVE" ? "#34d399" : "#f87171", fontFamily: "monospace" }}>
+                                {licenseTenantMap[lic.licenseKey].status}
+                              </Typography>
+                            </Box>
+                          ) : (
+                            <Typography sx={{ color: "#4a6080", fontSize: "12px" }}>—</Typography>
+                          )}
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
