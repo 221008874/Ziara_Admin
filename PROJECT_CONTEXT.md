@@ -145,7 +145,7 @@ Step 2 - Verify:
 | `saas_doctors` | Admin doctor records | Admin panel | `name`, `specialization`, `bio`, `education`, `city`, `address`, `tenantName` |
 | `comm_doctors` | Public mirror (community app reads) | Auto-synced from saas_doctors | `name`, `specialty`, `bio`, `education`, `city`, `address`, `clinicName`, `languages` |
 | `saas_licenses` | License key management | Admin panel | `doctorName` |
-| `config/saas_settings` | Global platform config (single doc) | Admin panel (Settings.jsx) | `appName` |
+| `saas_settings/config` | Global platform config (single doc) | Admin panel (Settings.jsx) | `appName` |
 | `comm_doctor_users` | Doctor Firebase Auth mapping | Auto (on doctor create) | — |
 | `comm_patients` | Patient records | Community app | varies |
 | `comm_appointments` | Appointments | Community app | varies |

@@ -163,11 +163,11 @@ export const migrateERPFields = async () => {
  * Returns { success: boolean, message: string }
  */
 export const triggerERPSync = async () => {
+  const syncUrl = import.meta.env.VITE_ERP_SYNC_URL;
+  if (!syncUrl) {
+    return { success: true, message: "ERP sync URL not configured (set VITE_ERP_SYNC_URL)" };
+  }
   try {
-    // The ERP sync endpoint URL should be configured in settings/environment.
-    // This is a fire-and-forget call — we don't wait for a full sync cycle.
-    const syncUrl =
-      import.meta.env.VITE_ERP_SYNC_URL || "http://localhost:3001/api/integration/sync";
     const response = await fetch(`${syncUrl}?reconcile=true`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

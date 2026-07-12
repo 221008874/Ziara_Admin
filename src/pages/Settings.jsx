@@ -94,8 +94,8 @@ const InfoPill = styled(Box)({
 
 // ─── Firestore helpers ────────────────────────────────────────────────────────
 
-const SETTINGS_DOC = "saas_settings";
-const SETTINGS_COL = "config";
+const SETTINGS_COL = "saas_settings";
+const SETTINGS_DOC = "config";
 
 const loadSettings = async () => {
   const ref = doc(db, SETTINGS_COL, SETTINGS_DOC);

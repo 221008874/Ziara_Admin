@@ -20,6 +20,18 @@ export const createTenant = async (tenantData) => {
     }
   }
 
+  // Prevent tenant-category license from binding to multiple tenants
+  if (licenseKey) {
+    const dupQuery = query(
+      collection(db, COLLECTIONS.SAAS_TENANTS),
+      where("licenseKey", "==", licenseKey)
+    );
+    const dupSnap = await getDocs(dupQuery);
+    if (!dupSnap.empty) {
+      throw new Error(`License "${licenseKey}" is already bound to another tenant`);
+    }
+  }
+
   // 1. Write to saas_tenants
   const saasRef = await addDoc(collection(db, COLLECTIONS.SAAS_TENANTS), {
     ...tenantFields,
@@ -52,6 +64,7 @@ export const updateTenantStatus = async (tenantId, newStatus) => {
   // 1. Update saas_tenants
   await updateDoc(doc(db, COLLECTIONS.SAAS_TENANTS, tenantId), {
     status: newStatus,
+    updatedAt: serverTimestamp(),
   });
 
   // 2. Sync visibility to comm_tenants
@@ -63,6 +76,27 @@ export const updateTenantStatus = async (tenantId, newStatus) => {
 };
 
 export const updateTenant = async (tenantId, updates) => {
+  // Sync expiryDate from license if licenseKey is changing
+  if (updates.licenseKey) {
+    const licSnap = await getDoc(doc(db, COLLECTIONS.SAAS_LICENSES, updates.licenseKey));
+    if (licSnap.exists() && licSnap.data().expiryDate) {
+      updates.expiryDate = licSnap.data().expiryDate;
+    }
+  }
+
+  // Prevent tenant-category license from binding to multiple tenants
+  if (updates.licenseKey) {
+    const dupQuery = query(
+      collection(db, COLLECTIONS.SAAS_TENANTS),
+      where("licenseKey", "==", updates.licenseKey)
+    );
+    const dupSnap = await getDocs(dupQuery);
+    const bound = dupSnap.docs.some((d) => d.id !== tenantId);
+    if (bound) {
+      throw new Error(`License "${updates.licenseKey}" is already bound to another tenant`);
+    }
+  }
+
   // 1. Update saas_tenants
   await updateDoc(doc(db, COLLECTIONS.SAAS_TENANTS, tenantId), {
     ...updates,

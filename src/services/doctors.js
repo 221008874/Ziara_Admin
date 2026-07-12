@@ -1,6 +1,7 @@
 import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, where, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { isBilingual } from "../lib/i18n";
+import { debug } from "../lib/debug";
 import { COLLECTIONS, normalizeBilingual, resolveSpecialty, resolveSpecialtyKey, buildPublicDoctor } from "./core";
 import { createLicense } from "./licenses";
 
@@ -19,6 +20,14 @@ export const createDoctor = async (doctorData) => {
         phone: doctorPublicData.phone || "",
         expiryDate: "",
       });
+    }
+  }
+
+  // If doctor belongs to tenant, validate tenant exists in saas_tenants
+  if (doctorPublicData.tenantId) {
+    const tenantSnap = await getDoc(doc(db, COLLECTIONS.SAAS_TENANTS, doctorPublicData.tenantId));
+    if (!tenantSnap.exists()) {
+      throw new Error(`Tenant "${doctorPublicData.tenantId}" not found. Create the tenant first.`);
     }
   }
 
@@ -114,7 +123,7 @@ export const createDoctor = async (doctorData) => {
         visibility: "PUBLIC",
         _syncedAt: serverTimestamp(),
       }).catch((e) =>
-        console.error("Tenant sync to comm_tenants failed (non-fatal):", e)
+        debug.error("TenantSync", e)
       );
     }
   }
@@ -145,8 +154,7 @@ export const getPublicDoctors = async () => {
 export const getDoctorsByTenant = async (tenantId) => {
   const q = query(
     collection(db, COLLECTIONS.SAAS_DOCTORS),
-    where("tenantId", "==", tenantId),
-    orderBy("createdAt", "desc")
+    where("tenantId", "==", tenantId)
   );
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -156,6 +164,7 @@ export const updateDoctorStatus = async (doctorId, newStatus) => {
   // 1. Update saas_doctors
   await updateDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, doctorId), {
     status: newStatus,
+    updatedAt: serverTimestamp(),
   });
 
   // 2. Sync visibility to comm_doctors
@@ -171,6 +180,14 @@ export const updateDoctor = async (doctorId, updates) => {
   if (updates.password) {
     const { password: _password, ...updatesWithoutPassword } = updates;
     updates = updatesWithoutPassword;
+  }
+
+  // Validate tenantId exists if being changed
+  if (updates.tenantId) {
+    const tenantSnap = await getDoc(doc(db, COLLECTIONS.SAAS_TENANTS, updates.tenantId));
+    if (!tenantSnap.exists()) {
+      throw new Error(`Tenant "${updates.tenantId}" not found. Create the tenant first.`);
+    }
   }
 
   // 1. Update saas_doctors
@@ -231,5 +248,15 @@ export const deleteDoctor = async (doctorId) => {
 
   // 2. Delete from comm_doctors
   await deleteDoc(doc(db, COLLECTIONS.COMM_DOCTORS, doctorId));
+
+  // 3. Clean up comm_doctor_users mapping
+  const userMapQuery = query(
+    collection(db, COLLECTIONS.COMM_DOCTOR_USERS),
+    where("doctorId", "==", doctorId)
+  );
+  const userMaps = await getDocs(userMapQuery);
+  for (const u of userMaps.docs) {
+    await deleteDoc(u.ref);
+  }
 };
 

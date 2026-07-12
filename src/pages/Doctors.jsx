@@ -8,10 +8,12 @@ import {
   updateDoctor,
   updateDoctorStatus,
   deleteDoctor,
+  triggerERPSync,
 } from "../services/firestoreService";
 import { uploadImageToCloudinary } from "../lib/cloudinary";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
+import { validateEgyptMobile } from "../lib/validation";
 import { normalizeError } from "../lib/errorHandler";
 import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
@@ -577,6 +579,8 @@ export default function Doctors() {
       setError("Passwords do not match");
       return;
     }
+    const docPhoneErr = validateEgyptMobile(formData.phone);
+    if (formData.phone && docPhoneErr) { setError(`Phone: ${docPhoneErr}`); return; }
     const pwdError = (() => {
       const p = formData.password;
       if (p.length < 8) return "Password must be at least 8 characters";
@@ -598,6 +602,7 @@ export default function Doctors() {
       await createDoctor(doctorData);
       debug.action('Doctors', 'Doctor created', { email: formData.email });
       showNotification("Doctor created successfully", "success");
+      triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); });
       setCreateOpen(false);
       setFormData(BLANK);
       load();
@@ -669,6 +674,7 @@ export default function Doctors() {
       await updateDoctor(editTarget.id, updateData);
       debug.action('Doctors', 'Doctor updated', { id: editTarget.id });
       showNotification("Doctor updated successfully", "success");
+      triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); });
       setEditOpen(false);
       load();
     } catch (e) {
@@ -686,6 +692,7 @@ export default function Doctors() {
       await updateDoctorStatus(id, current === "ACTIVE" ? "INACTIVE" : "ACTIVE");
       debug.action('Doctors', `Status updated: ${id}`);
       showNotification("Status updated", "success");
+      triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); });
       load();
     } catch (e) {
       debug.error('Doctors.toggleStatus', e);
@@ -703,6 +710,7 @@ export default function Doctors() {
       await deleteDoctor(deleteConfirm.id);
       debug.action('Doctors', 'Doctor deleted', { id: deleteConfirm.id });
       showNotification("Doctor deleted", "success");
+      triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); });
       setDeleteConfirm(null);
       load();
     } catch (e) {

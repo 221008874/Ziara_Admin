@@ -84,7 +84,7 @@ clinic-admin/
 | `saas_doctors` | Admin doctor records | `name`, `specialization`, `bio`, `education`, `city`, `address`, `tenantName` |
 | `comm_doctors` | Public mirror (customer app) | `name`, `specialty`, `bio`, `education`, `city`, `address`, `clinicName`, `languages` |
 | `saas_licenses` | License keys | `doctorName` |
-| `config/saas_settings` | Global platform config | `appName` |
+| `saas_settings/config` | Global platform config | `appName` |
 | `comm_doctor_users` | Doctor auth mapping | — |
 | `comm_patients` | Patient records | depends on customer app |
 | `comm_appointments` | Appointments | depends on customer app |

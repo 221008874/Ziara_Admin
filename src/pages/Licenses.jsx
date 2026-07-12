@@ -5,13 +5,15 @@ import { auth } from "../firebase";
 import {
   getAllLicenses,
   createLicense,
+  updateLicense,
   updateLicenseStatus,
-  updateLicenseExpiry,
   updateLicenseOnlineBooking,
   getAllTenants,
+  triggerERPSync,
 } from "../services/firestoreService";
 import { createBilingual, getLang, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
+import { validateEgyptMobile } from "../lib/validation";
 import { normalizeError } from "../lib/errorHandler";
 import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
@@ -174,7 +176,7 @@ export default function Licenses() {
   const [openDialog, setOpenDialog] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editLicense, setEditLicense] = useState(null);
-  const [newExpiryDate, setNewExpiryDate] = useState("");
+  const [editForm, setEditForm] = useState({ category: "doctor", doctorName: "", phone: "", expiryDate: "", onlineBooking: false });
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({ licenseKey: "", category: "doctor", doctorName: createBilingual(), phone: "", expiryDate: "", onlineBooking: false });
   const [actionLoading, setActionLoading] = useState(null);
@@ -205,6 +207,8 @@ export default function Licenses() {
     if (!formData.licenseKey || !formData.expiryDate) {
       setError("License key and expiry date are required"); return;
     }
+    const licPhoneErr = validateEgyptMobile(formData.phone);
+    if (formData.phone && licPhoneErr) { setError(`Phone: ${licPhoneErr}`); return; }
     setActionLoading('create');
     try {
       setError(null);
@@ -231,6 +235,7 @@ export default function Licenses() {
       await updateLicenseStatus(docId, newStatus);
       debug.action('Licenses', `Status updated: ${docId} -> ${newStatus}`);
       showNotification(`License ${newStatus === "ACTIVE" ? "activated" : "deactivated"}`, "success");
+      triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); });
       loadLicenses();
     } catch (err) {
       debug.error('Licenses.toggleStatus', err);
@@ -259,25 +264,34 @@ export default function Licenses() {
   };
 
   const handleEditOpen = (lic) => {
-    debug.action('Licenses', `Opening edit expiry dialog: ${lic.id}`, { key: lic.licenseKey, currentExpiry: lic.expiryDate });
+    debug.action('Licenses', `Opening edit dialog: ${lic.id}`, { key: lic.licenseKey });
     setEditLicense(lic);
-    setNewExpiryDate(lic.expiryDate || "");
+    setEditForm({
+      category: lic.category || "doctor",
+      doctorName: lic.doctorName || createBilingual(),
+      phone: lic.phone || "",
+      expiryDate: lic.expiryDate || "",
+      onlineBooking: Boolean(lic.onlineBooking),
+    });
     setEditDialogOpen(true);
   };
 
   const handleEditSave = async () => {
-    if (!newExpiryDate || !editLicense) return;
-    debug.action('Licenses', `Saving expiry: ${editLicense.id} -> ${newExpiryDate}`);
+    if (!editLicense) return;
+    const licEditPhoneErr = validateEgyptMobile(editForm.phone);
+    if (editForm.phone && licEditPhoneErr) { setError(`Phone: ${licEditPhoneErr}`); return; }
+    debug.action('Licenses', `Saving license: ${editLicense.id}`, editForm);
     setActionLoading('edit');
     try {
       setError(null);
-      await updateLicenseExpiry(editLicense.id, newExpiryDate);
-      debug.action('Licenses', `Expiry saved: ${editLicense.id} -> ${newExpiryDate}`);
-      showNotification("License expiry updated", "success");
+      await updateLicense(editLicense.id, editForm);
+      debug.action('Licenses', `License saved: ${editLicense.id}`);
+      showNotification("License updated successfully", "success");
+      triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); });
       setEditDialogOpen(false);
       loadLicenses();
     } catch (err) {
-      debug.error('Licenses.editExpiry', err);
+      debug.error('Licenses.edit', err);
       const n = normalizeError(err);
       setError(n.message);
     } finally {
@@ -353,7 +367,7 @@ export default function Licenses() {
                     <TableCell>Tenant</TableCell>
                     <TableCell>Doctor</TableCell>
                     <TableCell>Phone</TableCell>
-                    <TableCell>Device MAC</TableCell>
+                    <TableCell>Device Fingerprint</TableCell>
                     <TableCell>Expiry</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell align="center">Online Booking</TableCell>
@@ -513,19 +527,44 @@ export default function Licenses() {
         </DialogContent>
       </StyledDialog>
 
-      <StyledDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Edit Expiry Date</DialogTitle>
+      <StyledDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit License — {editLicense?.licenseKey}</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <Typography sx={{ color: "#dde6f0", mb: 2 }}>
-            License: <strong>{editLicense?.licenseKey}</strong>
-          </Typography>
+          <FormControl fullWidth margin="normal">
+            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Category</InputLabel>
+            <StyledSelect label="Category" value={editForm.category} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))}>
+              <MenuItem value="doctor" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Individual Doctor</MenuItem>
+              <MenuItem value="tenant" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Tenant / Organization</MenuItem>
+            </StyledSelect>
+          </FormControl>
           <StyledDialogField
-            fullWidth
-            label="New Expiry Date"
+            fullWidth label="Name" margin="normal"
+            value={editForm.doctorName?.en || editForm.doctorName || ""}
+            onChange={e => setEditForm(p => ({ ...p, doctorName: typeof p.doctorName === "object" ? { ...p.doctorName, en: e.target.value } : e.target.value }))}
+          />
+          <StyledDialogField
+            fullWidth label="Phone" margin="normal"
+            value={editForm.phone}
+            onChange={e => setEditForm(p => ({ ...p, phone: e.target.value }))}
+            placeholder="010xxxxxxxx"
+          />
+          <StyledDialogField
+            fullWidth label="Expiry Date" margin="normal"
             type="date"
-            value={newExpiryDate}
-            onChange={e => setNewExpiryDate(e.target.value)}
+            value={editForm.expiryDate}
+            onChange={e => setEditForm(p => ({ ...p, expiryDate: e.target.value }))}
             InputLabelProps={{ shrink: true }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={editForm.onlineBooking}
+                onChange={e => setEditForm(p => ({ ...p, onlineBooking: e.target.checked }))}
+                sx={{ color: "#4a6080", "&.Mui-checked": { color: "#0fb8a6" } }}
+              />
+            }
+            label={<Typography sx={{ color: "#9ecfca", fontSize: "13px" }}>Enable Online Booking</Typography>}
+            sx={{ mt: 1 }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton variant="secondary" onClick={() => setEditDialogOpen(false)} disabled={actionLoading === 'edit'}>Cancel</ActionButton>

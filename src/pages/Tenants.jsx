@@ -11,6 +11,7 @@ import {
 } from "../services/firestoreService";
 import { createBilingual, getLang, isBilingual, BilingualInput } from "../lib/i18n";
 import { debug } from "../lib/debug";
+import { validateEgyptMobile } from "../lib/validation";
 import { normalizeError } from "../lib/errorHandler";
 import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
@@ -246,6 +247,8 @@ export default function Tenants() {
   const handleCreate = async () => {
     if (!formData.name.en) { setError("Tenant name (English) is required"); return; }
     if (!formData.licenseKey) { setError("License key is required"); return; }
+    const phoneErr = validateEgyptMobile(formData.contactPhone);
+    if (formData.contactPhone && phoneErr) { setError(`Contact Phone: ${phoneErr}`); return; }
     debug.action('Tenants', 'Creating tenant', { name: getLang(formData.name) });
     setActionLoading('create');
     try {
@@ -288,6 +291,8 @@ export default function Tenants() {
 
   const handleEdit = async () => {
     if (!editTarget || !editData.name.en) return;
+    const phoneErr = validateEgyptMobile(editData.contactPhone);
+    if (editData.contactPhone && phoneErr) { setError(`Contact Phone: ${phoneErr}`); return; }
     debug.action('Tenants', `Updating tenant: ${editTarget.id}`);
     setActionLoading('edit');
     try {
@@ -342,7 +347,7 @@ export default function Tenants() {
   const inactive = tenants.filter(t => t.status === "INACTIVE").length;
   const doctorCountByTenant = {};
   doctors.forEach(d => {
-    if (d.tenantId) doctorCountByTenant[d.tenantId] = (doctorCountByTenant[d.tenantId] || 0) + 1;
+    if (d.tenantId && d.status === "ACTIVE") doctorCountByTenant[d.tenantId] = (doctorCountByTenant[d.tenantId] || 0) + 1;
   });
 
   const getPlanDoctorLimit = (plan) => ({ BASIC: 2, PRO: 10, ENTERPRISE: Infinity }[plan] || Infinity);
@@ -538,7 +543,7 @@ export default function Tenants() {
                 — Select a license —
               </MenuItem>
               {allLicenses
-                .filter(l => l.category === "tenant" || !tenants.some(t => t.licenseKey === l.licenseKey))
+                .filter(l => !tenants.some(t => t.licenseKey === l.licenseKey))
                 .map(l => (
                   <MenuItem key={l.licenseKey} value={l.licenseKey} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", gap: 2 }}>

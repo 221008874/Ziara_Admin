@@ -3,7 +3,7 @@ import { Box, Typography, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { Menu, X, Building2, Stethoscope, Key, Cloud, Settings } from "lucide-react";
+import { Menu, X, Building2, Stethoscope, Key, Cloud, Zap, Settings } from "lucide-react";
 const logo = "/favicon.svg";
 import { useSidebar } from "../App";
 
@@ -163,6 +163,12 @@ const NAV_ITEMS = [
     section: "System",
     items: [
       { to: "/settings", icon: <Settings size={16} />, label: "SaaS Settings" },
+    ],
+  },
+  {
+    section: "ERP Integration",
+    items: [
+      { to: "/erp-settings", icon: <Zap size={16} />, label: "ERP Settings" },
     ],
   },
 ];
