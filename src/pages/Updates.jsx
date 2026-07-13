@@ -15,42 +15,15 @@ import { Hamburger } from "../components/Sidebar";
 const logo = "/favicon.svg";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
-  Button, TextField, Dialog, DialogTitle, DialogContent,
+  TextField, Dialog, DialogTitle, DialogContent,
   Select, MenuItem, FormControl, InputLabel,
   CircularProgress, Alert, Box, Typography, Chip,
   Checkbox, FormControlLabel, IconButton, Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { PageContainer, TopBar, ContentWrapper, GlassPanel, ActionButton, dialogPaperSx, sharedFieldSx } from "./components/shared/PageShells";
 import { Trash2, History, PauseCircle, CloudUpload } from "lucide-react";
 
-const PageContainer = styled(Box)(({ theme }) => ({
-  minHeight: "100vh",
-  backgroundColor: "#070f1e",
-  marginLeft: 0,
-  position: "relative",
-  overflow: "hidden",
-  transition: "margin-left 0.3s ease",
-  [theme.breakpoints.up("md")]: {
-    marginLeft: "240px",
-  },
-}));
-const TopBar = styled(Box)({ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 24px", borderBottom: "1px solid rgba(15,184,166,0.12)" });
-const ContentWrapper = styled(Box)({ padding: "24px", maxWidth: 1400, margin: "0 auto" });
-const GlassPanel = styled(Box)({ backgroundColor: "rgba(11,22,40,0.6)", borderRadius: "16px", border: "1px solid rgba(15,184,166,0.12)", backdropFilter: "blur(12px)", overflow: "hidden" });
-const StyledTableContainer = styled(Box)({ overflowX: "auto" });
-const ActionButton = styled(Button)(({ variant }) => ({
-  borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px",
-  ...(variant === "primary" ? { backgroundColor: "#0fb8a6", color: "#070f1e", "&:hover": { backgroundColor: "#0dd4bf", boxShadow: "0 4px 16px rgba(15,184,166,0.35)" } } : {}),
-  ...(variant === "secondary" ? { borderColor: "rgba(15,184,166,0.30)", color: "#6a8aaa", backgroundColor: "rgba(15,184,166,0.06)", "&:hover": { backgroundColor: "rgba(15,184,166,0.12)" } } : {}),
-  ...(variant === "warning" ? { borderColor: "rgba(251,191,36,0.30)", color: "#fbbf24", backgroundColor: "rgba(251,191,36,0.06)", "&:hover": { backgroundColor: "rgba(251,191,36,0.12)" } } : {}),
-  ...(variant === "danger" ? { borderColor: "rgba(248,113,113,0.30)", color: "#f87171", backgroundColor: "rgba(248,113,113,0.06)", "&:hover": { backgroundColor: "rgba(248,113,113,0.12)" } } : {}),
-}));
-const StyledDialog = styled(Dialog)({ "& .MuiDialog-paper": { backgroundColor: "#0f1e36", borderRadius: "16px", border: "1px solid rgba(15,184,166,0.15)" } });
-const StyledDialogField = styled(TextField)({
-  "& .MuiOutlinedInput-root": { backgroundColor: "#0b1628", borderRadius: "10px", color: "#dde6f0", "& fieldset": { borderColor: "rgba(15,184,166,0.18)" }, "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" }, "&.Mui-focused fieldset": { borderColor: "#0fb8a6" } },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } },
-  "& .MuiInputBase-input": { color: "#dde6f0" },
-});
 const StatusBadge = styled(Box)(({ status }) => ({
   display: "inline-flex", alignItems: "center", padding: "4px 12px", borderRadius: "12px",
   fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", cursor: "pointer",
@@ -184,6 +157,7 @@ export default function Updates() {
 
   return (
     <PageContainer>
+      <title>App Updates — Smart Clinic Admin</title>
       <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(15,184,166,0.05), transparent 70%)", top: -200, right: -200, filter: "blur(60px)", pointerEvents: "none" }} />
 
       <TopBar>
@@ -228,15 +202,15 @@ export default function Updates() {
                 )}
 
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                  <ActionButton variant="primary" size="small" onClick={() => handleOpenCreate(v.appId)}>
+                  <ActionButton btnVariant="primary" size="small" onClick={() => handleOpenCreate(v.appId)}>
                     <CloudUpload size={14} style={{ marginRight: 4 }} /> Publish
                   </ActionButton>
                   {status === "published" && (
-                    <ActionButton variant="warning" size="small" onClick={() => handleUnpublish(v.appId)}>
+                    <ActionButton btnVariant="warning" size="small" onClick={() => handleUnpublish(v.appId)}>
                       <PauseCircle size={14} style={{ marginRight: 4 }} /> Unpublish
                     </ActionButton>
                   )}
-                  <ActionButton variant="secondary" size="small" onClick={() => handleOpenHistory(v.appId)}>
+                  <ActionButton btnVariant="secondary" size="small" onClick={() => handleOpenHistory(v.appId)}>
                     <History size={14} style={{ marginRight: 4 }} /> History
                   </ActionButton>
                 </Box>
@@ -303,34 +277,34 @@ export default function Updates() {
       </ContentWrapper>
 
       {/* Publish Dialog */}
-      <StyledDialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={{ color: "#eaf2ff", backgroundColor: "#0b1628" }}>
           Publish Update — {APP_META[formData.appId]?.icon} {APP_META[formData.appId]?.label}
         </DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <StyledDialogField fullWidth label="Version *" margin="normal" value={formData.version}
-            onChange={e => setFormData(p => ({ ...p, version: e.target.value }))} placeholder="2.5.0" />
-          <StyledDialogField fullWidth label="Build Number" margin="normal" type="number" value={formData.buildNumber}
-            onChange={e => setFormData(p => ({ ...p, buildNumber: e.target.value }))} placeholder="2848" />
-          <StyledDialogField fullWidth label="Download URL" margin="normal" value={formData.downloadUrl}
-            onChange={e => setFormData(p => ({ ...p, downloadUrl: e.target.value }))} placeholder="https://..." />
-          <StyledDialogField fullWidth label="MSI URL (legacy)" margin="normal" value={formData.msiUrl}
-            onChange={e => setFormData(p => ({ ...p, msiUrl: e.target.value }))} placeholder="https://..." />
-          <StyledDialogField fullWidth label="Release Date" margin="normal" type="date" value={formData.releaseDate}
-            onChange={e => setFormData(p => ({ ...p, releaseDate: e.target.value }))} InputLabelProps={{ shrink: true }} />
-          <StyledDialogField fullWidth label="Min Required Version" margin="normal" value={formData.minVersion}
-            onChange={e => setFormData(p => ({ ...p, minVersion: e.target.value }))} placeholder="2.4.0" />
-          <StyledDialogField fullWidth label="File Size (bytes)" margin="normal" type="number" value={formData.fileSize}
-            onChange={e => setFormData(p => ({ ...p, fileSize: e.target.value }))} placeholder="123456789" />
-          <StyledDialogField fullWidth label="SHA-256 Checksum" margin="normal" value={formData.checksum}
-            onChange={e => setFormData(p => ({ ...p, checksum: e.target.value }))} placeholder="sha256:..." />
+          <TextField fullWidth label="Version *" margin="normal" value={formData.version}
+            onChange={e => setFormData(p => ({ ...p, version: e.target.value }))} placeholder="2.5.0" sx={sharedFieldSx} />
+          <TextField fullWidth label="Build Number" margin="normal" type="number" value={formData.buildNumber}
+            onChange={e => setFormData(p => ({ ...p, buildNumber: e.target.value }))} placeholder="2848" sx={sharedFieldSx} />
+          <TextField fullWidth label="Download URL" margin="normal" value={formData.downloadUrl}
+            onChange={e => setFormData(p => ({ ...p, downloadUrl: e.target.value }))} placeholder="https://..." sx={sharedFieldSx} />
+          <TextField fullWidth label="MSI URL (legacy)" margin="normal" value={formData.msiUrl}
+            onChange={e => setFormData(p => ({ ...p, msiUrl: e.target.value }))} placeholder="https://..." sx={sharedFieldSx} />
+          <TextField fullWidth label="Release Date" margin="normal" type="date" value={formData.releaseDate}
+            onChange={e => setFormData(p => ({ ...p, releaseDate: e.target.value }))} InputLabelProps={{ shrink: true }} sx={sharedFieldSx} />
+          <TextField fullWidth label="Min Required Version" margin="normal" value={formData.minVersion}
+            onChange={e => setFormData(p => ({ ...p, minVersion: e.target.value }))} placeholder="2.4.0" sx={sharedFieldSx} />
+          <TextField fullWidth label="File Size (bytes)" margin="normal" type="number" value={formData.fileSize}
+            onChange={e => setFormData(p => ({ ...p, fileSize: e.target.value }))} placeholder="123456789" sx={sharedFieldSx} />
+          <TextField fullWidth label="SHA-256 Checksum" margin="normal" value={formData.checksum}
+            onChange={e => setFormData(p => ({ ...p, checksum: e.target.value }))} placeholder="sha256:..." sx={sharedFieldSx} />
 
-          <StyledDialogField
+          <TextField
             fullWidth margin="normal" multiline minRows={3}
             label="Release Notes" value={formData.releaseNotes}
             onChange={e => setFormData(p => ({ ...p, releaseNotes: e.target.value }))}
             placeholder="- Fixed login issue&#10;- Improved sync performance"
-            sx={{ "& .MuiInputBase-input": { color: "#dde6f0", fontFamily: "monospace", fontSize: "12px" } }}
+            sx={{ ...sharedFieldSx, "& .MuiInputBase-input": { color: "#dde6f0", fontFamily: "monospace", fontSize: "12px" } }}
           />
 
           <FormControlLabel
@@ -339,16 +313,16 @@ export default function Updates() {
           />
 
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setOpenDialog(false)} disabled={publishLoading}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handlePublish} disabled={publishLoading}>
+            <ActionButton btnVariant="secondary" onClick={() => setOpenDialog(false)} disabled={publishLoading}>Cancel</ActionButton>
+            <ActionButton btnVariant="primary" onClick={handlePublish} disabled={publishLoading}>
               {publishLoading ? "Publishing…" : "Publish"}
             </ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
 
       {/* History Dialog */}
-      <StyledDialog open={historyOpen} onClose={() => setHistoryOpen(false)} maxWidth="md" fullWidth>
+      <Dialog open={historyOpen} onClose={() => setHistoryOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={{ color: "#eaf2ff", backgroundColor: "#0b1628" }}>
           Release History — {APP_META[historyAppId]?.icon} {APP_META[historyAppId]?.label}
         </DialogTitle>
@@ -386,23 +360,23 @@ export default function Updates() {
             </Table>
           )}
           <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setHistoryOpen(false)}>Close</ActionButton>
+            <ActionButton btnVariant="secondary" onClick={() => setHistoryOpen(false)}>Close</ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
       {/* Delete Confirm Dialog */}
-      <StyledDialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
+      <Dialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={{ color: "#eaf2ff", backgroundColor: "#0b1628" }}>Delete Release</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <Typography sx={{ color: "#dde6f0", mb: 3 }}>
             Delete <strong style={{ color: "#f87171" }}>{historyAppId} v{deleteConfirm}</strong>? This cannot be undone.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</ActionButton>
-            <ActionButton variant="danger" onClick={() => handleDeleteRelease(deleteConfirm)}>Delete</ActionButton>
+            <ActionButton btnVariant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</ActionButton>
+            <ActionButton btnVariant="danger" onClick={() => handleDeleteRelease(deleteConfirm)}>Delete</ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
     </PageContainer>
   );
 }

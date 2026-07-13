@@ -1,4 +1,3 @@
-// src/pages/admin/Doctors.jsx
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -21,211 +20,12 @@ import { Hamburger } from "../components/Sidebar";
 const logo = "/favicon.svg";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
-  Button, TextField, Dialog, DialogTitle, DialogContent,
+  TextField, Dialog, DialogTitle, DialogContent,
   Select, MenuItem, FormControl, InputLabel,
-  CircularProgress, Alert, Box, Typography, Chip, IconButton,
+  Button, CircularProgress, Alert, Box, Typography, Chip, IconButton,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { PageContainer, TopBar, ContentWrapper, GlassPanel, StyledTableContainer, ActionButton, StatCard, EmptyState, dialogPaperSx, dialogTitleSx, sharedFieldSx, ClickableStatus } from "./components/shared/PageShells";
 import { Eye, EyeOff } from 'lucide-react';
-
-// ─── Shared Styled Components ─────────────────────────────────────────────
-
-const PageContainer = styled(Box)(({ theme }) => ({
-  minHeight: "100vh",
-  backgroundColor: "#04091a",
-  marginLeft: 0,
-  position: "relative",
-  overflow: "hidden",
-  transition: "margin-left 0.3s ease",
-  [theme.breakpoints.up("md")]: {
-    marginLeft: "240px",
-  },
-}));
-
-const TopBar = styled(Box)({
-  background: "linear-gradient(to right, #090f22, #0c1830)",
-  borderBottom: "1px solid rgba(15,184,166,0.12)",
-  padding: "16px 28px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.50)",
-  position: "relative",
-  "&::after": {
-    content: '""',
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "2px",
-    background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)",
-    opacity: 0.45,
-  },
-});
-
-const ContentWrapper = styled(Box)({
-  padding: "24px 28px",
-  position: "relative",
-  zIndex: 1,
-});
-
-const GlassPanel = styled(Box)({
-  background: "linear-gradient(to bottom, #0b1628, #081020)",
-  borderRadius: "16px",
-  border: "1px solid rgba(15,184,166,0.12)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
-  overflow: "hidden",
-});
-
-const StyledTableContainer = styled(Box)({
-  "& .MuiTable-root": { backgroundColor: "transparent" },
-  "& .MuiTableHead-root": { backgroundColor: "#0c1a30" },
-  "& .MuiTableCell-head": {
-    color: "#2dd4bf",
-    fontWeight: 700,
-    fontSize: "11px",
-    letterSpacing: "0.8px",
-    textTransform: "uppercase",
-    padding: "14px 20px",
-    borderBottom: "1px solid rgba(15,184,166,0.12)",
-  },
-  "& .MuiTableRow-root": {
-    transition: "all 0.15s ease",
-    borderBottom: "1px solid rgba(15,184,166,0.06)",
-    "&:nth-of-type(odd)": { backgroundColor: "rgba(8,16,32,0.35)" },
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.09)" },
-  },
-  "& .MuiTableCell-body": {
-    color: "#dde6f0",
-    fontSize: "13px",
-    padding: "14px 20px",
-    borderBottom: "none",
-  },
-});
-
-const StatusBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "status" })(({ status }) => ({
-  borderRadius: "12px",
-  fontSize: "10px",
-  fontWeight: 700,
-  height: "28px",
-  minWidth: "80px",
-  cursor: "pointer",
-  ...(status === "ACTIVE"
-    ? {
-        backgroundColor: "rgba(52,211,153,0.14)",
-        color: "#34d399",
-        border: "1px solid rgba(52,211,153,0.28)",
-      }
-    : {
-        backgroundColor: "rgba(248,113,113,0.14)",
-        color: "#f87171",
-        border: "1px solid rgba(248,113,113,0.28)",
-      }),
-  "&:hover": { filter: "brightness(1.2)" },
-}));
-
-const ActionButton = styled(Button)(({ variant: v }) => ({
-  borderRadius: "9px",
-  textTransform: "none",
-  fontWeight: 600,
-  fontSize: "12px",
-  padding: "8px 18px",
-  transition: "all 0.2s ease",
-  ...(v === "primary"
-    ? {
-        background: "linear-gradient(to right, #0fb8a6, #0d9488)",
-        color: "white",
-        boxShadow: "0 4px 14px rgba(15,184,166,0.40)",
-        "&:hover": {
-          background: "linear-gradient(to right, #0d9488, #0b7a72)",
-          transform: "translateY(-1px)",
-        },
-      }
-    : v === "warning"
-      ? {
-          backgroundColor: "rgba(245,158,11,0.12)",
-          color: "#f59e0b",
-          border: "1px solid rgba(245,158,11,0.30)",
-          "&:hover": { backgroundColor: "#f59e0b", color: "white" },
-        }
-      : v === "danger"
-        ? {
-            backgroundColor: "rgba(248,113,113,0.10)",
-            color: "#f87171",
-            border: "1px solid rgba(248,113,113,0.25)",
-            "&:hover": { backgroundColor: "#f87171", color: "white" },
-          }
-        : {
-            backgroundColor: "rgba(15,184,166,0.07)",
-            color: "#2dd4bf",
-            border: "1px solid rgba(15,184,166,0.20)",
-            "&:hover": { backgroundColor: "rgba(15,184,166,0.20)" },
-          }),
-}));
-
-const StyledDialog = styled(Dialog)({
-  "& .MuiDialog-paper": {
-    backgroundColor: "#0b1628",
-    borderRadius: "20px",
-    border: "1px solid rgba(15,184,166,0.15)",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.80)",
-  },
-  "& .MuiDialogTitle-root": {
-    background: "linear-gradient(to right, #0d9488, #083040)",
-    color: "white",
-    fontSize: "18px",
-    fontWeight: 700,
-    padding: "20px 24px",
-    position: "relative",
-    "&::after": {
-      content: '""',
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
-      height: "1px",
-      background: "linear-gradient(to right, transparent, rgba(15,184,166,0.5), transparent)",
-    },
-  },
-});
-
-const StyledField = styled(TextField)({
-  "& .MuiOutlinedInput-root": {
-    backgroundColor: "#0f1e36",
-    borderRadius: "10px",
-    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#0fb8a6" },
-  },
-  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
-});
-
-const StyledSelect = styled(Select)({
-  backgroundColor: "#0f1e36",
-  borderRadius: "10px",
-  color: "#dde6f0",
-  fontSize: "14px",
-  "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" },
-  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.35)" },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#0fb8a6" },
-  "& .MuiSvgIcon-root": { color: "#4a6080" },
-});
-
-const StatCard = styled(Box)({
-  background: "linear-gradient(135deg, #0b1628, #081020)",
-  border: "1px solid rgba(15,184,166,0.10)",
-  borderRadius: "14px",
-  padding: "18px 22px",
-  flex: "1 1 0",
-  minWidth: 0,
-});
-
-const EmptyState = styled(Box)({
-  textAlign: "center",
-  padding: "48px 20px",
-});
 
 // ─── Constants ────────────────────────────────────────────────────────────
 
@@ -404,7 +204,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
       </Typography>
 
       <Box sx={{ position: "relative", mb: 1 }}>
-        <StyledField
+        <TextField
           fullWidth
           type={showPassword ? "text" : "password"}
           placeholder={isEdit ? "Leave blank to keep current password" : "Enter initial password"}
@@ -413,7 +213,9 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
           error={!isEdit && obj.password && !!validatePassword(obj.password)}
           helperText={!isEdit && obj.password ? validatePassword(obj.password) : ""}
           sx={{
+            ...sharedFieldSx,
             "& .MuiOutlinedInput-root": {
+              ...(sharedFieldSx["& .MuiOutlinedInput-root"] || {}),
               paddingRight: "40px !important",
               backgroundColor: isEdit ? "#0a1525" : "#0f1e36",
             },
@@ -461,7 +263,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
 
       {!isEdit && (
         <Box sx={{ position: "relative", mt: 1 }}>
-          <StyledField
+          <TextField
             fullWidth
             type={showConfirm ? "text" : "password"}
             placeholder="Confirm password"
@@ -469,7 +271,10 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
             onChange={(e) => set(p => ({ ...p, confirmPassword: e.target.value }))}
             error={obj.confirmPassword && obj.password !== obj.confirmPassword}
             helperText={obj.confirmPassword && obj.password !== obj.confirmPassword ? "Passwords do not match" : ""}
-            sx={{ "& .MuiOutlinedInput-root": { paddingRight: "40px !important" } }}
+            sx={{
+              ...sharedFieldSx,
+              "& .MuiOutlinedInput-root": { paddingRight: "40px !important" },
+            }}
           />
           <IconButton
             size="small"
@@ -736,12 +541,13 @@ export default function Doctors() {
   }
 
   const fieldEl = (label, key, obj, set, opts = {}) => (
-    <StyledField
+    <TextField
       fullWidth
       label={label}
       margin="normal"
       value={obj[key]}
       onChange={e => set(p => ({ ...p, [key]: e.target.value }))}
+      sx={sharedFieldSx}
       {...opts}
     />
   );
@@ -751,13 +557,14 @@ export default function Doctors() {
       <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>
         Tenant (Clinic)
       </InputLabel>
-      <StyledSelect
+      <Select
         label="Tenant (Clinic)"
         value={obj.tenantId || ""}
         onChange={e => {
           const t = tenants.find(t => t.id === e.target.value);
           set(p => ({ ...p, tenantId: e.target.value || "", providerId: e.target.value || "", tenantName: t ? (isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name))) : createBilingual(), licenseKey: t?.licenseKey || "" }));
         }}
+        sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}
       >
         <MenuItem value="" sx={{ backgroundColor: "#0f1e36", color: "#6b7e9b", fontStyle: "italic" }}>
           — No Tenant (Individual) —
@@ -767,7 +574,7 @@ export default function Doctors() {
             {getLang(t.name) || t.name}
           </MenuItem>
         ))}
-      </StyledSelect>
+      </Select>
     </FormControl>
   );
 
@@ -776,10 +583,11 @@ export default function Doctors() {
       <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>
         Specialization / التخصص
       </InputLabel>
-      <StyledSelect
+      <Select
         label="Specialization / التخصص"
         value={obj.specialization}
         onChange={e => set(p => ({ ...p, specialization: e.target.value }))}
+        sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}
       >
         {SPECIALIZATIONS.map(s => (
           <MenuItem key={s.value} value={s.value} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
@@ -789,12 +597,13 @@ export default function Doctors() {
             </Box>
           </MenuItem>
         ))}
-      </StyledSelect>
+      </Select>
     </FormControl>
   );
 
   return (
     <PageContainer>
+      <title>Doctors — Smart Clinic Admin</title>
       <Box sx={{
         position: "fixed", width: 600, height: 600,
         background: "radial-gradient(circle, rgba(59,130,246,0.04), transparent 70%)",
@@ -818,11 +627,11 @@ export default function Doctors() {
         </Box>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <FormControl size="small" sx={{ minWidth: 180 }}>
-            <StyledSelect
+            <Select
               value={tenantFilter}
               onChange={e => setTenantFilter(e.target.value)}
               displayEmpty
-              sx={{ height: 38, fontSize: "12px" }}
+              sx={{ height: 38, fontSize: "12px", backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}
             >
               <MenuItem value="ALL" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
                 All Tenants
@@ -832,10 +641,10 @@ export default function Doctors() {
                   {getLang(t.name)}
                 </MenuItem>
               ))}
-            </StyledSelect>
+            </Select>
           </FormControl>
           <ActionButton
-            variant="primary"
+            btnVariant="primary"
             onClick={() => setCreateOpen(true)}
             disabled={actionLoading === 'create'}
           >
@@ -998,18 +807,16 @@ export default function Doctors() {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <StatusBadge
+                          <ClickableStatus
                             status={d.status}
-                            label={d.status}
-                            size="small"
-                            onClick={() => toggleStatus(d.id, d.status)}
-                            disabled={actionLoading === `status-${d.id}`}
+                            onToggle={() => toggleStatus(d.id, d.status)}
+                            loading={actionLoading === `status-${d.id}`}
                           />
                         </TableCell>
                         <TableCell align="right">
                           <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
                             <ActionButton
-                              variant="warning"
+                              btnVariant="warning"
                               size="small"
                               onClick={() => openEdit(d)}
                               disabled={actionLoading === 'edit' || actionLoading === 'delete'}
@@ -1017,7 +824,7 @@ export default function Doctors() {
                               Edit
                             </ActionButton>
                             <ActionButton
-                              variant="danger"
+                              btnVariant="danger"
                               size="small"
                               onClick={() => setDeleteConfirm(d)}
                               disabled={actionLoading === 'edit' || actionLoading === 'delete'}
@@ -1036,8 +843,8 @@ export default function Doctors() {
         </GlassPanel>
       </ContentWrapper>
 
-      <StyledDialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Add New Doctor</DialogTitle>
+      <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: dialogPaperSx }}>
+        <DialogTitle sx={dialogTitleSx}>Add New Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <ImageUploadField obj={formData} set={setFormData} error={error} setError={setError} />
           <BilingualInput label="Full Name" labelAr="الاسم الكامل" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
@@ -1076,14 +883,14 @@ export default function Doctors() {
 
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton
-              variant="secondary"
+              btnVariant="secondary"
               onClick={() => { setCreateOpen(false); setError(null); }}
               disabled={actionLoading === 'create'}
             >
               Cancel
             </ActionButton>
             <ActionButton
-              variant="primary"
+              btnVariant="primary"
               onClick={handleCreate}
               disabled={actionLoading === 'create'}
             >
@@ -1096,10 +903,10 @@ export default function Doctors() {
             </ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
 
-      <StyledDialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Edit Doctor</DialogTitle>
+      <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: dialogPaperSx }}>
+        <DialogTitle sx={dialogTitleSx}>Edit Doctor</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <ImageUploadField obj={editData} set={setEditData} error={error} setError={setError} />
           <BilingualInput label="Full Name" labelAr="الاسم الكامل" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />
@@ -1125,14 +932,14 @@ export default function Doctors() {
 
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton
-              variant="secondary"
+              btnVariant="secondary"
               onClick={() => setEditOpen(false)}
               disabled={actionLoading === 'edit'}
             >
               Cancel
             </ActionButton>
             <ActionButton
-              variant="primary"
+              btnVariant="primary"
               onClick={handleEdit}
               disabled={actionLoading === 'edit'}
             >
@@ -1145,10 +952,10 @@ export default function Doctors() {
             </ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
 
-      <StyledDialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
-        <DialogTitle>Confirm Delete</DialogTitle>
+      <Dialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth PaperProps={{ sx: dialogPaperSx }}>
+        <DialogTitle sx={dialogTitleSx}>Confirm Delete</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <Typography sx={{ color: "#dde6f0", mb: 1 }}>
             Delete <strong style={{ color: "#f87171" }}>Dr. {getLang(deleteConfirm?.name)}</strong>?
@@ -1158,14 +965,14 @@ export default function Doctors() {
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
             <ActionButton
-              variant="secondary"
+              btnVariant="secondary"
               onClick={() => setDeleteConfirm(null)}
               disabled={actionLoading === 'delete'}
             >
               Cancel
             </ActionButton>
             <ActionButton
-              variant="danger"
+              btnVariant="danger"
               onClick={handleDelete}
               disabled={actionLoading === 'delete'}
             >
@@ -1178,7 +985,7 @@ export default function Doctors() {
             </ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
     </PageContainer>
   );
 }

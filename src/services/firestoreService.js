@@ -12,3 +12,4 @@ export * from './versions';
 export * from './erp';
 export * from './inventory';
 export * from './procurement';
+export * from './admin';

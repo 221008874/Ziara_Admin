@@ -8,32 +8,11 @@ import {
   CircularProgress, Alert, Divider,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { PageContainer, TopBar, ContentWrapper, sharedFieldSx } from "./components/shared/PageShells";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 
-// ─── Styled Components ────────────────────────────────────────────────────────
-
-const PageContainer = styled(Box)(({ theme }) => ({
-  minHeight: "100vh",
-  backgroundColor: "#04091a",
-  marginLeft: 0,
-  position: "relative",
-  overflow: "hidden",
-  transition: "margin-left 0.3s ease",
-  [theme.breakpoints.up("md")]: {
-    marginLeft: "240px",
-  },
-}));
-
-const TopBar = styled(Box)({
-  background: "linear-gradient(to right, #090f22, #0c1830)",
-  borderBottom: "1px solid rgba(15,184,166,0.12)", padding: "16px 28px",
-  display: "flex", justifyContent: "space-between", alignItems: "center",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.50)", position: "relative",
-  "&::after": { content: '""', position: "absolute", bottom: 0, left: 0, right: 0, height: "2px", background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)", opacity: 0.45 },
-});
-
-const ContentWrapper = styled(Box)({ padding: "24px 28px", maxWidth: 860, position: "relative", zIndex: 1 });
+// ─── Page-specific Styled Components ──────────────────────────────────────────
 
 const SettingsCard = styled(Box)({
   background: "linear-gradient(to bottom, #0b1628, #081020)", borderRadius: "16px",
@@ -51,19 +30,6 @@ const CardDesc = styled(Typography)({
 
 const SectionDivider = styled(Divider)({
   borderColor: "rgba(15,184,166,0.08)", margin: "20px 0",
-});
-
-const StyledField = styled(TextField)({
-  "& .MuiOutlinedInput-root": {
-    backgroundColor: "#0f1e36", borderRadius: "10px",
-    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#0fb8a6" },
-  },
-  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
-  "& .MuiFormHelperText-root": { color: "#4a6080", fontSize: "11px" },
 });
 
 const SaveButton = styled(Button)({
@@ -139,7 +105,11 @@ export default function Settings() {
     (async () => {
       try {
         const data = await loadSettings();
-        if (data) setSettings(s => ({ ...s, ...data }));
+        if (data) {
+          const masked = { ...data };
+          delete masked.smtpPass;
+          setSettings(s => ({ ...s, ...masked }));
+        }
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
     })();
@@ -148,7 +118,9 @@ export default function Settings() {
   const handleSave = async () => {
     try {
       setSaving(true); setError(null); setSuccess(false);
-      await saveSettings(settings);
+      const toSave = { ...settings };
+      delete toSave.smtpPass;
+      await saveSettings(toSave);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 4000);
     } catch (e) {
@@ -161,7 +133,7 @@ export default function Settings() {
   const toggle = (key) => () => setSettings(s => ({ ...s, [key]: !s[key] }));
 
   const field = (label, key, opts = {}) => (
-    <StyledField fullWidth label={label} margin="dense" value={settings[key]} onChange={set(key)} {...opts} />
+    <TextField fullWidth label={label} margin="dense" value={settings[key]} onChange={set(key)} sx={sharedFieldSx} {...opts} />
   );
 
   if (loading) {
@@ -174,6 +146,7 @@ export default function Settings() {
 
   return (
     <PageContainer>
+      <title>Settings — Smart Clinic Admin</title>
       <Box sx={{ position: "fixed", width: 500, height: 500, background: "radial-gradient(circle, rgba(15,184,166,0.04), transparent 70%)", top: -100, right: -100, filter: "blur(60px)", pointerEvents: "none" }} />
 
       <TopBar>
@@ -262,8 +235,11 @@ export default function Settings() {
           </Box>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, mt: 0.5 }}>
             {field("SMTP Username", "smtpUser")}
-            {field("SMTP Password", "smtpPass", { type: "password" })}
+            {field("SMTP Password", "smtpPass", { type: "password", placeholder: "Managed via server env (GMAIL_APP_PASSWORD)", helperText: "Not stored in Firestore — configured on the server via GMAIL_APP_PASSWORD.", disabled: true })}
           </Box>
+          <Alert severity="info" sx={{ mt: 2, backgroundColor: "rgba(15,184,166,0.1)", border: "1px solid rgba(15,184,166,0.25)", color: "#0fb8a6", borderRadius: "10px", "& .MuiAlert-icon": { color: "#0fb8a6" } }}>
+            Email sending uses the server's GMAIL_APP_PASSWORD environment variable. The SMTP password is no longer stored in Firestore.
+          </Alert>
         </SettingsCard>
 
         {/* Save footer */}

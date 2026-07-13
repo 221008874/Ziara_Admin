@@ -1,7 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
 import {
   getAllLicenses,
   createLicense,
@@ -18,138 +15,16 @@ import { normalizeError } from "../lib/errorHandler";
 import { useNotification } from "../contexts/NotificationContext";
 import { useSidebar } from "../App";
 import { Hamburger } from "../components/Sidebar";
+import { Skeleton } from "@mui/material";
 const logo = "/favicon.svg";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
-  Button, TextField, Dialog, DialogTitle, DialogContent,
+  TextField, Dialog, DialogTitle, DialogContent,
   Select, MenuItem, FormControl, InputLabel,
   CircularProgress, Alert, Box, Typography, Chip,
   Checkbox, FormControlLabel,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-
-const StyledSelect = styled(Select)({
-  backgroundColor: "#0f1e36", borderRadius: "10px",
-  "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
-  "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
-  "&.Mui-focused fieldset": { borderColor: "#0fb8a6", boxShadow: "0 0 0 3px rgba(15,184,166,0.15)" },
-  "& .MuiSelect-select": { color: "#dde6f0", fontSize: "14px" },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
-  "& .MuiSvgIcon-root": { color: "#2dd4bf" },
-});
-
-const PageContainer = styled(Box)(({ theme }) => ({
-  minHeight: "100vh",
-  backgroundColor: "#04091a",
-  marginLeft: 0,
-  position: "relative",
-  overflow: "hidden",
-  transition: "margin-left 0.3s ease",
-  [theme.breakpoints.up("md")]: {
-    marginLeft: "240px",
-  },
-}));
-
-const TopBar = styled(Box)({
-  background: "linear-gradient(to right, #090f22, #0c1830)",
-  borderBottom: "1px solid rgba(15,184,166,0.12)",
-  padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.50)", position: "relative",
-  "&::after": {
-    content: '""', position: "absolute", bottom: 0, left: 0, right: 0, height: "2px",
-    background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)", opacity: 0.45,
-  },
-});
-
-const ContentWrapper = styled(Box)({ padding: "24px 28px", position: "relative", zIndex: 1 });
-
-const GlassPanel = styled(Box)({
-  background: "linear-gradient(to bottom, #0b1628, #081020)", borderRadius: "16px",
-  border: "1px solid rgba(15,184,166,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.55)", overflow: "hidden",
-});
-
-const StyledTableContainer = styled(Box)({
-  "& .MuiTable-root": { backgroundColor: "transparent" },
-  "& .MuiTableHead-root": { backgroundColor: "#0c1a30" },
-  "& .MuiTableCell-head": {
-    color: "#2dd4bf", fontWeight: 700, fontSize: "11px", letterSpacing: "0.8px",
-    textTransform: "uppercase", padding: "14px 20px", borderBottom: "1px solid rgba(15,184,166,0.12)",
-  },
-  "& .MuiTableRow-root": {
-    transition: "all 0.15s ease", borderBottom: "1px solid rgba(15,184,166,0.06)",
-    "&:nth-of-type(odd)": { backgroundColor: "rgba(8,16,32,0.35)" },
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.09)" },
-  },
-  "& .MuiTableCell-body": { color: "#dde6f0", fontSize: "13px", padding: "14px 20px", borderBottom: "none" },
-});
-
-const StatusBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "status" })(({ status }) => ({
-  borderRadius: "12px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", height: "28px", minWidth: "80px",
-  ...(status === "ACTIVE" ? {
-    backgroundColor: "rgba(52,211,153,0.14)", color: "#34d399",
-    border: "1px solid rgba(52,211,153,0.28)", boxShadow: "0 0 8px rgba(52,211,153,0.15)",
-  } : status === "EXPIRED" ? {
-    backgroundColor: "rgba(239,68,68,0.14)", color: "#ef4444",
-    border: "1px solid rgba(239,68,68,0.28)", boxShadow: "0 0 8px rgba(239,68,68,0.15)",
-  } : {
-    backgroundColor: "rgba(248,113,113,0.14)", color: "#f87171",
-    border: "1px solid rgba(248,113,113,0.28)", boxShadow: "0 0 8px rgba(248,113,113,0.15)",
-  }),
-  "&:hover": { cursor: "pointer", filter: "brightness(1.2)" },
-}));
-
-const ActionButton = styled(Button)(({ variant }) => ({
-  borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px", transition: "all 0.2s ease",
-  ...(variant === "primary" ? {
-    background: "linear-gradient(to right, #0fb8a6, #0d9488)", color: "white", boxShadow: "0 4px 14px rgba(15,184,166,0.40)",
-    "&:hover": { background: "linear-gradient(to right, #0d9488, #0b7a72)", boxShadow: "0 6px 20px rgba(15,184,166,0.60)", transform: "translateY(-1px)" },
-  } : variant === "warning" ? {
-    backgroundColor: "rgba(245,158,11,0.12)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.30)",
-    "&:hover": { backgroundColor: "#f59e0b", color: "white", boxShadow: "0 4px 12px rgba(245,158,11,0.40)" },
-  } : {
-    backgroundColor: "rgba(15,184,166,0.07)", color: "#2dd4bf", border: "1px solid rgba(15,184,166,0.20)",
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.20)", borderColor: "#0fb8a6", color: "#eaf2ff" },
-  }),
-}));
-
-const StyledDialog = styled(Dialog)({
-  "& .MuiDialog-paper": {
-    backgroundColor: "#0b1628", borderRadius: "20px", border: "1px solid rgba(15,184,166,0.15)",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.80), 0 0 0 1px rgba(15,184,166,0.08)", overflow: "hidden",
-  },
-  "& .MuiDialogTitle-root": {
-    background: "linear-gradient(to right, #0d9488, #083040)", color: "white", fontSize: "18px", fontWeight: 700, padding: "20px 24px",
-    position: "relative",
-    "&::after": { content: '""', position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(to right, transparent, rgba(15,184,166,0.5), transparent)" },
-  },
-});
-
-const StyledDialogField = styled(TextField)({
-  "& .MuiOutlinedInput-root": {
-    backgroundColor: "#0f1e36", borderRadius: "10px",
-    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#0fb8a6", boxShadow: "0 0 0 3px rgba(15,184,166,0.15)" },
-  },
-  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
-  "& .MuiFormHelperText-root": { color: "#4a6080", fontSize: "11px", marginTop: "6px" },
-});
-
-const EmptyState = styled(Box)({ textAlign: "center", padding: "48px 20px", color: "#3a5070" });
-
-const UserPill = styled(Box)({
-  display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px",
-  backgroundColor: "rgba(15,184,166,0.08)", borderRadius: "20px",
-  border: "1px solid rgba(15,184,166,0.15)", color: "#6a8aaa", fontSize: "13px",
-});
-
-const LogoutButton = styled(Button)({
-  borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px",
-  borderColor: "rgba(248,113,113,0.30)", color: "#f87171", backgroundColor: "rgba(248,113,113,0.08)",
-  "&:hover": { backgroundColor: "#f87171", color: "white", borderColor: "#f87171", boxShadow: "0 4px 12px rgba(248,113,113,0.35)" },
-});
+import { PageContainer, TopBar, ContentWrapper, GlassPanel, StyledTableContainer, ActionButton, ClickableStatus, EmptyState, dialogPaperSx, dialogTitleSx, sharedFieldSx } from "./components/shared/PageShells";
 
 function getEffectiveStatus(lic) {
   if (!lic.expiryDate) return lic.status || "INACTIVE";
@@ -299,20 +174,21 @@ export default function Licenses() {
     }
   };
 
-  const navigate = useNavigate();
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-    } catch { /* noop */ }
-    localStorage.removeItem("clinic_admin_logged");
-    localStorage.removeItem("clinic_admin_user");
-    navigate("/login");
-  };
-
   if (loading) {
     return (
-      <PageContainer sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CircularProgress sx={{ color: "#0fb8a6" }} size={48} thickness={3} />
+      <PageContainer>
+        <TopBar>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Hamburger onClick={toggle} />
+            <Skeleton sx={{ bgcolor: "#0c1a30", width: 180 }} />
+          </Box>
+        </TopBar>
+        <ContentWrapper>
+          <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+            {[1,2,3].map(i => <Skeleton key={i} sx={{ bgcolor: "#0c1a30", borderRadius: "14px", height: 80, flex: 1 }} />)}
+          </Box>
+          <Skeleton sx={{ bgcolor: "#0c1a30", borderRadius: "16px", height: 400 }} />
+        </ContentWrapper>
       </PageContainer>
     );
   }
@@ -325,6 +201,7 @@ export default function Licenses() {
 
   return (
     <PageContainer>
+      <title>Licenses — Smart Clinic Admin</title>
       <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(15,184,166,0.05), transparent 70%)", top: -200, right: -200, filter: "blur(60px)", pointerEvents: "none" }} />
       <Box sx={{ position: "fixed", width: 500, height: 500, background: "radial-gradient(circle, rgba(59,130,246,0.04), transparent 70%)", bottom: -150, left: -150, filter: "blur(60px)", pointerEvents: "none" }} />
 
@@ -341,9 +218,9 @@ export default function Licenses() {
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
-          <UserPill className="hide-on-mobile"><span>👋</span>{localStorage.getItem("clinic_admin_user") || "Admin"}</UserPill>
-          <LogoutButton variant="outlined" size="small" onClick={handleLogout} className="hide-on-mobile">Logout</LogoutButton>
-          <ActionButton variant="primary" size="small" onClick={() => setOpenDialog(true)} sx={{ fontSize: { xs: "11px", sm: "12px" } }}>
+          <Box className="hide-on-mobile" sx={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(15,184,166,0.08)", borderRadius: "20px", border: "1px solid rgba(15,184,166,0.15)", color: "#6a8aaa", fontSize: "13px" }}><span>👋</span>{localStorage.getItem("clinic_admin_user") || "Admin"}</Box>
+          <ActionButton btnVariant="secondary" size="small" onClick={loadLicenses} disabled={loading} className="hide-on-mobile">Refresh</ActionButton>
+          <ActionButton btnVariant="primary" size="small" onClick={() => setOpenDialog(true)} sx={{ fontSize: { xs: "11px", sm: "12px" } }}>
             <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>+ </Box>New License
           </ActionButton>
         </Box>
@@ -433,11 +310,10 @@ export default function Licenses() {
                         </TableCell>
                         <TableCell>{lic.expiryDate?.toDate ? lic.expiryDate.toDate().toLocaleDateString() : lic.expiryDate || "—"}</TableCell>
                         <TableCell>
-                          <StatusBadge
+                          <ClickableStatus
                             status={getEffectiveStatus(lic)}
-                            label={getEffectiveStatus(lic)}
-                            onClick={() => getEffectiveStatus(lic) !== "EXPIRED" && actionLoading !== `status-${lic.id}` && toggleStatus(lic.id, lic.status)}
-                            size="small"
+                            onToggle={() => getEffectiveStatus(lic) !== "EXPIRED" && toggleStatus(lic.id, lic.status)}
+                            loading={actionLoading === `status-${lic.id}`}
                           />
                         </TableCell>
                         <TableCell align="center">
@@ -454,7 +330,7 @@ export default function Licenses() {
                           />
                         </TableCell>
                         <TableCell align="right">
-                          <ActionButton variant="warning" size="small" onClick={() => handleEditOpen(lic)} sx={{ mr: 1 }}>
+                          <ActionButton btnVariant="warning" size="small" onClick={() => handleEditOpen(lic)} sx={{ mr: 1 }}>
                             Edit Expiry
                           </ActionButton>
                         </TableCell>
@@ -468,23 +344,24 @@ export default function Licenses() {
         </GlassPanel>
       </ContentWrapper>
 
-      <StyledDialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Create New License</DialogTitle>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogPaperSx }}>
+        <DialogTitle sx={dialogTitleSx}>Create New License</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <StyledDialogField
+          <TextField
             fullWidth
             label="License Key"
             margin="normal"
             value={formData.licenseKey}
             onChange={e => setFormData(p => ({ ...p, licenseKey: e.target.value }))}
             placeholder="LIC-2026-001"
+            sx={sharedFieldSx}
           />
           <FormControl fullWidth margin="normal">
             <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Category</InputLabel>
-            <StyledSelect label="Category" value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))}>
+            <Select label="Category" value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
               <MenuItem value="doctor" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Individual Doctor</MenuItem>
               <MenuItem value="tenant" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Tenant / Organization</MenuItem>
-            </StyledSelect>
+            </Select>
           </FormControl>
           <BilingualInput
             label={formData.category === "tenant" ? "Tenant Name" : "Doctor Name"}
@@ -492,15 +369,16 @@ export default function Licenses() {
             value={formData.doctorName}
             onChange={v => setFormData(p => ({ ...p, doctorName: v }))}
           />
-          <StyledDialogField
+          <TextField
             fullWidth
             label="Phone"
             margin="normal"
             value={formData.phone}
             onChange={e => setFormData(p => ({ ...p, phone: e.target.value }))}
             placeholder="010xxxxxxxx"
+            sx={sharedFieldSx}
           />
-          <StyledDialogField
+          <TextField
             fullWidth
             label="Expiry Date"
             margin="normal"
@@ -508,6 +386,7 @@ export default function Licenses() {
             value={formData.expiryDate}
             onChange={e => setFormData(p => ({ ...p, expiryDate: e.target.value }))}
             InputLabelProps={{ shrink: true }}
+            sx={sharedFieldSx}
           />
           <FormControlLabel
             control={
@@ -521,39 +400,42 @@ export default function Licenses() {
             sx={{ mt: 1 }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setOpenDialog(false)} disabled={actionLoading === 'create'}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleCreate} disabled={actionLoading === 'create'}>{actionLoading === 'create' ? 'Creating...' : 'Create License'}</ActionButton>
+            <ActionButton btnVariant="secondary" onClick={() => setOpenDialog(false)} disabled={actionLoading === 'create'}>Cancel</ActionButton>
+            <ActionButton btnVariant="primary" onClick={handleCreate} disabled={actionLoading === 'create'}>{actionLoading === 'create' ? 'Creating...' : 'Create License'}</ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
 
-      <StyledDialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit License — {editLicense?.licenseKey}</DialogTitle>
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogPaperSx }}>
+        <DialogTitle sx={dialogTitleSx}>Edit License — {editLicense?.licenseKey}</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           <FormControl fullWidth margin="normal">
             <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Category</InputLabel>
-            <StyledSelect label="Category" value={editForm.category} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))}>
+            <Select label="Category" value={editForm.category} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
               <MenuItem value="doctor" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Individual Doctor</MenuItem>
               <MenuItem value="tenant" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Tenant / Organization</MenuItem>
-            </StyledSelect>
+            </Select>
           </FormControl>
-          <StyledDialogField
+          <TextField
             fullWidth label="Name" margin="normal"
             value={editForm.doctorName?.en || editForm.doctorName || ""}
             onChange={e => setEditForm(p => ({ ...p, doctorName: typeof p.doctorName === "object" ? { ...p.doctorName, en: e.target.value } : e.target.value }))}
+            sx={sharedFieldSx}
           />
-          <StyledDialogField
+          <TextField
             fullWidth label="Phone" margin="normal"
             value={editForm.phone}
             onChange={e => setEditForm(p => ({ ...p, phone: e.target.value }))}
             placeholder="010xxxxxxxx"
+            sx={sharedFieldSx}
           />
-          <StyledDialogField
+          <TextField
             fullWidth label="Expiry Date" margin="normal"
             type="date"
             value={editForm.expiryDate}
             onChange={e => setEditForm(p => ({ ...p, expiryDate: e.target.value }))}
             InputLabelProps={{ shrink: true }}
+            sx={sharedFieldSx}
           />
           <FormControlLabel
             control={
@@ -567,11 +449,11 @@ export default function Licenses() {
             sx={{ mt: 1 }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setEditDialogOpen(false)} disabled={actionLoading === 'edit'}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleEditSave} disabled={actionLoading === 'edit'}>{actionLoading === 'edit' ? 'Saving...' : 'Save'}</ActionButton>
+            <ActionButton btnVariant="secondary" onClick={() => setEditDialogOpen(false)} disabled={actionLoading === 'edit'}>Cancel</ActionButton>
+            <ActionButton btnVariant="primary" onClick={handleEditSave} disabled={actionLoading === 'edit'}>{actionLoading === 'edit' ? 'Saving...' : 'Save'}</ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
     </PageContainer>
   );
 }

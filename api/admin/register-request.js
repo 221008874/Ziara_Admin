@@ -72,7 +72,49 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Valid email is required' });
   }
 
+  const clientIp =
+    (req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
+    req.socket?.remoteAddress ||
+    'unknown';
+  const now = Date.now();
+
+  async function sha256(value) {
+    const encoder = new TextEncoder();
+    const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(value));
+    return Array.from(new Uint8Array(buffer))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
   try {
+    // Rate limit: per-email cooldown (3 min) to prevent OTP spam
+    const existingOtp = await db.collection('saas_otp_requests').doc(userEmail).get();
+    if (existingOtp.exists) {
+      const requestedAt = new Date(existingOtp.data().requestedAt).getTime();
+      if (now - requestedAt < 3 * 60 * 1000) {
+        return res
+          .status(429)
+          .json({ error: 'Too many requests. Please wait before requesting another code.' });
+      }
+    }
+
+    // Rate limit: per-IP global cooldown (1 min) to prevent owner email bombing
+    const ipKey = await sha256(clientIp);
+    const rlDoc = await db.collection('saas_rate_limits').doc(ipKey).get();
+    if (rlDoc.exists) {
+      const lastRequest = new Date(rlDoc.data().lastRequest).getTime();
+      if (now - lastRequest < 60 * 1000) {
+        return res
+          .status(429)
+          .json({ error: 'Too many requests. Please try again later.' });
+      }
+    }
+    await db
+      .collection('saas_rate_limits')
+      .doc(ipKey)
+      .set({ lastRequest: new Date().toISOString(), ipHash: ipKey });
+
+    // Continue with OTP generation
     // Check if already an admin
     try {
       const user = await auth.getUserByEmail(userEmail);

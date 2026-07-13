@@ -10,6 +10,8 @@ import Licenses from "./pages/Licenses";
 import Tenants from "./pages/Tenants";
 import Doctors from "./pages/Doctors";
 import Settings from "./pages/Settings";
+import PlatformAdmins from "./pages/PlatformAdmins";
+import ErrorLogs from "./pages/ErrorLogs";
 
 import Updates from "./pages/Updates";
 import ERPSettings from "./pages/ERPSettings";
@@ -37,8 +39,23 @@ function RequireAuth({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        try {
+          await u.getIdToken(true);
+          const tokenResult = await u.getIdTokenResult();
+          const isAdmin = tokenResult.claims?.admin === true || tokenResult.claims?.role === "admin";
+          if (isAdmin) {
+            setUser(u);
+          } else {
+            setUser(null);
+          }
+        } catch {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
     return unsub;
@@ -93,6 +110,8 @@ export default function App() {
               <Route path="/tenants" element={<Tenants />} />
               <Route path="/doctors" element={<Doctors />} />
               <Route path="/licenses" element={<Licenses />} />
+              <Route path="/platform-admins" element={<PlatformAdmins />} />
+              <Route path="/error-logs" element={<ErrorLogs />} />
               <Route path="/updates" element={<Updates />} />
               <Route path="/erp-settings" element={<ERPSettings />} />
               <Route path="/settings" element={<Settings />} />

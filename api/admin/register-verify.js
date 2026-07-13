@@ -144,7 +144,7 @@ if (password.length < 8) {
     }
 
     // ─── 9. Store admin profile in Firestore ─────────────────────────────
-    await db.collection('admins').doc(userRecord.uid).set({
+    await db.collection('platform_admins').doc(userRecord.uid).set({
       email: userEmail,
       fullName: fullName,
       createdAt: new Date().toISOString(),

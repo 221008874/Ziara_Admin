@@ -163,22 +163,23 @@ export const migrateERPFields = async () => {
  * Returns { success: boolean, message: string }
  */
 export const triggerERPSync = async () => {
-  const syncUrl = import.meta.env.VITE_ERP_SYNC_URL;
-  if (!syncUrl) {
-    return { success: true, message: "ERP sync URL not configured (set VITE_ERP_SYNC_URL)" };
+  const user = (await import("firebase/auth")).getAuth().currentUser;
+  if (!user) {
+    return { success: false, message: "Not authenticated" };
   }
+  const token = await user.getIdToken();
   try {
-    const response = await fetch(`${syncUrl}?reconcile=true`, {
+    const response = await fetch("/api/sync/trigger", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: AbortSignal.timeout(5000),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      signal: AbortSignal.timeout(35000),
     });
-    if (!response.ok) {
-      return { success: false, message: `ERP sync returned ${response.status}` };
-    }
-    return { success: true, message: "ERP cache refreshed" };
+    const data = await response.json();
+    return { success: data.success ?? response.ok, message: data.message ?? `HTTP ${response.status}` };
   } catch {
-    // ERP may not be reachable from Admin Panel; this is non-critical
     return { success: false, message: "ERP not reachable — cache will refresh in ~5 min" };
   }
 };

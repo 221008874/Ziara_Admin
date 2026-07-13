@@ -39,6 +39,16 @@ export const createDoctor = async (doctorData) => {
     }
   }
 
+  // Enforce email uniqueness across doctors (comm_doctor_users is keyed by email)
+  if (doctorData.email) {
+    const existingUser = await getDoc(
+      doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email.toLowerCase())
+    );
+    if (existingUser.exists()) {
+      throw new Error(`A doctor with email "${doctorData.email}" already exists`);
+    }
+  }
+
   // Pre-generate the saas_doctors doc ID
   const doctorId = doc(collection(db, COLLECTIONS.SAAS_DOCTORS)).id;
 
@@ -97,7 +107,14 @@ export const createDoctor = async (doctorData) => {
         firebaseUid: result.firebaseUid,
       });
     } catch (authErr) {
-      console.error("Auth creation failed (Firestore data already saved, retry safe):", authErr);
+      console.error("Auth creation failed, cleaning up Firestore records:", authErr);
+      await deleteDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, doctorId)).catch(() => {});
+      if (doctorData.email) {
+        await deleteDoc(
+          doc(db, COLLECTIONS.COMM_DOCTOR_USERS, doctorData.email.toLowerCase())
+        ).catch(() => {});
+      }
+      await deleteDoc(doc(db, COLLECTIONS.COMM_DOCTORS, doctorId)).catch(() => {});
       throw authErr;
     }
   }
@@ -176,11 +193,15 @@ export const updateDoctorStatus = async (doctorId, newStatus) => {
 };
 
 export const updateDoctor = async (doctorId, updates) => {
-  // 🔑 If password is being updated, handle Firebase Auth separately
-  if (updates.password) {
-    const { password: _password, ...updatesWithoutPassword } = updates;
-    updates = updatesWithoutPassword;
+  const password = updates.password;
+  if (password) {
+    const { password: _password, ...rest } = updates;
+    updates = rest;
   }
+
+  const currentSnap = await getDoc(doc(db, COLLECTIONS.SAAS_DOCTORS, doctorId));
+  if (!currentSnap.exists()) throw new Error("Doctor not found");
+  const current = currentSnap.data();
 
   // Validate tenantId exists if being changed
   if (updates.tenantId) {
@@ -188,6 +209,28 @@ export const updateDoctor = async (doctorId, updates) => {
     if (!tenantSnap.exists()) {
       throw new Error(`Tenant "${updates.tenantId}" not found. Create the tenant first.`);
     }
+  }
+
+  // Re-key comm_doctor_users when email changes (preserve firebaseUid)
+  const newEmail = updates.email ? updates.email.toLowerCase() : null;
+  const oldEmail = (current.email || "").toLowerCase();
+  if (newEmail && newEmail !== oldEmail) {
+    const existingMap = await getDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, newEmail));
+    if (existingMap.exists() && existingMap.data().doctorId !== doctorId) {
+      throw new Error(`A doctor with email "${updates.email}" already exists`);
+    }
+    const oldMap = oldEmail ? await getDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, oldEmail)) : null;
+    const firebaseUid = oldMap?.exists() ? oldMap.data().firebaseUid : "";
+    if (oldEmail) {
+      await deleteDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, oldEmail)).catch(() => {});
+    }
+    await setDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, newEmail), {
+      doctorId,
+      email: newEmail,
+      firebaseUid,
+      firstLogin: false,
+      updatedAt: serverTimestamp(),
+    });
   }
 
   // 1. Update saas_doctors
@@ -239,6 +282,36 @@ export const updateDoctor = async (doctorId, updates) => {
       doc(db, COLLECTIONS.COMM_DOCTORS, doctorId),
       publicUpdates
     );
+  }
+
+  // 3. Sync email/password to the Firebase Auth account
+  const emailChanged = newEmail && newEmail !== oldEmail;
+  if (password || emailChanged) {
+    try {
+      const authEmail = newEmail || oldEmail;
+      const mapSnap = await getDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, authEmail));
+      const firebaseUid = mapSnap.exists() ? mapSnap.data().firebaseUid : "";
+      if (!firebaseUid) {
+        throw new Error("Doctor has no linked auth account");
+      }
+      const apiBase = import.meta.env.VITE_API_BASE || "";
+      const res = await fetch(`${apiBase}/api/admin/reset-doctor-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: firebaseUid,
+          email: emailChanged ? newEmail : undefined,
+          password: password || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const result = await res.json().catch(() => ({}));
+        throw new Error(result.error || "Failed to update doctor account");
+      }
+    } catch (pwErr) {
+      console.error("Doctor auth update failed:", pwErr);
+      throw pwErr;
+    }
   }
 };
 

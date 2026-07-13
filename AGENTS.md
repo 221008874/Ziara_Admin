@@ -53,6 +53,15 @@ Fix all 16 identified issues across Categories A–D in the clinic-admin Firesto
 | D4 | `updateLicenseOnlineBooking` missing `updatedAt` | Added `updatedAt: serverTimestamp()` |
 | D5 | Tenant doesn't sync license `expiryDate` | `updateTenant()` fetches new license doc and copies `expiryDate` on licenseKey change |
 
+## Plannotator Plan Mode
+
+When in plan mode, always use `submit_plan` before proceeding with implementation. This sends the plan for review:
+
+- **Approved**: proceed with implementation
+- **Denied**: apply feedback from the response, then re-submit
+
+After plan approval, use `/plannotator-review` for mid-task reviews or `/plannotator-annotate` to annotate code changes.
+
 ### Files Modified
 - `src/services/licenses.js` — A1, C4, D3, D4
 - `src/services/doctors.js` — A2, D1, D2, D3

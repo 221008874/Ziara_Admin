@@ -43,6 +43,8 @@ export const updateLicenseStatus = async (docId, newStatus) => {
 };
 
 export const updateLicenseExpiry = async (licenseKey, newExpiryDate) => {
+  const snap = await getDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey));
+  const current = snap.data();
   const isPast = new Date(newExpiryDate) < new Date();
   const updates = {
     expiryDate: newExpiryDate,
@@ -50,6 +52,8 @@ export const updateLicenseExpiry = async (licenseKey, newExpiryDate) => {
   };
   if (isPast) {
     updates.status = "EXPIRED";
+  } else if (current?.status === "EXPIRED") {
+    updates.status = "ACTIVE";
   }
   await updateDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey), updates);
 };
@@ -62,6 +66,8 @@ export const updateLicenseOnlineBooking = async (licenseKey, enabled) => {
 };
 
 export const updateLicense = async (licenseKey, updates) => {
+  const snap = await getDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey));
+  const current = snap.data();
   const allowed = ["category", "doctorName", "phone", "onlineBooking", "expiryDate"];
   const safe = {};
   for (const key of allowed) {
@@ -71,6 +77,7 @@ export const updateLicense = async (licenseKey, updates) => {
     const isPast = new Date(updates.expiryDate) < new Date();
     safe.expired = isPast;
     if (isPast) safe.status = "EXPIRED";
+    else if (current?.status === "EXPIRED") safe.status = "ACTIVE";
   }
   safe.updatedAt = serverTimestamp();
   await updateDoc(doc(db, COLLECTIONS.SAAS_LICENSES, licenseKey), safe);

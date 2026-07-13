@@ -16,108 +16,13 @@ import { PLANS, PLAN_KEYS, ALL_MODULES, MODULE_LABELS, getPlanTemplate } from ".
 import { validateERPSettings } from "../lib/erpValidation";
 import {
   Table, TableBody, TableCell, TableHead, TableRow,
-  Button, TextField, Dialog, DialogTitle, DialogContent,
-  Select, MenuItem, FormControl, InputLabel,
+  TextField, Dialog, DialogTitle, DialogContent,
+  Select, MenuItem, FormControl, InputLabel, Button,
   CircularProgress, Alert, Box, Typography, Chip,
   Checkbox, FormControlLabel, FormGroup, Switch,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-
-const PageContainer = styled(Box)(({ theme }) => ({
-  minHeight: "100vh",
-  backgroundColor: "#04091a",
-  marginLeft: 0,
-  position: "relative",
-  overflow: "hidden",
-  transition: "margin-left 0.3s ease",
-  [theme.breakpoints.up("md")]: { marginLeft: "240px" },
-}));
-
-const TopBar = styled(Box)({
-  background: "linear-gradient(to right, #090f22, #0c1830)",
-  borderBottom: "1px solid rgba(15,184,166,0.12)",
-  padding: "16px 28px",
-  display: "flex", justifyContent: "space-between", alignItems: "center",
-  boxShadow: "0 4px 20px rgba(0,0,0,0.50)", position: "relative",
-  "&::after": {
-    content: '""', position: "absolute", bottom: 0, left: 0, right: 0, height: "2px",
-    background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)", opacity: 0.45,
-  },
-});
-
-const ContentWrapper = styled(Box)({ padding: "24px 28px", position: "relative", zIndex: 1 });
-
-const GlassPanel = styled(Box)({
-  background: "linear-gradient(to bottom, #0b1628, #081020)", borderRadius: "16px",
-  border: "1px solid rgba(15,184,166,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.55)", overflow: "hidden",
-});
-
-const StyledTableContainer = styled(Box)({
-  "& .MuiTable-root": { backgroundColor: "transparent" },
-  "& .MuiTableHead-root": { backgroundColor: "#0c1a30" },
-  "& .MuiTableCell-head": {
-    color: "#2dd4bf", fontWeight: 700, fontSize: "11px", letterSpacing: "0.8px",
-    textTransform: "uppercase", padding: "14px 20px", borderBottom: "1px solid rgba(15,184,166,0.12)",
-  },
-  "& .MuiTableRow-root": {
-    transition: "all 0.15s ease", borderBottom: "1px solid rgba(15,184,166,0.06)",
-    "&:nth-of-type(odd)": { backgroundColor: "rgba(8,16,32,0.35)" },
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.09)" },
-  },
-  "& .MuiTableCell-body": { color: "#dde6f0", fontSize: "13px", padding: "14px 20px", borderBottom: "none" },
-});
-
-const StatCard = styled(Box)({
-  background: "linear-gradient(135deg, #0b1628, #081020)",
-  border: "1px solid rgba(15,184,166,0.10)", borderRadius: "14px",
-  padding: "18px 22px", flex: "1 1 0", minWidth: 0,
-});
-
-const EmptyState = styled(Box)({ textAlign: "center", padding: "48px 20px", color: "#3a5070" });
-
-const ActionButton = styled(Button)(({ variant: v }) => ({
-  borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px", transition: "all 0.2s ease",
-  ...(v === "primary" ? {
-    background: "linear-gradient(to right, #0fb8a6, #0d9488)", color: "white", boxShadow: "0 4px 14px rgba(15,184,166,0.40)",
-    "&:hover": { background: "linear-gradient(to right, #0d9488, #0b7a72)", transform: "translateY(-1px)" },
-  } : v === "warning" ? {
-    backgroundColor: "rgba(245,158,11,0.12)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.30)",
-    "&:hover": { backgroundColor: "#f59e0b", color: "white" },
-  } : v === "danger" ? {
-    backgroundColor: "rgba(248,113,113,0.10)", color: "#f87171", border: "1px solid rgba(248,113,113,0.25)",
-    "&:hover": { backgroundColor: "#f87171", color: "white" },
-  } : v === "migration" ? {
-    background: "linear-gradient(to right, #7c3aed, #6d28d9)", color: "white", boxShadow: "0 4px 14px rgba(124,58,237,0.40)",
-    "&:hover": { background: "linear-gradient(to right, #6d28d9, #5b21b6)", transform: "translateY(-1px)" },
-  } : {
-    backgroundColor: "rgba(15,184,166,0.07)", color: "#2dd4bf", border: "1px solid rgba(15,184,166,0.20)",
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.20)", borderColor: "#0fb8a6" },
-  }),
-}));
-
-const StyledDialog = styled(Dialog)({
-  "& .MuiDialog-paper": {
-    backgroundColor: "#0b1628", borderRadius: "20px",
-    border: "1px solid rgba(15,184,166,0.15)", boxShadow: "0 20px 60px rgba(0,0,0,0.80)",
-  },
-  "& .MuiDialogTitle-root": {
-    background: "linear-gradient(to right, #0d9488, #083040)", color: "white",
-    fontSize: "18px", fontWeight: 700, padding: "20px 24px", position: "relative",
-    "&::after": { content: '""', position: "absolute", bottom: 0, left: 0, right: 0, height: "1px", background: "linear-gradient(to right, transparent, rgba(15,184,166,0.5), transparent)" },
-  },
-});
-
-const StyledField = styled(TextField)({
-  "& .MuiOutlinedInput-root": {
-    backgroundColor: "#0f1e36", borderRadius: "10px",
-    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#0fb8a6" },
-  },
-  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
-});
+import { PageContainer, TopBar, ContentWrapper, GlassPanel, StyledTableContainer, ActionButton, StatCard, EmptyState, dialogPaperSx, dialogTitleSx, sharedFieldSx } from "./components/shared/PageShells";
 
 const StyledSelect = styled(Select)({
   backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px",
@@ -259,6 +164,7 @@ export default function ERPSettings() {
 
   return (
     <PageContainer>
+      <title>ERP Settings — Smart Clinic Admin</title>
       <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(124,58,237,0.05), transparent 70%)", top: -200, right: 0, filter: "blur(60px)", pointerEvents: "none" }} />
 
       <TopBar>
@@ -273,11 +179,21 @@ export default function ERPSettings() {
           </Box>
         </Box>
         <Box sx={{ display: "flex", gap: 1.5 }}>
-          <ActionButton variant="migration" onClick={handleMigrate} disabled={migrating}>
+          <Button
+            onClick={handleMigrate}
+            disabled={migrating}
+            sx={{
+              borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px",
+              background: "linear-gradient(to right, #7c3aed, #6d28d9)", color: "white",
+              boxShadow: "0 4px 14px rgba(124,58,237,0.40)",
+              "&:hover": { background: "linear-gradient(to right, #6d28d9, #5b21b6)", transform: "translateY(-1px)" },
+              transition: "all 0.2s ease",
+            }}
+          >
             {migrating ? <CircularProgress size={14} sx={{ color: "white", mr: 1 }} /> : null}
             {migrating ? "Migrating..." : "Migrate ERP Fields"}
-          </ActionButton>
-          <ActionButton variant="primary" onClick={() => triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); })}>
+          </Button>
+          <ActionButton btnVariant="primary" onClick={() => triggerERPSync().then(r => { if (!r.success) showNotification(r.message, "warning"); })}>
             Sync ERP
           </ActionButton>
         </Box>
@@ -410,7 +326,7 @@ export default function ERPSettings() {
                             />
                           </TableCell>
                           <TableCell align="right">
-                            <ActionButton variant="warning" size="small" onClick={() => openConfig(t)}>
+                            <ActionButton btnVariant="warning" size="small" onClick={() => openConfig(t)}>
                               Configure
                             </ActionButton>
                           </TableCell>
@@ -425,8 +341,8 @@ export default function ERPSettings() {
         </GlassPanel>
       </ContentWrapper>
 
-      <StyledDialog open={configOpen} onClose={() => setConfigOpen(false)} maxWidth="md" fullWidth sx={{ "& .MuiDialog-paper": { maxHeight: { xs: "100vh", sm: "none" } } }}>
-        <DialogTitle>ERP Configuration — {configTarget?.name?.en || configTarget?.id || ""}</DialogTitle>
+      <Dialog open={configOpen} onClose={() => setConfigOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { ...dialogPaperSx, maxHeight: { xs: "100vh", sm: "none" } } }}>
+        <DialogTitle sx={dialogTitleSx}>ERP Configuration — {configTarget?.name?.en || configTarget?.id || ""}</DialogTitle>
         <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
           {configErrors.length > 0 && (
             <Alert severity="error" sx={{ mb: 2, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>
@@ -480,31 +396,34 @@ export default function ERPSettings() {
           </FormControl>
 
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, mt: 1 }}>
-            <StyledField
+            <TextField
               fullWidth label="Max Users" margin="normal"
               type="number"
               value={configForm.maxUsers}
               onChange={e => setConfigForm(p => ({ ...p, maxUsers: e.target.value === "" ? "" : Number(e.target.value) }))}
               disabled={configForm.plan === "ENTERPRISE"}
               helperText={configForm.plan === "ENTERPRISE" ? "Unlimited for Enterprise" : "Override plan default"}
+              sx={sharedFieldSx}
             />
-            <StyledField
+            <TextField
               fullWidth label="Max Doctors" margin="normal"
               type="number"
               value={configForm.maxDoctors}
               onChange={e => setConfigForm(p => ({ ...p, maxDoctors: e.target.value === "" ? "" : Number(e.target.value) }))}
               disabled={configForm.plan === "ENTERPRISE"}
               helperText={configForm.plan === "ENTERPRISE" ? "Unlimited for Enterprise" : "Override plan default"}
+              sx={sharedFieldSx}
             />
           </Box>
 
-          <StyledField
+          <TextField
             fullWidth label="License Expiry (ERP)" margin="normal"
             type="date"
             value={configForm.expiresAt}
             onChange={e => setConfigForm(p => ({ ...p, expiresAt: e.target.value }))}
             InputLabelProps={{ shrink: true }}
             helperText="ERP-specific expiry (separate from license expiryDate)"
+            sx={sharedFieldSx}
           />
 
           <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "14px", mb: 1, mt: 2 }}>Enabled Modules</Typography>
@@ -542,16 +461,14 @@ export default function ERPSettings() {
           </Box>
 
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-            <ActionButton variant="secondary" onClick={() => setConfigOpen(false)} disabled={configSaving}>Cancel</ActionButton>
-            <ActionButton variant="primary" onClick={handleConfigSave} disabled={configSaving}>
+            <ActionButton btnVariant="secondary" onClick={() => setConfigOpen(false)} disabled={configSaving}>Cancel</ActionButton>
+            <ActionButton btnVariant="primary" onClick={handleConfigSave} disabled={configSaving}>
               {configSaving ? <CircularProgress size={14} sx={{ color: "white", mr: 1 }} /> : null}
               {configSaving ? "Saving..." : "Save Configuration"}
             </ActionButton>
           </Box>
         </DialogContent>
-      </StyledDialog>
+      </Dialog>
     </PageContainer>
   );
 }
-
-

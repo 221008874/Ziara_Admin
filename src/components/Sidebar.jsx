@@ -3,7 +3,7 @@ import { Box, Typography, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { Menu, X, Building2, Stethoscope, Key, Cloud, Zap, Settings } from "lucide-react";
+import { Menu, X, Building2, Stethoscope, Key, Cloud, Zap, Settings, Shield, Bug } from "lucide-react";
 const logo = "/favicon.svg";
 import { useSidebar } from "../App";
 
@@ -157,6 +157,13 @@ const NAV_ITEMS = [
       { to: "/doctors",   icon: <Stethoscope size={16} />, label: "Doctors"   },
       { to: "/licenses",  icon: <Key size={16} />, label: "Licenses"  },
       { to: "/updates",   icon: <Cloud size={16} />, label: "Updates"   },
+    ],
+  },
+  {
+    section: "Admin",
+    items: [
+      { to: "/platform-admins", icon: <Shield size={16} />, label: "Platform Admins" },
+      { to: "/error-logs", icon: <Bug size={16} />, label: "Error Logs" },
     ],
   },
   {
