@@ -224,11 +224,13 @@ export const updateDoctor = async (doctorId, updates) => {
     if (oldEmail) {
       await deleteDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, oldEmail)).catch(() => {});
     }
+    const oldUserData = oldMap?.exists() ? oldMap.data() : {};
     await setDoc(doc(db, COLLECTIONS.COMM_DOCTOR_USERS, newEmail), {
       doctorId,
       email: newEmail,
       firebaseUid,
       firstLogin: false,
+      ...(oldUserData.passwordChangedAt ? { passwordChangedAt: oldUserData.passwordChangedAt } : {}),
       updatedAt: serverTimestamp(),
     });
   }
