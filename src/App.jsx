@@ -27,9 +27,9 @@ export const useSidebar = () => useContext(SidebarCtx);
 
 function AuthLoading() {
   return (
-    <Box sx={{ minHeight: "100vh", backgroundColor: "#04091a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
-      <CircularProgress sx={{ color: "#0fb8a6" }} size={40} thickness={3} />
-      <Box sx={{ color: "#3a5070", fontSize: "13px", fontWeight: 500 }}>Verifying session…</Box>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "var(--bg-primary)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
+      <CircularProgress sx={{ color: "var(--zy-teal-500)" }} size={40} thickness={3} />
+      <Box sx={{ color: "var(--text-dark)", fontSize: "13px", fontWeight: 500 }}>Verifying session…</Box>
     </Box>
   );
 }

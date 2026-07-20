@@ -14,20 +14,27 @@ service cloud.firestore {
         request.auth.uid in get(/databases/$(database)/documents/saas_tenants/$(tenantId)).data.staffUids;
     }
 
-    function isAnonymous() {
-      return request.auth != null &&
-        request.auth.token.firebase.sign_in_provider == 'anonymous';
-    }
-
     function isValidPhone(phone) {
       return phone.matches('^01[0125][0-9]{8}$');
+    }
+
+    // Patient's OTP-verified phone (custom-token claim); null if absent.
+    function verifiedPhone() {
+      return request.auth != null ? request.auth.token.verified_phone : null;
+    }
+
+    // Doctor identity is carried as a custom-token claim (doctor_id),
+    // since doctors are not listed in any tenant staffUids array.
+    function isDoctorOf(doctorId) {
+      return request.auth != null &&
+        request.auth.token.doctor_id == doctorId;
     }
 
     // ─── comm_doctors ────────────────────────────────────────────────────
     match /comm_doctors/{doctorId} {
       allow read: if true;
       allow create: if isAnyAdmin() || isTenantStaff(request.resource.data.tenantId);
-      allow update: if isAnyAdmin() || isTenantStaff(resource.data.tenantId);
+      allow update: if isAnyAdmin() || isTenantStaff(resource.data.tenantId) || isDoctorOf(doctorId);
       allow delete: if isAnyAdmin();
     }
 
@@ -41,17 +48,15 @@ service cloud.firestore {
 
     // ─── comm_patients ───────────────────────────────────────────────────
     match /comm_patients/{phone} {
-      allow read: if request.auth != null && (
-        isAnonymous() ||
-        request.auth.token.phone_number == phone ||
+      allow read: if isAnyAdmin() ||
         isTenantStaff(resource.data.tenantId) ||
-        isAnyAdmin()
-      );
-      allow create: if (request.resource.data.phone == phone && isValidPhone(phone)) || isAnyAdmin() || isAnonymous();
-      allow update: if isAnonymous() ||
-        request.auth.token.phone_number == phone ||
+        verifiedPhone() == phone;
+      allow create: if isAnyAdmin() ||
+        (request.resource.data.phone == phone && isValidPhone(phone)) ||
+        verifiedPhone() == phone;
+      allow update: if isAnyAdmin() ||
         isTenantStaff(resource.data.tenantId) ||
-        isAnyAdmin();
+        verifiedPhone() == phone;
       allow delete: if isAnyAdmin();
     }
 
@@ -63,18 +68,14 @@ service cloud.firestore {
     // UPDATE permits patients/staff but enforces immutable routing fields
     // so forged providerId/licenseKey/doctorId cannot be injected post-creation.
     match /comm_appointments/{appointmentId} {
-      allow read: if request.auth != null && (
-        isAnonymous() ||
-        resource.data.patientPhone == request.auth.token.phone_number ||
+      allow read: if isAnyAdmin() ||
         isTenantStaff(resource.data.tenantId) ||
-        isAnyAdmin()
-      );
+        verifiedPhone() == resource.data.patientPhone;
       allow create: if isAnyAdmin();
-      allow update: if request.auth != null && (
-        isAnonymous() ||
-        request.auth.token.phone_number == resource.data.patientPhone ||
+      allow update: if (
+        isAnyAdmin() ||
         isTenantStaff(resource.data.tenantId) ||
-        isAnyAdmin()
+        verifiedPhone() == resource.data.patientPhone
       )
         && request.resource.data.providerId == resource.data.providerId
         && request.resource.data.licenseKey == resource.data.licenseKey
@@ -82,6 +83,22 @@ service cloud.firestore {
         && request.resource.data.tenantId == resource.data.tenantId
         && request.resource.data.providerType == resource.data.providerType;
       allow delete: if isAnyAdmin();
+    }
+
+    // ─── comm_telegram_links (server-only: pre-booking linkage) ─────────
+    match /comm_telegram_links/{phone} {
+      allow read, write: if false;
+    }
+
+    // ─── comm_otp_requests (server-only: OTP codes) ─────────────────────
+    match /comm_otp_requests/{id} {
+      allow read, write: if false;
+    }
+
+    // ─── comm_doctor_availability (public read, doctor/admin write) ───────
+    match /comm_doctor_availability/{doctorId} {
+      allow read: if true;
+      allow write: if isAnyAdmin() || isDoctorOf(doctorId);
     }
 
     // ─── comm_doctor_users ───────────────────────────────────────────────

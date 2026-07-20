@@ -16,7 +16,7 @@ const pulseRing = keyframes`
 
 const LoginWrapper = styled(Box)({
   minHeight: "100vh",
-  backgroundColor: "#04091a",
+  backgroundColor: "var(--bg-primary)",
   position: "relative",
   overflow: "hidden",
   display: "flex",
@@ -37,10 +37,10 @@ const LoginCard = styled(Box)({
   zIndex: 2,
   width: "100%",
   maxWidth: "420px",
-  backgroundColor: "#0b1628",
+  backgroundColor: "var(--bg-secondary)",
   borderRadius: "20px",
-  border: "1px solid rgba(15,184,166,0.13)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(15,184,166,0.05)",
+  border: "1px solid rgba(28,138,126,0.13)",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px rgba(28,138,126,0.05)",
   overflow: "hidden",
   "@media (max-width: 480px)": {
     borderRadius: "16px",
@@ -48,7 +48,7 @@ const LoginCard = styled(Box)({
 });
 
 const CardHeader = styled(Box)({
-  background: "linear-gradient(to bottom, #0d9488 0%, #083040 60%, transparent 100%)",
+  background: "linear-gradient(to bottom, var(--zy-teal-700) 0%, var(--zy-teal-900) 60%, transparent 100%)",
   padding: "32px 32px 24px",
   textAlign: "center",
   position: "relative",
@@ -59,7 +59,7 @@ const CardHeader = styled(Box)({
     left: "10%",
     right: "10%",
     height: "1px",
-    background: "linear-gradient(to right, transparent, rgba(15,184,166,0.4), transparent)",
+    background: "linear-gradient(to right, transparent, rgba(28,138,126,0.4), transparent)",
   },
 });
 
@@ -68,7 +68,7 @@ const LogoRing = styled(Box)({
   height: "64px",
   margin: "0 auto 16px",
   borderRadius: "50%",
-  border: "2px solid rgba(15,184,166,0.3)",
+  border: "2px solid rgba(28,138,126,0.3)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -78,47 +78,47 @@ const LogoRing = styled(Box)({
     position: "absolute",
     inset: "-4px",
     borderRadius: "50%",
-    border: "2px solid rgba(15,184,166,0.15)",
+    border: "2px solid rgba(28,138,126,0.15)",
     animation: `${pulseRing} 2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
   },
 });
 
 const StyledTextField = styled(TextField)({
   "& .MuiOutlinedInput-root": {
-    backgroundColor: "#0f1e36",
+    backgroundColor: "var(--bg-input)",
     borderRadius: "10px",
     transition: "all 0.2s ease",
     "& fieldset": {
-      borderColor: "rgba(15,184,166,0.18)",
+      borderColor: "rgba(28,138,126,0.18)",
       borderWidth: "1px",
     },
     "&:hover fieldset": {
-      borderColor: "rgba(15,184,166,0.35)",
+      borderColor: "rgba(28,138,126,0.35)",
     },
     "&.Mui-focused fieldset": {
-      borderColor: "#0fb8a6",
-      boxShadow: "0 0 0 3px rgba(15,184,166,0.15)",
+      borderColor: "var(--zy-teal-500)",
+      boxShadow: "0 0 0 3px rgba(28,138,126,0.15)",
     },
   },
   "& .MuiInputBase-input": {
-    color: "#dde6f0",
+    color: "var(--text-secondary)",
     fontSize: "14px",
     padding: "14px 16px",
   },
   "& .MuiInputLabel-root": {
-    color: "#3a5070",
+    color: "var(--text-dark)",
     fontSize: "12px",
     fontWeight: 600,
     letterSpacing: "0.5px",
     textTransform: "uppercase",
   },
   "& .MuiInputLabel-root.Mui-focused": {
-    color: "#0fb8a6",
+    color: "var(--zy-teal-500)",
   },
 });
 
 const LoginButton = styled(Button)({
-  background: "linear-gradient(to right, #0fb8a6, #0d9488)",
+  background: "linear-gradient(to right, var(--zy-teal-500), var(--zy-teal-700))",
   color: "white",
   fontSize: "14px",
   fontWeight: 700,
@@ -126,25 +126,25 @@ const LoginButton = styled(Button)({
   borderRadius: "10px",
   textTransform: "none",
   letterSpacing: "0.5px",
-  boxShadow: "0 4px 14px rgba(15,184,166,0.45)",
+  boxShadow: "0 4px 14px rgba(28,138,126,0.45)",
   transition: "all 0.3s ease",
   "&:hover": {
-    background: "linear-gradient(to right, #0d9488, #0b7a72)",
-    boxShadow: "0 6px 20px rgba(15,184,166,0.65)",
+    background: "linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-700))",
+    boxShadow: "0 6px 20px rgba(28,138,126,0.65)",
     transform: "translateY(-1px)",
   },
   "&:active": {
     transform: "translateY(0)",
   },
   "&.Mui-disabled": {
-    background: "linear-gradient(to right, #0a5c52, #074038)",
+    background: "linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-900))",
     color: "rgba(255,255,255,0.5)",
   },
 });
 
 // ← NEW: Styled link for registration
 const RegisterLink = styled(Link)({
-  color: "#0fb8a6",
+  color: "var(--zy-teal-500)",
   textDecoration: "none",
   fontWeight: 600,
   fontSize: "13px",
@@ -153,7 +153,7 @@ const RegisterLink = styled(Link)({
   gap: "4px",
   transition: "all 0.2s ease",
   "&:hover": {
-    color: "#2dd4bf",
+    color: "var(--accent-light)",
     textDecoration: "underline",
   },
 });
@@ -165,14 +165,14 @@ const SecurityIndicator = styled(Box)({
   gap: "8px",
   marginTop: "16px",
   paddingTop: "16px",
-  borderTop: "1px solid rgba(15,184,166,0.1)",
+  borderTop: "1px solid rgba(28,138,126,0.1)",
 });
 
 const StatusDot = styled(Box)({
   width: "8px",
   height: "8px",
   borderRadius: "50%",
-  backgroundColor: "#34d399",
+  backgroundColor: "var(--success)",
   boxShadow: "0 0 8px rgba(52,211,153,0.6)",
 });
 
@@ -216,7 +216,7 @@ export default function Login() {
   return (
     <LoginWrapper>
       {/* Decorative Background */}
-      <BgCircle sx={{ width: 500, height: 500, background: "radial-gradient(circle, rgba(15,184,166,0.08), transparent 70%)", top: -100, right: -100 }} />
+      <BgCircle sx={{ width: 500, height: 500, background: "radial-gradient(circle, rgba(28,138,126,0.08), transparent 70%)", top: -100, right: -100 }} />
       <BgCircle sx={{ width: 400, height: 400, background: "radial-gradient(circle, rgba(59,130,246,0.06), transparent 70%)", bottom: -100, left: -100 }} />
       
       <LoginCard>
@@ -234,7 +234,7 @@ export default function Login() {
 
         <Box sx={{ p: "28px 32px 32px", display: "flex", flexDirection: "column", gap: 2.5 }}>
           {successMessage && (
-            <Alert severity="success" sx={{ backgroundColor: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", borderRadius: "10px" }}>
+            <Alert severity="success" sx={{ backgroundColor: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.25)", color: "var(--success)", borderRadius: "10px" }}>
               {successMessage}
             </Alert>
           )}
@@ -244,9 +244,9 @@ export default function Login() {
               sx={{ 
                 backgroundColor: "rgba(248,113,113,0.1)", 
                 border: "1px solid rgba(248,113,113,0.25)",
-                color: "#f87171",
+                color: "var(--danger)",
                 borderRadius: "10px",
-                "& .MuiAlert-icon": { color: "#f87171" }
+                "& .MuiAlert-icon": { color: "var(--danger)" }
               }}
             >
               {error}
@@ -291,9 +291,9 @@ export default function Login() {
             alignItems: "center", 
             gap: 1,
             pt: 2,
-            borderTop: "1px solid rgba(15,184,166,0.1)"
+            borderTop: "1px solid rgba(28,138,126,0.1)"
           }}>
-            <Typography sx={{ color: "#4a6080", fontSize: "12px" }}>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "12px" }}>
               Don't have an admin account?
             </Typography>
             <RegisterLink to="/register">
@@ -303,7 +303,7 @@ export default function Login() {
 
           <SecurityIndicator>
             <StatusDot />
-            <Typography sx={{ color: "#3a5070", fontSize: "11px", fontStyle: "italic" }}>
+            <Typography sx={{ color: "var(--text-dark)", fontSize: "11px", fontStyle: "italic" }}>
               End-to-end encrypted connection
             </Typography>
           </SecurityIndicator>

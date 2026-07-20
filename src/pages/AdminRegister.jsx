@@ -11,7 +11,7 @@ const logo = "/favicon.svg";
 
 const RegisterWrapper = styled(Box)({
   minHeight: '100vh',
-  backgroundColor: '#04091a',
+  backgroundColor: 'var(--bg-primary)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -21,27 +21,27 @@ const RegisterWrapper = styled(Box)({
 const RegisterCard = styled(Paper)({
   width: '100%',
   maxWidth: '480px',
-  backgroundColor: '#0b1628',
+  backgroundColor: 'var(--bg-secondary)',
   borderRadius: '20px',
-  border: '1px solid rgba(15,184,166,0.13)',
+  border: '1px solid rgba(28,138,126,0.13)',
   padding: '32px',
 });
 
 const StyledTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
-    backgroundColor: '#0f1e36',
+    backgroundColor: 'var(--bg-input)',
     borderRadius: '10px',
-    color: '#dde6f0',
+    color: 'var(--text-secondary)',
     transition: 'all 0.2s ease',
     '& fieldset': {
-      borderColor: 'rgba(15,184,166,0.18)',
+      borderColor: 'rgba(28,138,126,0.18)',
     },
     '&:hover fieldset': {
-      borderColor: 'rgba(15,184,166,0.35)',
+      borderColor: 'rgba(28,138,126,0.35)',
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#0fb8a6',
-      boxShadow: '0 0 0 3px rgba(15,184,166,0.15)',
+      borderColor: 'var(--zy-teal-500)',
+      boxShadow: '0 0 0 3px rgba(28,138,126,0.15)',
     },
   },
   '& .MuiInputBase-input': {
@@ -49,21 +49,21 @@ const StyledTextField = styled(TextField)({
     padding: '14px 16px',
   },
   '& .MuiInputLabel-root': {
-    color: '#3a5070',
+    color: 'var(--text-dark)',
     fontSize: '12px',
     fontWeight: 600,
   },
   '& .MuiInputLabel-root.Mui-focused': {
-    color: '#0fb8a6',
+    color: 'var(--zy-teal-500)',
   },
   '& .MuiFormHelperText-root': {
-    color: '#4a6080',
+    color: 'var(--zy-slate-300)',
     fontSize: '11px',
   },
 });
 
 const RegisterButton = styled(Button)({
-  background: 'linear-gradient(to right, #0fb8a6, #0d9488)',
+  background: 'linear-gradient(to right, var(--zy-teal-500), var(--zy-teal-700))',
   color: 'white',
   fontWeight: 700,
   padding: '14px 0',
@@ -71,17 +71,17 @@ const RegisterButton = styled(Button)({
   textTransform: 'none',
   fontSize: '14px',
   '&:hover': {
-    background: 'linear-gradient(to right, #0d9488, #0b7a72)',
+    background: 'linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-700))',
     transform: 'translateY(-1px)',
   },
   '&.Mui-disabled': {
-    background: 'linear-gradient(to right, #0a5c52, #074038)',
+    background: 'linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-900))',
     color: 'rgba(255,255,255,0.5)',
   },
 });
 
 const BackLink = styled(Link)({
-  color: '#0fb8a6',
+  color: 'var(--zy-teal-500)',
   textDecoration: 'none',
   fontWeight: 600,
   fontSize: '13px',
@@ -89,7 +89,7 @@ const BackLink = styled(Link)({
   alignItems: 'center',
   gap: '4px',
   '&:hover': {
-    color: '#2dd4bf',
+    color: 'var(--accent-light)',
     textDecoration: 'underline',
   },
 });
@@ -211,7 +211,7 @@ export default function AdminRegister() {
         <Typography variant="h4" sx={{ color: 'white', fontWeight: 700, mb: 1, textAlign: 'center', fontSize: { xs: "20px", sm: "24px" } }}>
           Register as Admin
         </Typography>
-        <Typography sx={{ color: '#4a6080', mb: 3, textAlign: 'center' }}>
+        <Typography sx={{ color: 'var(--zy-slate-300)', mb: 3, textAlign: 'center' }}>
           Create a new admin account for Smart Clinic
         </Typography>
 
@@ -274,7 +274,7 @@ export default function AdminRegister() {
         {/* Step 2 */}
         {step === 2 && (
           <form onSubmit={handleVerifyAndRegister} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <Typography sx={{ color: '#dde6f0', mb: 1 }}>
+            <Typography sx={{ color: 'var(--text-secondary)', mb: 1 }}>
               Enter the 6-digit code sent to administrator
             </Typography>
             

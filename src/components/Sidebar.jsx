@@ -12,8 +12,8 @@ import { useSidebar } from "../App";
 const SidebarRoot = styled(Box)(({ $open }) => ({
   width: 240,
   minHeight: "100vh",
-  background: "linear-gradient(to bottom, #090f22, #060d1c)",
-  borderRight: "1px solid rgba(15,184,166,0.10)",
+  background: "linear-gradient(to bottom, var(--bg-primary), var(--bg-primary))",
+  borderRight: "1px solid rgba(28,138,126,0.10)",
   display: "flex",
   flexDirection: "column",
   position: "fixed",
@@ -31,7 +31,7 @@ const SidebarRoot = styled(Box)(({ $open }) => ({
 
 const Logo = styled(Box)({
   padding: "16px 20px",
-  borderBottom: "1px solid rgba(15,184,166,0.08)",
+  borderBottom: "1px solid rgba(28,138,126,0.08)",
   display: "flex",
   alignItems: "center",
   gap: 12,
@@ -50,11 +50,11 @@ const CloseBtn = styled(IconButton)({
   position: "absolute",
   right: 12,
   top: 16,
-  color: "#4a6a8a",
+  color: "var(--zy-slate-300)",
   "@media (max-width: 768px)": {
     display: "flex",
   },
-  "&:hover": { backgroundColor: "rgba(15,184,166,0.10)" },
+  "&:hover": { backgroundColor: "rgba(28,138,126,0.10)" },
 });
 
 const NavSection = styled(Box)({
@@ -68,7 +68,7 @@ const SectionLabel = styled(Typography)({
   fontWeight: 700,
   letterSpacing: "1.2px",
   textTransform: "uppercase",
-  color: "#2a3a52",
+  color: "var(--zy-slate-700)",
   padding: "8px 10px 4px",
 });
 
@@ -80,18 +80,18 @@ const NavItem = styled(NavLink)({
   borderRadius: "10px",
   marginBottom: 2,
   textDecoration: "none",
-  color: "#4a6a8a",
+  color: "var(--zy-slate-300)",
   fontSize: "13px",
   fontWeight: 500,
   transition: "all 0.18s ease",
   position: "relative",
   "&:hover": {
-    backgroundColor: "rgba(15,184,166,0.08)",
-    color: "#9ecfca",
+    backgroundColor: "rgba(28,138,126,0.08)",
+    color: "var(--zy-teal-100)",
   },
   "&.active": {
-    backgroundColor: "rgba(15,184,166,0.12)",
-    color: "#2dd4bf",
+    backgroundColor: "rgba(28,138,126,0.12)",
+    color: "var(--accent-light)",
     fontWeight: 600,
     "&::before": {
       content: '""',
@@ -101,8 +101,8 @@ const NavItem = styled(NavLink)({
       bottom: "20%",
       width: 3,
       borderRadius: "0 3px 3px 0",
-      backgroundColor: "#0fb8a6",
-      boxShadow: "0 0 8px rgba(15,184,166,0.60)",
+      backgroundColor: "var(--zy-teal-500)",
+      boxShadow: "0 0 8px rgba(28,138,126,0.60)",
     },
   },
 });
@@ -116,7 +116,7 @@ const NavIcon = styled(Box)({
 
 const BottomSection = styled(Box)({
   padding: "12px 10px 20px",
-  borderTop: "1px solid rgba(15,184,166,0.08)",
+  borderTop: "1px solid rgba(28,138,126,0.08)",
 });
 
 const UserBox = styled(Box)({
@@ -125,8 +125,8 @@ const UserBox = styled(Box)({
   gap: 8,
   padding: "10px 12px",
   borderRadius: "10px",
-  backgroundColor: "rgba(15,184,166,0.05)",
-  border: "1px solid rgba(15,184,166,0.10)",
+  backgroundColor: "rgba(28,138,126,0.05)",
+  border: "1px solid rgba(28,138,126,0.10)",
   marginBottom: 8,
 });
 
@@ -136,14 +136,14 @@ const LogoutBtn = styled(Box)({
   gap: 10,
   padding: "10px 12px",
   borderRadius: "10px",
-  color: "#f87171",
+  color: "var(--danger)",
   fontSize: "13px",
   fontWeight: 500,
   cursor: "pointer",
   transition: "all 0.18s ease",
   "&:hover": {
     backgroundColor: "rgba(248,113,113,0.10)",
-    color: "#fca5a5",
+    color: "var(--zy-danger)",
   },
 });
 
@@ -209,10 +209,10 @@ export default function Sidebar({ onToggle }) {
       <Logo>
         <LogoIcon src={logo} alt="Smart Clinic" />
         <Box>
-          <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "14px", lineHeight: 1.2 }}>
+          <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "14px", lineHeight: 1.2 }}>
             Smart Clinic
           </Typography>
-          <Typography sx={{ color: "#2a3a52", fontSize: "10px", fontStyle: "italic" }}>
+          <Typography sx={{ color: "var(--zy-slate-700)", fontSize: "10px", fontStyle: "italic" }}>
             Admin Console
           </Typography>
         </Box>
@@ -237,7 +237,7 @@ export default function Sidebar({ onToggle }) {
       <BottomSection>
         <UserBox>
           <Box sx={{ fontSize: 14 }}>👋</Box>
-          <Typography sx={{ color: "#4a6a8a", fontSize: "12px", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "12px", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {adminUser}
           </Typography>
         </UserBox>
@@ -258,9 +258,9 @@ export function Hamburger({ onClick }) {
       onClick={onClick}
       sx={{
         display: { xs: "flex", md: "none" },
-        color: "#eaf2ff",
+        color: "var(--text-primary)",
         mr: 1,
-        "&:hover": { backgroundColor: "rgba(15,184,166,0.12)" },
+        "&:hover": { backgroundColor: "rgba(28,138,126,0.12)" },
       }}
       size="small"
     >

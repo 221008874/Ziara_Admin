@@ -28,7 +28,7 @@ export default class ErrorBoundary extends Component {
         <Box
           sx={{
             minHeight: "100vh",
-            bgcolor: "#04091a",
+            bgcolor: "var(--bg-primary)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -36,20 +36,20 @@ export default class ErrorBoundary extends Component {
           }}
         >
           <Box sx={{ maxWidth: 480, width: "100%" }}>
-            <Typography variant="h5" sx={{ color: "#f87171", mb: 2, fontWeight: 700 }}>
+            <Typography variant="h5" sx={{ color: "var(--danger)", mb: 2, fontWeight: 700 }}>
               Something went wrong
             </Typography>
             <Alert severity="error" sx={{ mb: 3 }}>
               {normalized.message}
             </Alert>
             <Box sx={{ display: "flex", gap: 2 }}>
-              <Button variant="outlined" onClick={this.handleReset} sx={{ color: "#0fb8a6", borderColor: "#0fb8a6" }}>
+              <Button variant="outlined" onClick={this.handleReset} sx={{ color: "var(--zy-teal-500)", borderColor: "var(--zy-teal-500)" }}>
                 Try Again
               </Button>
               <Button
                 variant="outlined"
                 onClick={() => window.location.replace("/")}
-                sx={{ color: "#eaf2ff", borderColor: "#6a8aaa" }}
+                sx={{ color: "var(--text-primary)", borderColor: "var(--text-muted)" }}
               >
                 Go Home
               </Button>
@@ -60,9 +60,9 @@ export default class ErrorBoundary extends Component {
                 sx={{
                   mt: 3,
                   p: 2,
-                  bgcolor: "#0b1628",
+                  bgcolor: "var(--bg-secondary)",
                   borderRadius: 1,
-                  color: "#6a8aaa",
+                  color: "var(--text-muted)",
                   fontSize: 12,
                   overflow: "auto",
                   maxHeight: 200,

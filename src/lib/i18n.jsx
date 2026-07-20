@@ -42,16 +42,16 @@ export const getLang = (value, lang = "en") => {
 
 const BiField = styled(TextField)({
   "& .MuiOutlinedInput-root": {
-    backgroundColor: "#0f1e36",
+    backgroundColor: "var(--bg-input)",
     borderRadius: "10px",
-    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#0fb8a6", boxShadow: "0 0 0 3px rgba(15,184,166,0.12)" },
+    "& fieldset": { borderColor: "rgba(28,138,126,0.18)" },
+    "&:hover fieldset": { borderColor: "rgba(28,138,126,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "var(--zy-teal-500)", boxShadow: "0 0 0 3px rgba(28,138,126,0.12)" },
   },
-  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
-  "& .MuiFormHelperText-root": { color: "#4a6080", fontSize: "11px" },
+  "& .MuiInputBase-input": { color: "var(--text-secondary)", fontSize: "14px" },
+  "& .MuiInputLabel-root": { color: "var(--text-dark)", fontSize: "12px", fontWeight: 600 },
+  "& .MuiInputLabel-root.Mui-focused": { color: "var(--zy-teal-500)" },
+  "& .MuiFormHelperText-root": { color: "var(--zy-slate-300)", fontSize: "11px" },
 });
 
 // ─── BilingualInput ───────────────────────────────────────────────────────────

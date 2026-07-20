@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   getAllTenants,
   createTenant,
@@ -31,14 +31,14 @@ import { PageContainer, TopBar, ContentWrapper, GlassPanel, StyledTableContainer
 const PlanBadge = styled(Chip, { shouldForwardProp: (prop) => prop !== "plan" })(({ plan }) => ({
   borderRadius: "8px", fontSize: "10px", fontWeight: 700, letterSpacing: "0.5px", height: "24px",
   ...(plan === "ENTERPRISE" ? {
-    backgroundColor: "rgba(139,92,246,0.14)", color: "#a78bfa",
+    backgroundColor: "rgba(139,92,246,0.14)", color: "var(--zy-teal-100)",
     border: "1px solid rgba(139,92,246,0.28)",
   } : plan === "PRO" ? {
-    backgroundColor: "rgba(59,130,246,0.14)", color: "#60a5fa",
+    backgroundColor: "rgba(59,130,246,0.14)", color: "var(--zy-info)",
     border: "1px solid rgba(59,130,246,0.28)",
   } : {
-    backgroundColor: "rgba(15,184,166,0.10)", color: "#2dd4bf",
-    border: "1px solid rgba(15,184,166,0.20)",
+    backgroundColor: "rgba(28,138,126,0.10)", color: "var(--accent-light)",
+    border: "1px solid rgba(28,138,126,0.20)",
   }),
 }));
 
@@ -51,11 +51,11 @@ const PLAN_LIMITS = {
 const FeatureChip = styled(Chip, { shouldForwardProp: (prop) => prop !== "feature" })(({ feature }) => ({
   borderRadius: "6px", fontSize: "10px", fontWeight: 600, height: "22px",
   ...(feature === "erp" ? {
-    backgroundColor: "rgba(59,130,246,0.14)", color: "#60a5fa",
+    backgroundColor: "rgba(59,130,246,0.14)", color: "var(--zy-info)",
     border: "1px solid rgba(59,130,246,0.28)",
   } : {
-    backgroundColor: "rgba(15,184,166,0.10)", color: "#2dd4bf",
-    border: "1px solid rgba(15,184,166,0.20)",
+    backgroundColor: "rgba(28,138,126,0.10)", color: "var(--accent-light)",
+    border: "1px solid rgba(28,138,126,0.20)",
   }),
 }));
 
@@ -240,14 +240,14 @@ export default function Tenants() {
         <TopBar>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Hamburger onClick={toggle} />
-            <Skeleton sx={{ bgcolor: "#0c1a30", width: 180 }} />
+            <Skeleton sx={{ bgcolor: "var(--bg-secondary)", width: 180 }} />
           </Box>
         </TopBar>
         <ContentWrapper>
           <Box className="stats-grid" sx={{ mb: 3, display: "flex", gap: 2 }}>
-            {[1,2,3,4,5].map(i => <Skeleton key={i} sx={{ bgcolor: "#0c1a30", borderRadius: "14px", height: 80, flex: 1 }} />)}
+            {[1,2,3,4,5].map(i => <Skeleton key={i} sx={{ bgcolor: "var(--bg-secondary)", borderRadius: "14px", height: 80, flex: 1 }} />)}
           </Box>
-          <Skeleton sx={{ bgcolor: "#0c1a30", borderRadius: "16px", height: 400 }} />
+          <Skeleton sx={{ bgcolor: "var(--bg-secondary)", borderRadius: "16px", height: 400 }} />
         </ContentWrapper>
       </PageContainer>
     );
@@ -266,7 +266,7 @@ export default function Tenants() {
   return (
       <PageContainer>
       <title>Tenants — Smart Clinic Admin</title>
-      <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(15,184,166,0.05), transparent 70%)", top: -200, right: 0, filter: "blur(60px)", pointerEvents: "none" }} />
+      <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(28,138,126,0.05), transparent 70%)", top: -200, right: 0, filter: "blur(60px)", pointerEvents: "none" }} />
 
       <TopBar>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -275,8 +275,8 @@ export default function Tenants() {
             <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>Tenant Management</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Manage clinics & organizations</Typography>
+            <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>Tenant Management</Typography>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Manage clinics & organizations</Typography>
           </Box>
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -294,21 +294,21 @@ export default function Tenants() {
 
       <ContentWrapper>
         {error && (
-          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>
+          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--danger)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--danger)" } }}>
             {error}
           </Alert>
         )}
 
         <Box className="stats-grid" sx={{ mb: 3 }}>
           {[
-            { label: "Total Tenants", value: tenants.length, color: "#2dd4bf" },
-            { label: "Active",        value: active,         color: "#34d399" },
-            { label: "Pending",       value: pending,        color: "#f59e0b" },
-            { label: "Suspended",     value: suspended,      color: "#f87171" },
-            { label: "Pro Plan",      value: tenants.filter(t => t.plan === "PRO").length, color: "#60a5fa" },
+            { label: "Total Tenants", value: tenants.length, color: "var(--accent-light)" },
+            { label: "Active",        value: active,         color: "var(--success)" },
+            { label: "Pending",       value: pending,        color: "var(--zy-warning)" },
+            { label: "Suspended",     value: suspended,      color: "var(--danger)" },
+            { label: "Pro Plan",      value: tenants.filter(t => t.plan === "PRO").length, color: "var(--zy-info)" },
           ].map(s => (
             <StatCard key={s.label}>
-              <Typography sx={{ color: "#4a6080", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>{s.label}</Typography>
+              <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>{s.label}</Typography>
               <Typography sx={{ color: s.color, fontSize: "28px", fontWeight: 700, lineHeight: 1 }}>{s.value}</Typography>
             </StatCard>
           ))}
@@ -337,8 +337,8 @@ export default function Tenants() {
                       <TableCell colSpan={9}>
                         <EmptyState>
                           <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>👥</Typography>
-                          <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants yet</Typography>
-                          <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New Tenant" to onboard your first clinic</Typography>
+                          <Typography sx={{ color: "var(--zy-slate-300)", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants yet</Typography>
+                          <Typography sx={{ color: "var(--zy-slate-700)", fontSize: "13px" }}>Click "+ New Tenant" to onboard your first clinic</Typography>
                         </EmptyState>
                       </TableCell>
                     </TableRow>
@@ -346,23 +346,23 @@ export default function Tenants() {
                     tenants.map(t => (
                       <TableRow key={t.id}>
                         <TableCell>
-                          <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                          <Typography sx={{ fontWeight: 600, color: "var(--text-primary)" }}>
                             {getLang(t.name)}
                           </Typography>
                           {getLang(t.name, "ar") && getLang(t.name, "ar") !== getLang(t.name, "en") && (
-                            <Typography sx={{ fontSize: "12px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
+                            <Typography sx={{ fontSize: "12px", color: "var(--zy-teal-100)", mt: 0.25, fontFamily: "sans-serif" }}>
                               {getLang(t.name, "ar")}
                             </Typography>
                           )}
-                          {t.address && <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>{getLang(t.address) || "—"}</Typography>}
+                          {t.address && <Typography sx={{ fontSize: "11px", color: "var(--zy-slate-300)", mt: 0.25 }}>{getLang(t.address) || "—"}</Typography>}
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: "flex", flexDirection: "column" }}>
-                            <Typography sx={{ color: t.licenseKey ? "#34d399" : "#4a6080", fontSize: "13px", fontFamily: "monospace" }}>
+                            <Typography sx={{ color: t.licenseKey ? "var(--success)" : "var(--zy-slate-300)", fontSize: "13px", fontFamily: "monospace" }}>
                               {t.licenseKey || "—"}
                             </Typography>
                             {t.expiryDate && (
-                              <Typography sx={{ fontSize: "10px", color: "#4a6080", fontFamily: "monospace" }}>
+                              <Typography sx={{ fontSize: "10px", color: "var(--zy-slate-300)", fontFamily: "monospace" }}>
                                 expires {typeof t.expiryDate === "string" ? t.expiryDate : t.expiryDate?.toDate?.().toLocaleDateString() || ""}
                               </Typography>
                             )}
@@ -377,7 +377,7 @@ export default function Tenants() {
                             const limit = getPlanDoctorLimit(t.plan);
                             const isOver = limit !== Infinity && used > limit;
                             return (
-                              <Typography sx={{ fontSize: "10px", color: isOver ? "#f87171" : "#4a6080", mt: 0.25 }}>
+                              <Typography sx={{ fontSize: "10px", color: isOver ? "var(--danger)" : "var(--zy-slate-300)", mt: 0.25 }}>
                                 {used}/{limit === Infinity ? "∞" : limit} doctors
                               </Typography>
                             );
@@ -388,7 +388,7 @@ export default function Tenants() {
                             {(t.features || ["desktop"]).map(f => (
                               <FeatureChip key={f} feature={f} label={f === "erp" ? "ERP" : "Desktop"} size="small" />
                             ))}
-                            {(!t.features || t.features.length === 0) && <Typography sx={{ color: "#4a6080", fontSize: "11px" }}>—</Typography>}
+                            {(!t.features || t.features.length === 0) && <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px" }}>—</Typography>}
                           </Box>
                         </TableCell>
                         <TableCell>
@@ -398,7 +398,7 @@ export default function Tenants() {
                           />
                         </TableCell>
                         <TableCell>
-                          <Typography sx={{ fontSize: "12px", color: "#4a6080" }}>
+                          <Typography sx={{ fontSize: "12px", color: "var(--zy-slate-300)" }}>
                             {t.createdAt?.toDate?.().toLocaleDateString() || "—"}
                           </Typography>
                         </TableCell>
@@ -421,13 +421,13 @@ export default function Tenants() {
 
       <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { ...dialogPaperSx, maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle sx={dialogTitleSx}>Create New Tenant</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
           <BilingualInput label="Address" labelAr="العنوان" value={formData.address} onChange={v => setFormData(p => ({ ...p, address: v }))} />
           <BilingualInput label="City" labelAr="المدينة" value={formData.city} onChange={v => setFormData(p => ({ ...p, city: v }))} />
           <BilingualInput label="Description" labelAr="الوصف" value={formData.description} onChange={v => setFormData(p => ({ ...p, description: v }))} />
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>License Key *</InputLabel>
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>License Key *</InputLabel>
             <Select
               label="License Key *"
               value={formData.licenseKey}
@@ -440,25 +440,25 @@ export default function Tenants() {
                   expiryDate: lic?.expiryDate || p.expiryDate,
                 }));
               }}
-              sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}
+              sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}
             >
-              <MenuItem value="" sx={{ backgroundColor: "#0f1e36", color: "#4a6080", fontStyle: "italic" }}>
+              <MenuItem value="" sx={{ backgroundColor: "var(--bg-input)", color: "var(--zy-slate-300)", fontStyle: "italic" }}>
                 — Select a license —
               </MenuItem>
               {allLicenses
                 .filter(l => !tenants.some(t => t.licenseKey === l.licenseKey))
                 .map(l => (
-                  <MenuItem key={l.licenseKey} value={l.licenseKey} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+                  <MenuItem key={l.licenseKey} value={l.licenseKey} sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", gap: 2 }}>
                       <span style={{ fontFamily: "monospace" }}>{l.licenseKey}</span>
-                      <span style={{ color: "#4a6080", fontSize: "12px" }}>
+                      <span style={{ color: "var(--zy-slate-300)", fontSize: "12px" }}>
                         {l.status} {l.expiryDate ? `· ${l.expiryDate}` : ""}
                       </span>
                     </Box>
                   </MenuItem>
                 ))}
               {allLicenses.length === 0 && (
-                <MenuItem disabled sx={{ backgroundColor: "#0f1e36", color: "#4a6080" }}>
+                <MenuItem disabled sx={{ backgroundColor: "var(--bg-input)", color: "var(--zy-slate-300)" }}>
                   No licenses available — create one in Licenses first
                 </MenuItem>
               )}
@@ -467,31 +467,31 @@ export default function Tenants() {
           {field("Contact Email", "contactEmail", formData, setFormData, { type: "email" })}
           {field("Contact Phone", "contactPhone", formData, setFormData, { placeholder: "010xxxxxxxx" })}
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Plan</InputLabel>
-            <Select label="Plan" value={formData.plan} onChange={e => setFormData(p => ({ ...p, plan: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
-              {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>{p}</MenuItem>)}
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Plan</InputLabel>
+            <Select label="Plan" value={formData.plan} onChange={e => setFormData(p => ({ ...p, plan: e.target.value }))} sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}>
+              {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>{p}</MenuItem>)}
             </Select>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 0.5, ml: 1 }}>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", mt: 0.5, ml: 1 }}>
               {formData.plan}: {PLAN_LIMITS[formData.plan]}
             </Typography>
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Provider Type</InputLabel>
-            <Select label="Provider Type" value={formData.providerType} onChange={e => setFormData(p => ({ ...p, providerType: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
-              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👥 Clinic (Multi-Doctor)</MenuItem>
-              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👨‍⚕️ Individual Doctor</MenuItem>
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Provider Type</InputLabel>
+            <Select label="Provider Type" value={formData.providerType} onChange={e => setFormData(p => ({ ...p, providerType: e.target.value }))} sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}>
+              <MenuItem value="CLINIC" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>👥 Clinic (Multi-Doctor)</MenuItem>
+              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>👨‍⚕️ Individual Doctor</MenuItem>
             </Select>
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>Features</Typography>
+            <Typography sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, mb: 1 }}>Features</Typography>
             <FormGroup row>
               <FormControlLabel
-                control={<Checkbox checked={formData.features?.includes('desktop') || false} onChange={e => { const a = formData.features || []; setFormData(p => ({ ...p, features: e.target.checked ? [...a, 'desktop'] : a.filter(x => x !== 'desktop') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
-                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>Desktop App</Typography>}
+                control={<Checkbox checked={formData.features?.includes('desktop') || false} onChange={e => { const a = formData.features || []; setFormData(p => ({ ...p, features: e.target.checked ? [...a, 'desktop'] : a.filter(x => x !== 'desktop') })); }} sx={{ color: 'var(--zy-slate-300)', '&.Mui-checked': { color: 'var(--zy-teal-500)' } }} />}
+                label={<Typography sx={{ color: "var(--text-secondary)", fontSize: "13px" }}>Desktop App</Typography>}
               />
               <FormControlLabel
-                control={<Checkbox checked={formData.features?.includes('erp') || false} onChange={e => { const a = formData.features || []; setFormData(p => ({ ...p, features: e.target.checked ? [...a, 'erp'] : a.filter(x => x !== 'erp') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
-                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>ERP Web</Typography>}
+                control={<Checkbox checked={formData.features?.includes('erp') || false} onChange={e => { const a = formData.features || []; setFormData(p => ({ ...p, features: e.target.checked ? [...a, 'erp'] : a.filter(x => x !== 'erp') })); }} sx={{ color: 'var(--zy-slate-300)', '&.Mui-checked': { color: 'var(--zy-teal-500)' } }} />}
+                label={<Typography sx={{ color: "var(--text-secondary)", fontSize: "13px" }}>ERP Web</Typography>}
               />
             </FormGroup>
           </FormControl>
@@ -504,7 +504,7 @@ export default function Tenants() {
 
       <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { ...dialogPaperSx, maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle sx={dialogTitleSx}>Edit Tenant</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <BilingualInput label="Clinic / Organization Name" labelAr="اسم العيادة / المنظمة" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />
           <BilingualInput label="Address" labelAr="العنوان" value={editData.address} onChange={v => setEditData(p => ({ ...p, address: v }))} />
           <BilingualInput label="City" labelAr="المدينة" value={editData.city} onChange={v => setEditData(p => ({ ...p, city: v }))} />
@@ -514,31 +514,31 @@ export default function Tenants() {
           {field("Contact Email", "contactEmail", editData, setEditData, { type: "email" })}
           {field("Contact Phone", "contactPhone", editData, setEditData)}
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Plan</InputLabel>
-            <Select label="Plan" value={editData.plan} onChange={e => setEditData(p => ({ ...p, plan: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
-              {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>{p}</MenuItem>)}
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Plan</InputLabel>
+            <Select label="Plan" value={editData.plan} onChange={e => setEditData(p => ({ ...p, plan: e.target.value }))} sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}>
+              {["BASIC", "PRO", "ENTERPRISE"].map(p => <MenuItem key={p} value={p} sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>{p}</MenuItem>)}
             </Select>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 0.5, ml: 1 }}>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", mt: 0.5, ml: 1 }}>
               {editData.plan}: {PLAN_LIMITS[editData.plan]}
             </Typography>
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Provider Type</InputLabel>
-            <Select label="Provider Type" value={editData.providerType} onChange={e => setEditData(p => ({ ...p, providerType: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
-              <MenuItem value="CLINIC" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👥 Clinic (Multi-Doctor)</MenuItem>
-              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>👨‍⚕️ Individual Doctor</MenuItem>
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Provider Type</InputLabel>
+            <Select label="Provider Type" value={editData.providerType} onChange={e => setEditData(p => ({ ...p, providerType: e.target.value }))} sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}>
+              <MenuItem value="CLINIC" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>👥 Clinic (Multi-Doctor)</MenuItem>
+              <MenuItem value="INDIVIDUAL_DOCTOR" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>👨‍⚕️ Individual Doctor</MenuItem>
             </Select>
           </FormControl>
           <FormControl fullWidth margin="normal">
-            <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>Features</Typography>
+            <Typography sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, mb: 1 }}>Features</Typography>
             <FormGroup row>
               <FormControlLabel
-                control={<Checkbox checked={editData.features?.includes('desktop') || false} onChange={e => { const a = editData.features || []; setEditData(p => ({ ...p, features: e.target.checked ? [...a, 'desktop'] : a.filter(x => x !== 'desktop') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
-                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>Desktop App</Typography>}
+                control={<Checkbox checked={editData.features?.includes('desktop') || false} onChange={e => { const a = editData.features || []; setEditData(p => ({ ...p, features: e.target.checked ? [...a, 'desktop'] : a.filter(x => x !== 'desktop') })); }} sx={{ color: 'var(--zy-slate-300)', '&.Mui-checked': { color: 'var(--zy-teal-500)' } }} />}
+                label={<Typography sx={{ color: "var(--text-secondary)", fontSize: "13px" }}>Desktop App</Typography>}
               />
               <FormControlLabel
-                control={<Checkbox checked={editData.features?.includes('erp') || false} onChange={e => { const a = editData.features || []; setEditData(p => ({ ...p, features: e.target.checked ? [...a, 'erp'] : a.filter(x => x !== 'erp') })); }} sx={{ color: '#4a6080', '&.Mui-checked': { color: '#0fb8a6' } }} />}
-                label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>ERP Web</Typography>}
+                control={<Checkbox checked={editData.features?.includes('erp') || false} onChange={e => { const a = editData.features || []; setEditData(p => ({ ...p, features: e.target.checked ? [...a, 'erp'] : a.filter(x => x !== 'erp') })); }} sx={{ color: 'var(--zy-slate-300)', '&.Mui-checked': { color: 'var(--zy-teal-500)' } }} />}
+                label={<Typography sx={{ color: "var(--text-secondary)", fontSize: "13px" }}>ERP Web</Typography>}
               />
             </FormGroup>
           </FormControl>
@@ -551,11 +551,11 @@ export default function Tenants() {
 
       <Dialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={dialogTitleSx}>Confirm Delete</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <Typography sx={{ color: "#dde6f0", mb: 1 }}>
-            Delete <strong style={{ color: "#f87171" }}>{getLang(deleteConfirm?.name)}</strong>?
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
+          <Typography sx={{ color: "var(--text-secondary)", mb: 1 }}>
+            Delete <strong style={{ color: "var(--danger)" }}>{getLang(deleteConfirm?.name)}</strong>?
           </Typography>
-          <Typography sx={{ color: "#4a6080", fontSize: "13px", mb: 3 }}>
+          <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "13px", mb: 3 }}>
             This action cannot be undone. All associated data will be permanently removed.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>

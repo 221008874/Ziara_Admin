@@ -20,7 +20,7 @@ import { styled } from "@mui/material/styles";
 
 export const PageContainer = styled(Box)(({ theme }) => ({
   minHeight: "100vh",
-  backgroundColor: "#04091a",
+  backgroundColor: "var(--bg-primary)",
   marginLeft: 0,                          // mobile: no sidebar
   position: "relative",
   overflow: "hidden",
@@ -31,8 +31,8 @@ export const PageContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const TopBar = styled(Box)({
-  background: "linear-gradient(to right, #090f22, #0c1830)",
-  borderBottom: "1px solid rgba(15,184,166,0.12)",
+  background: "linear-gradient(to right, var(--bg-primary), var(--bg-secondary))",
+  borderBottom: "1px solid rgba(28,138,126,0.12)",
   padding: "16px 28px",
   display: "flex",
   justifyContent: "space-between",
@@ -45,7 +45,7 @@ export const TopBar = styled(Box)({
     content: '""',
     position: "absolute",
     bottom: 0, left: 0, right: 0, height: "2px",
-    background: "linear-gradient(to right, transparent, #0fb8a6 35%, #3b82f6 65%, transparent)",
+    background: "linear-gradient(to right, transparent, var(--zy-teal-500) 35%, var(--zy-info) 65%, transparent)",
     opacity: 0.45,
   },
 });
@@ -57,16 +57,16 @@ export const ContentWrapper = styled(Box)({
 });
 
 export const GlassPanel = styled(Box)({
-  background: "linear-gradient(to bottom, #0b1628, #081020)",
+  background: "linear-gradient(to bottom, var(--bg-secondary), var(--bg-tertiary))",
   borderRadius: "16px",
-  border: "1px solid rgba(15,184,166,0.12)",
+  border: "1px solid rgba(28,138,126,0.12)",
   boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
   overflow: "hidden",
 });
 
 export const StatCard = styled(Box)({
-  background: "linear-gradient(135deg, #0b1628, #081020)",
-  border: "1px solid rgba(15,184,166,0.10)",
+  background: "linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary))",
+  border: "1px solid rgba(28,138,126,0.10)",
   borderRadius: "14px",
   padding: "18px 22px",
   flex: "1 1 0",
@@ -94,16 +94,16 @@ export const ActionButton = styled(Button, {
   transition: "all 0.2s ease",
 
   ...(btnVariant === "primary" && {
-    background: "linear-gradient(to right, #0fb8a6, #0d9488)",
+    background: "linear-gradient(to right, var(--zy-teal-500), var(--zy-teal-700))",
     color: "white",
-    boxShadow: "0 4px 14px rgba(15,184,166,0.40)",
+    boxShadow: "0 4px 14px rgba(28,138,126,0.40)",
     "&:hover": {
-      background: "linear-gradient(to right, #0d9488, #0b7a72)",
+      background: "linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-700))",
       transform: "translateY(-1px)",
-      boxShadow: "0 6px 20px rgba(15,184,166,0.55)",
+      boxShadow: "0 6px 20px rgba(28,138,126,0.55)",
     },
     "&.Mui-disabled": {
-      background: "linear-gradient(to right, #0a5c52, #074038)",
+      background: "linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-900))",
       color: "rgba(255,255,255,0.5)",
       boxShadow: "none",
       transform: "none",
@@ -112,23 +112,23 @@ export const ActionButton = styled(Button, {
 
   ...(btnVariant === "warning" && {
     backgroundColor: "rgba(245,158,11,0.12)",
-    color: "#f59e0b",
+    color: "var(--zy-warning)",
     border: "1px solid rgba(245,158,11,0.30)",
-    "&:hover": { backgroundColor: "#f59e0b", color: "white" },
+    "&:hover": { backgroundColor: "var(--zy-warning)", color: "white" },
   }),
 
   ...(btnVariant === "danger" && {
     backgroundColor: "rgba(248,113,113,0.10)",
-    color: "#f87171",
+    color: "var(--danger)",
     border: "1px solid rgba(248,113,113,0.25)",
-    "&:hover": { backgroundColor: "#f87171", color: "white" },
+    "&:hover": { backgroundColor: "var(--danger)", color: "white" },
   }),
 
   ...((!btnVariant || btnVariant === "secondary") && {
-    backgroundColor: "rgba(15,184,166,0.07)",
-    color: "#2dd4bf",
-    border: "1px solid rgba(15,184,166,0.20)",
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.20)", borderColor: "#0fb8a6" },
+    backgroundColor: "rgba(28,138,126,0.07)",
+    color: "var(--accent-light)",
+    border: "1px solid rgba(28,138,126,0.20)",
+    "&:hover": { backgroundColor: "rgba(28,138,126,0.20)", borderColor: "var(--zy-teal-500)" },
   }),
 }));
 
@@ -150,20 +150,20 @@ export const StatusBadge = styled(Chip, {
 
   ...(statusColor === "active" && {
     backgroundColor: "rgba(52,211,153,0.14)",
-    color: "#34d399",
+    color: "var(--success)",
     border: "1px solid rgba(52,211,153,0.28)",
     boxShadow: "0 0 8px rgba(52,211,153,0.15)",
   }),
   ...(statusColor === "expired" && {
     backgroundColor: "rgba(239,68,68,0.14)",
-    color: "#ef4444",
+    color: "var(--zy-danger)",
     border: "1px solid rgba(239,68,68,0.28)",
     boxShadow: "0 0 8px rgba(239,68,68,0.15)",
     cursor: "default",
   }),
   ...(statusColor === "inactive" && {
     backgroundColor: "rgba(248,113,113,0.14)",
-    color: "#f87171",
+    color: "var(--danger)",
     border: "1px solid rgba(248,113,113,0.28)",
     boxShadow: "0 0 8px rgba(248,113,113,0.15)",
   }),
@@ -206,20 +206,20 @@ export function ClickableStatus({ status, onToggle, loading }) {
 
 export const StyledTableContainer = styled(Box)({
   "& .MuiTable-root": { backgroundColor: "transparent" },
-  "& .MuiTableHead-root": { backgroundColor: "#0c1a30" },
+  "& .MuiTableHead-root": { backgroundColor: "var(--bg-secondary)" },
   "& .MuiTableCell-head": {
-    color: "#2dd4bf", fontWeight: 700, fontSize: "11px", letterSpacing: "0.8px",
+    color: "var(--accent-light)", fontWeight: 700, fontSize: "11px", letterSpacing: "0.8px",
     textTransform: "uppercase", padding: "14px 20px",
-    borderBottom: "1px solid rgba(15,184,166,0.12)",
+    borderBottom: "1px solid rgba(28,138,126,0.12)",
   },
   "& .MuiTableRow-root": {
     transition: "background 0.15s ease",
-    borderBottom: "1px solid rgba(15,184,166,0.06)",
+    borderBottom: "1px solid rgba(28,138,126,0.06)",
     "&:nth-of-type(odd)": { backgroundColor: "rgba(8,16,32,0.35)" },
-    "&:hover": { backgroundColor: "rgba(15,184,166,0.09)" },
+    "&:hover": { backgroundColor: "rgba(28,138,126,0.09)" },
   },
   "& .MuiTableCell-body": {
-    color: "#dde6f0", fontSize: "13px", padding: "14px 20px", borderBottom: "none",
+    color: "var(--text-secondary)", fontSize: "13px", padding: "14px 20px", borderBottom: "none",
   },
 });
 
@@ -235,14 +235,14 @@ export const StyledDialog = styled(Box)({
 
 
 export const dialogPaperSx = {
-  backgroundColor: "#0b1628",
+  backgroundColor: "var(--bg-secondary)",
   borderRadius: "20px",
-  border: "1px solid rgba(15,184,166,0.15)",
+  border: "1px solid rgba(28,138,126,0.15)",
   boxShadow: "0 20px 60px rgba(0,0,0,0.80)",
 };
 
 export const dialogTitleSx = {
-  background: "linear-gradient(to right, #0d9488, #083040)",
+  background: "linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-900))",
   color: "white",
   fontSize: "18px",
   fontWeight: 700,
@@ -252,7 +252,7 @@ export const dialogTitleSx = {
     content: '""',
     position: "absolute",
     bottom: 0, left: 0, right: 0, height: "1px",
-    background: "linear-gradient(to right, transparent, rgba(15,184,166,0.5), transparent)",
+    background: "linear-gradient(to right, transparent, rgba(28,138,126,0.5), transparent)",
   },
 };
 
@@ -260,14 +260,14 @@ export const dialogTitleSx = {
 
 export const sharedFieldSx = {
   "& .MuiOutlinedInput-root": {
-    backgroundColor: "#0f1e36",
+    backgroundColor: "var(--bg-input)",
     borderRadius: "10px",
-    "& fieldset": { borderColor: "rgba(15,184,166,0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(15,184,166,0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#0fb8a6", boxShadow: "0 0 0 3px rgba(15,184,166,0.12)" },
+    "& fieldset": { borderColor: "rgba(28,138,126,0.18)" },
+    "&:hover fieldset": { borderColor: "rgba(28,138,126,0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "var(--zy-teal-500)", boxShadow: "0 0 0 3px rgba(28,138,126,0.12)" },
   },
-  "& .MuiInputBase-input": { color: "#dde6f0", fontSize: "14px" },
-  "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 },
-  "& .MuiInputLabel-root.Mui-focused": { color: "#0fb8a6" },
-  "& .MuiFormHelperText-root": { color: "#4a6080", fontSize: "11px" },
+  "& .MuiInputBase-input": { color: "var(--text-secondary)", fontSize: "14px" },
+  "& .MuiInputLabel-root": { color: "var(--text-dark)", fontSize: "12px", fontWeight: 600 },
+  "& .MuiInputLabel-root.Mui-focused": { color: "var(--zy-teal-500)" },
+  "& .MuiFormHelperText-root": { color: "var(--zy-slate-300)", fontSize: "11px" },
 };

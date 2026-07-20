@@ -68,12 +68,12 @@ export default function PlatformAdmins() {
         <TopBar>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Hamburger onClick={toggle} />
-            <Skeleton sx={{ bgcolor: "#0c1a30", width: 180 }} />
+            <Skeleton sx={{ bgcolor: "var(--bg-secondary)", width: 180 }} />
           </Box>
         </TopBar>
         <ContentWrapper>
-          <Skeleton sx={{ bgcolor: "#0c1a30", borderRadius: "14px", height: 80, width: 200, mb: 3 }} />
-          <Skeleton sx={{ bgcolor: "#0c1a30", borderRadius: "16px", height: 400 }} />
+          <Skeleton sx={{ bgcolor: "var(--bg-secondary)", borderRadius: "14px", height: 80, width: 200, mb: 3 }} />
+          <Skeleton sx={{ bgcolor: "var(--bg-secondary)", borderRadius: "16px", height: 400 }} />
         </ContentWrapper>
       </PageContainer>
     );
@@ -87,8 +87,8 @@ export default function PlatformAdmins() {
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Hamburger onClick={toggle} />
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>Platform Admins</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }}>Manage administrator access</Typography>
+            <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>Platform Admins</Typography>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontStyle: "italic" }}>Manage administrator access</Typography>
           </Box>
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -98,14 +98,14 @@ export default function PlatformAdmins() {
       </TopBar>
       <ContentWrapper>
         {error && (
-          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>
+          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--danger)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--danger)" } }}>
             {error}
           </Alert>
         )}
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}>
           <StatCard>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>Total Admins</Typography>
-            <Typography sx={{ color: "#60a5fa", fontSize: "28px", fontWeight: 700, lineHeight: 1 }}>{admins.length}</Typography>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>Total Admins</Typography>
+            <Typography sx={{ color: "var(--zy-info)", fontSize: "28px", fontWeight: 700, lineHeight: 1 }}>{admins.length}</Typography>
           </StatCard>
         </Box>
         <GlassPanel>
@@ -125,7 +125,7 @@ export default function PlatformAdmins() {
                 {admins.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6}>
-                      <Box sx={{ textAlign: "center", py: 4, color: "#4a6080" }}>
+                      <Box sx={{ textAlign: "center", py: 4, color: "var(--zy-slate-300)" }}>
                         <Shield size={32} style={{ opacity: 0.3, margin: "0 auto 8px" }} />
                         <Typography>No platform admins yet</Typography>
                       </Box>
@@ -133,11 +133,11 @@ export default function PlatformAdmins() {
                   </TableRow>
                 ) : admins.map(a => (
                   <TableRow key={a.id}>
-                    <TableCell><Typography sx={{ fontWeight: 600, color: "#eaf2ff", fontSize: "13px" }}>{a.email || "—"}</Typography></TableCell>
+                    <TableCell><Typography sx={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "13px" }}>{a.email || "—"}</Typography></TableCell>
                     <TableCell>{a.displayName || "—"}</TableCell>
-                    <TableCell><Chip label={a.role || "admin"} size="small" sx={{ fontWeight: 600, fontSize: "10px", backgroundColor: "rgba(99,102,241,0.14)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.28)" }} /></TableCell>
-                    <TableCell><Typography sx={{ fontSize: "12px", color: "#4a6080" }}>{a.lastLogin?.toDate?.().toLocaleString() || a.lastLogin || "—"}</Typography></TableCell>
-                    <TableCell><Typography sx={{ fontSize: "12px", color: "#4a6080" }}>{a.createdAt?.toDate?.().toLocaleDateString() || "—"}</Typography></TableCell>
+                    <TableCell><Chip label={a.role || "admin"} size="small" sx={{ fontWeight: 600, fontSize: "10px", backgroundColor: "rgba(99,102,241,0.14)", color: "var(--zy-info)", border: "1px solid rgba(99,102,241,0.28)" }} /></TableCell>
+                    <TableCell><Typography sx={{ fontSize: "12px", color: "var(--zy-slate-300)" }}>{a.lastLogin?.toDate?.().toLocaleString() || a.lastLogin || "—"}</Typography></TableCell>
+                    <TableCell><Typography sx={{ fontSize: "12px", color: "var(--zy-slate-300)" }}>{a.createdAt?.toDate?.().toLocaleDateString() || "—"}</Typography></TableCell>
                     <TableCell align="right"><ActionButton btnVariant="danger" size="small" onClick={() => handleRemove(a.id, a.email)}><Trash2 size={14} /></ActionButton></TableCell>
                   </TableRow>
                 ))}
@@ -149,7 +149,7 @@ export default function PlatformAdmins() {
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={dialogTitleSx}>Add Platform Admin</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <TextField fullWidth label="Email" margin="normal" type="email" value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))} placeholder="admin@example.com" sx={sharedFieldSx} />
           <TextField fullWidth label="Display Name" margin="normal" value={formData.displayName} onChange={e => setFormData(p => ({ ...p, displayName: e.target.value }))} placeholder="Admin Name" sx={sharedFieldSx} />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>

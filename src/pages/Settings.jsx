@@ -15,47 +15,47 @@ import { db } from "../firebase";
 // ─── Page-specific Styled Components ──────────────────────────────────────────
 
 const SettingsCard = styled(Box)({
-  background: "linear-gradient(to bottom, #0b1628, #081020)", borderRadius: "16px",
-  border: "1px solid rgba(15,184,166,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
+  background: "linear-gradient(to bottom, var(--bg-secondary), var(--bg-tertiary))", borderRadius: "16px",
+  border: "1px solid rgba(28,138,126,0.12)", boxShadow: "0 8px 32px rgba(0,0,0,0.55)",
   padding: "28px 32px", marginBottom: "20px",
 });
 
 const CardTitle = styled(Typography)({
-  color: "#eaf2ff", fontWeight: 700, fontSize: "15px", marginBottom: 4,
+  color: "var(--text-primary)", fontWeight: 700, fontSize: "15px", marginBottom: 4,
 });
 
 const CardDesc = styled(Typography)({
-  color: "#4a6080", fontSize: "12px", marginBottom: "24px",
+  color: "var(--zy-slate-300)", fontSize: "12px", marginBottom: "24px",
 });
 
 const SectionDivider = styled(Divider)({
-  borderColor: "rgba(15,184,166,0.08)", margin: "20px 0",
+  borderColor: "rgba(28,138,126,0.08)", margin: "20px 0",
 });
 
 const SaveButton = styled(Button)({
   borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "13px", padding: "10px 28px",
-  background: "linear-gradient(to right, #0fb8a6, #0d9488)", color: "white",
-  boxShadow: "0 4px 14px rgba(15,184,166,0.40)",
-  "&:hover": { background: "linear-gradient(to right, #0d9488, #0b7a72)", transform: "translateY(-1px)", boxShadow: "0 6px 20px rgba(15,184,166,0.55)" },
+  background: "linear-gradient(to right, var(--zy-teal-500), var(--zy-teal-700))", color: "white",
+  boxShadow: "0 4px 14px rgba(28,138,126,0.40)",
+  "&:hover": { background: "linear-gradient(to right, var(--zy-teal-700), var(--zy-teal-700))", transform: "translateY(-1px)", boxShadow: "0 6px 20px rgba(28,138,126,0.55)" },
   transition: "all 0.2s ease",
 });
 
 const ToggleRow = styled(Box)({
   display: "flex", justifyContent: "space-between", alignItems: "center",
-  padding: "14px 0", borderBottom: "1px solid rgba(15,184,166,0.06)",
+  padding: "14px 0", borderBottom: "1px solid rgba(28,138,126,0.06)",
   "&:last-child": { borderBottom: "none" },
 });
 
 const StyledSwitch = styled(Switch)({
-  "& .MuiSwitch-switchBase.Mui-checked": { color: "#0fb8a6" },
-  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "rgba(15,184,166,0.40)" },
+  "& .MuiSwitch-switchBase.Mui-checked": { color: "var(--zy-teal-500)" },
+  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "rgba(28,138,126,0.40)" },
   "& .MuiSwitch-track": { backgroundColor: "rgba(255,255,255,0.10)" },
 });
 
 const InfoPill = styled(Box)({
   display: "inline-flex", alignItems: "center", gap: 6,
-  backgroundColor: "rgba(15,184,166,0.08)", border: "1px solid rgba(15,184,166,0.15)",
-  borderRadius: "8px", padding: "4px 10px", color: "#2dd4bf", fontSize: "12px", fontWeight: 600,
+  backgroundColor: "rgba(28,138,126,0.08)", border: "1px solid rgba(28,138,126,0.15)",
+  borderRadius: "8px", padding: "4px 10px", color: "var(--accent-light)", fontSize: "12px", fontWeight: 600,
 });
 
 // ─── Firestore helpers ────────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ export default function Settings() {
   if (loading) {
     return (
       <PageContainer sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CircularProgress sx={{ color: "#0fb8a6" }} size={48} thickness={3} />
+        <CircularProgress sx={{ color: "var(--zy-teal-500)" }} size={48} thickness={3} />
       </PageContainer>
     );
   }
@@ -147,7 +147,7 @@ export default function Settings() {
   return (
     <PageContainer>
       <title>Settings — Smart Clinic Admin</title>
-      <Box sx={{ position: "fixed", width: 500, height: 500, background: "radial-gradient(circle, rgba(15,184,166,0.04), transparent 70%)", top: -100, right: -100, filter: "blur(60px)", pointerEvents: "none" }} />
+      <Box sx={{ position: "fixed", width: 500, height: 500, background: "radial-gradient(circle, rgba(28,138,126,0.04), transparent 70%)", top: -100, right: -100, filter: "blur(60px)", pointerEvents: "none" }} />
 
       <TopBar>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -156,8 +156,8 @@ export default function Settings() {
             <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>SaaS Settings</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Global configuration for Smart Clinic platform</Typography>
+            <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>SaaS Settings</Typography>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Global configuration for Smart Clinic platform</Typography>
           </Box>
         </Box>
         <SaveButton onClick={handleSave} disabled={saving} sx={{ fontSize: { xs: "12px", sm: "13px" }, px: { xs: 2, sm: 4 } }}>
@@ -167,8 +167,8 @@ export default function Settings() {
       </TopBar>
 
       <ContentWrapper>
-        {error && <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>{error}</Alert>}
-        {success && <Alert severity="success" onClose={() => setSuccess(false)} sx={{ mb: 3, backgroundColor: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", borderRadius: "12px", "& .MuiAlert-icon": { color: "#34d399" } }}>Settings saved successfully.</Alert>}
+        {error && <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--danger)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--danger)" } }}>{error}</Alert>}
+        {success && <Alert severity="success" onClose={() => setSuccess(false)} sx={{ mb: 3, backgroundColor: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.25)", color: "var(--success)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--success)" } }}>Settings saved successfully.</Alert>}
 
         {/* ── General ───────────────────────────────────────────────────────── */}
         <SettingsCard>
@@ -205,11 +205,11 @@ export default function Settings() {
             
             <ToggleRow key={row.key}>
               <Box>
-                <Typography sx={{ color: "#dde6f0", fontSize: "14px", fontWeight: 600 }}>{row.label}</Typography>
-                <Typography sx={{ color: "#4a6080", fontSize: "12px", mt: 0.25 }}>{row.desc}</Typography>
+                <Typography sx={{ color: "var(--text-secondary)", fontSize: "14px", fontWeight: 600 }}>{row.label}</Typography>
+                <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "12px", mt: 0.25 }}>{row.desc}</Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <InfoPill sx={{ minWidth: 52, justifyContent: "center", ...(settings[row.key] ? { color: "#34d399", backgroundColor: "rgba(52,211,153,0.08)", borderColor: "rgba(52,211,153,0.20)" } : { color: "#f87171", backgroundColor: "rgba(248,113,113,0.08)", borderColor: "rgba(248,113,113,0.20)" }) }}>
+                <InfoPill sx={{ minWidth: 52, justifyContent: "center", ...(settings[row.key] ? { color: "var(--success)", backgroundColor: "rgba(52,211,153,0.08)", borderColor: "rgba(52,211,153,0.20)" } : { color: "var(--danger)", backgroundColor: "rgba(248,113,113,0.08)", borderColor: "rgba(248,113,113,0.20)" }) }}>
                   {settings[row.key] ? "ON" : "OFF"}
                 </InfoPill>
                 <StyledSwitch checked={!!settings[row.key]} onChange={toggle(row.key)} />
@@ -237,7 +237,7 @@ export default function Settings() {
             {field("SMTP Username", "smtpUser")}
             {field("SMTP Password", "smtpPass", { type: "password", placeholder: "Managed via server env (GMAIL_APP_PASSWORD)", helperText: "Not stored in Firestore — configured on the server via GMAIL_APP_PASSWORD.", disabled: true })}
           </Box>
-          <Alert severity="info" sx={{ mt: 2, backgroundColor: "rgba(15,184,166,0.1)", border: "1px solid rgba(15,184,166,0.25)", color: "#0fb8a6", borderRadius: "10px", "& .MuiAlert-icon": { color: "#0fb8a6" } }}>
+          <Alert severity="info" sx={{ mt: 2, backgroundColor: "rgba(28,138,126,0.1)", border: "1px solid rgba(28,138,126,0.25)", color: "var(--zy-teal-500)", borderRadius: "10px", "& .MuiAlert-icon": { color: "var(--zy-teal-500)" } }}>
             Email sending uses the server's GMAIL_APP_PASSWORD environment variable. The SMTP password is no longer stored in Firestore.
           </Alert>
         </SettingsCard>

@@ -180,14 +180,14 @@ export default function Licenses() {
         <TopBar>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Hamburger onClick={toggle} />
-            <Skeleton sx={{ bgcolor: "#0c1a30", width: 180 }} />
+            <Skeleton sx={{ bgcolor: "var(--bg-secondary)", width: 180 }} />
           </Box>
         </TopBar>
         <ContentWrapper>
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            {[1,2,3].map(i => <Skeleton key={i} sx={{ bgcolor: "#0c1a30", borderRadius: "14px", height: 80, flex: 1 }} />)}
+            {[1,2,3].map(i => <Skeleton key={i} sx={{ bgcolor: "var(--bg-secondary)", borderRadius: "14px", height: 80, flex: 1 }} />)}
           </Box>
-          <Skeleton sx={{ bgcolor: "#0c1a30", borderRadius: "16px", height: 400 }} />
+          <Skeleton sx={{ bgcolor: "var(--bg-secondary)", borderRadius: "16px", height: 400 }} />
         </ContentWrapper>
       </PageContainer>
     );
@@ -202,7 +202,7 @@ export default function Licenses() {
   return (
     <PageContainer>
       <title>Licenses — Smart Clinic Admin</title>
-      <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(15,184,166,0.05), transparent 70%)", top: -200, right: -200, filter: "blur(60px)", pointerEvents: "none" }} />
+      <Box sx={{ position: "fixed", width: 600, height: 600, background: "radial-gradient(circle, rgba(28,138,126,0.05), transparent 70%)", top: -200, right: -200, filter: "blur(60px)", pointerEvents: "none" }} />
       <Box sx={{ position: "fixed", width: 500, height: 500, background: "radial-gradient(circle, rgba(59,130,246,0.04), transparent 70%)", bottom: -150, left: -150, filter: "blur(60px)", pointerEvents: "none" }} />
 
       <TopBar>
@@ -212,13 +212,13 @@ export default function Licenses() {
             <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" }, letterSpacing: "0.3px" }}>License Management</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Smart Clinic Admin Console</Typography>
+            <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" }, letterSpacing: "0.3px" }}>License Management</Typography>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Smart Clinic Admin Console</Typography>
           </Box>
         </Box>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
-          <Box className="hide-on-mobile" sx={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(15,184,166,0.08)", borderRadius: "20px", border: "1px solid rgba(15,184,166,0.15)", color: "#6a8aaa", fontSize: "13px" }}><span>👋</span>{localStorage.getItem("clinic_admin_user") || "Admin"}</Box>
+          <Box className="hide-on-mobile" sx={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px", backgroundColor: "rgba(28,138,126,0.08)", borderRadius: "20px", border: "1px solid rgba(28,138,126,0.15)", color: "var(--text-muted)", fontSize: "13px" }}><span>👋</span>{localStorage.getItem("clinic_admin_user") || "Admin"}</Box>
           <ActionButton btnVariant="secondary" size="small" onClick={loadLicenses} disabled={loading} className="hide-on-mobile">Refresh</ActionButton>
           <ActionButton btnVariant="primary" size="small" onClick={() => setOpenDialog(true)} sx={{ fontSize: { xs: "11px", sm: "12px" } }}>
             <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>+ </Box>New License
@@ -228,7 +228,7 @@ export default function Licenses() {
 
       <ContentWrapper>
         {error && (
-          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>
+          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--danger)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--danger)" } }}>
             {error}
           </Alert>
         )}
@@ -257,8 +257,8 @@ export default function Licenses() {
                       <TableCell colSpan={10}>
                         <EmptyState>
                           <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>📋</Typography>
-                          <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No licenses found</Typography>
-                          <Typography sx={{ color: "#283848", fontSize: "13px" }}>Click "+ New License" to create your first license</Typography>
+                          <Typography sx={{ color: "var(--zy-slate-300)", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No licenses found</Typography>
+                          <Typography sx={{ color: "var(--zy-slate-700)", fontSize: "13px" }}>Click "+ New License" to create your first license</Typography>
                         </EmptyState>
                       </TableCell>
                     </TableRow>
@@ -266,7 +266,7 @@ export default function Licenses() {
                     licenses.map((lic) => (
                       <TableRow key={lic.id}>
                         <TableCell>
-                          <Typography sx={{ fontFamily: "monospace", color: "#eaf2ff", fontWeight: 600, letterSpacing: "0.5px" }}>{lic.licenseKey}</Typography>
+                          <Typography sx={{ fontFamily: "monospace", color: "var(--text-primary)", fontWeight: 600, letterSpacing: "0.5px" }}>{lic.licenseKey}</Typography>
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -274,37 +274,37 @@ export default function Licenses() {
                             size="small"
                             sx={{
                               fontWeight: 600, fontSize: "10px",
-                              backgroundColor: lic.category === "tenant" ? "rgba(59,130,246,0.14)" : "rgba(15,184,166,0.14)",
-                              color: lic.category === "tenant" ? "#60a5fa" : "#2dd4bf",
-                              border: lic.category === "tenant" ? "1px solid rgba(59,130,246,0.28)" : "1px solid rgba(15,184,166,0.28)",
+                              backgroundColor: lic.category === "tenant" ? "rgba(59,130,246,0.14)" : "rgba(28,138,126,0.14)",
+                              color: lic.category === "tenant" ? "var(--zy-info)" : "var(--accent-light)",
+                              border: lic.category === "tenant" ? "1px solid rgba(59,130,246,0.28)" : "1px solid rgba(28,138,126,0.28)",
                             }}
                           />
                         </TableCell>
                         <TableCell>
                           {licenseTenantMap[lic.licenseKey] ? (
                             <Box sx={{ display: "flex", flexDirection: "column" }}>
-                              <Typography sx={{ fontWeight: 600, color: "#eaf2ff", fontSize: "13px" }}>
+                              <Typography sx={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "13px" }}>
                                 {getLang(licenseTenantMap[lic.licenseKey].name)}
                               </Typography>
-                              <Typography sx={{ fontSize: "10px", color: licenseTenantMap[lic.licenseKey].status === "ACTIVE" ? "#34d399" : "#f87171", fontFamily: "monospace" }}>
+                              <Typography sx={{ fontSize: "10px", color: licenseTenantMap[lic.licenseKey].status === "ACTIVE" ? "var(--success)" : "var(--danger)", fontFamily: "monospace" }}>
                                 {licenseTenantMap[lic.licenseKey].status}
                               </Typography>
                             </Box>
                           ) : (
-                            <Typography sx={{ color: "#4a6080", fontSize: "12px" }}>—</Typography>
+                            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "12px" }}>—</Typography>
                           )}
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-                            <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                            <Typography sx={{ fontWeight: 600, color: "var(--text-primary)" }}>
                               {getLang(lic.doctorName) || "—"}
                             </Typography>
-                            {(() => { const ar = getLang(lic.doctorName, "ar"); const en = getLang(lic.doctorName, "en"); return ar && ar !== en ? <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{ar}</Typography> : null; })()}
+                            {(() => { const ar = getLang(lic.doctorName, "ar"); const en = getLang(lic.doctorName, "en"); return ar && ar !== en ? <Typography sx={{ fontSize: "11px", color: "var(--zy-teal-100)", fontFamily: "sans-serif" }}>{ar}</Typography> : null; })()}
                           </Box>
                         </TableCell>
                         <TableCell>{lic.phone || "—"}</TableCell>
                         <TableCell>
-                          <Typography sx={{ fontFamily: "monospace", color: lic.deviceId ? "#34d399" : "#6a8aaa", fontSize: "12px" }}>
+                          <Typography sx={{ fontFamily: "monospace", color: lic.deviceId ? "var(--success)" : "var(--text-muted)", fontSize: "12px" }}>
                             {lic.deviceFingerprint || "Not bound"}
                           </Typography>
                         </TableCell>
@@ -324,7 +324,7 @@ export default function Licenses() {
                             sx={{
                               fontWeight: 600, fontSize: "10px", cursor: "pointer",
                               backgroundColor: lic.onlineBooking ? "rgba(34,197,94,0.14)" : "rgba(100,116,139,0.14)",
-                              color: lic.onlineBooking ? "#22c55e" : "#64748b",
+                              color: lic.onlineBooking ? "var(--zy-success)" : "var(--zy-slate-300)",
                               border: lic.onlineBooking ? "1px solid rgba(34,197,94,0.28)" : "1px solid rgba(100,116,139,0.28)",
                             }}
                           />
@@ -346,7 +346,7 @@ export default function Licenses() {
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={dialogTitleSx}>Create New License</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <TextField
             fullWidth
             label="License Key"
@@ -357,10 +357,10 @@ export default function Licenses() {
             sx={sharedFieldSx}
           />
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Category</InputLabel>
-            <Select label="Category" value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
-              <MenuItem value="doctor" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Individual Doctor</MenuItem>
-              <MenuItem value="tenant" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Tenant / Organization</MenuItem>
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Category</InputLabel>
+            <Select label="Category" value={formData.category} onChange={e => setFormData(p => ({ ...p, category: e.target.value }))} sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}>
+              <MenuItem value="doctor" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>Individual Doctor</MenuItem>
+              <MenuItem value="tenant" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>Tenant / Organization</MenuItem>
             </Select>
           </FormControl>
           <BilingualInput
@@ -393,10 +393,10 @@ export default function Licenses() {
               <Checkbox
                 checked={formData.onlineBooking}
                 onChange={e => setFormData(p => ({ ...p, onlineBooking: e.target.checked }))}
-                sx={{ color: "#4a6080", "&.Mui-checked": { color: "#0fb8a6" } }}
+                sx={{ color: "var(--zy-slate-300)", "&.Mui-checked": { color: "var(--zy-teal-500)" } }}
               />
             }
-            label={<Typography sx={{ color: "#9ecfca", fontSize: "13px" }}>Enable Online Booking</Typography>}
+            label={<Typography sx={{ color: "var(--zy-teal-100)", fontSize: "13px" }}>Enable Online Booking</Typography>}
             sx={{ mt: 1 }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
@@ -408,12 +408,12 @@ export default function Licenses() {
 
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={dialogTitleSx}>Edit License — {editLicense?.licenseKey}</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Category</InputLabel>
-            <Select label="Category" value={editForm.category} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))} sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}>
-              <MenuItem value="doctor" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Individual Doctor</MenuItem>
-              <MenuItem value="tenant" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>Tenant / Organization</MenuItem>
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Category</InputLabel>
+            <Select label="Category" value={editForm.category} onChange={e => setEditForm(p => ({ ...p, category: e.target.value }))} sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}>
+              <MenuItem value="doctor" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>Individual Doctor</MenuItem>
+              <MenuItem value="tenant" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>Tenant / Organization</MenuItem>
             </Select>
           </FormControl>
           <TextField
@@ -442,10 +442,10 @@ export default function Licenses() {
               <Checkbox
                 checked={editForm.onlineBooking}
                 onChange={e => setEditForm(p => ({ ...p, onlineBooking: e.target.checked }))}
-                sx={{ color: "#4a6080", "&.Mui-checked": { color: "#0fb8a6" } }}
+                sx={{ color: "var(--zy-slate-300)", "&.Mui-checked": { color: "var(--zy-teal-500)" } }}
               />
             }
-            label={<Typography sx={{ color: "#9ecfca", fontSize: "13px" }}>Enable Online Booking</Typography>}
+            label={<Typography sx={{ color: "var(--zy-teal-100)", fontSize: "13px" }}>Enable Online Booking</Typography>}
             sx={{ mt: 1 }}
           />
           <Box sx={{ mt: 3, display: "flex", gap: 1.5, justifyContent: "flex-end" }}>

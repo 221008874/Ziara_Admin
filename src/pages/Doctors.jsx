@@ -116,7 +116,7 @@ function ImageUploadField({ obj, set, setError }) {
 
   return (
     <Box sx={{ mt: 2, mb: 1 }}>
-      <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>
+      <Typography sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, mb: 1 }}>
         Profile Photo
       </Typography>
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -125,13 +125,13 @@ function ImageUploadField({ obj, set, setError }) {
             <img
               src={preview}
               alt="Preview"
-              style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(15,184,166,0.3)" }}
+              style={{ width: 80, height: 80, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(28,138,126,0.3)" }}
             />
             <button
               onClick={clearPhoto}
               style={{
                 position: "absolute", top: -4, right: -4,
-                background: "#f87171", color: "white", border: "none",
+                background: "var(--danger)", color: "white", border: "none",
                 borderRadius: "50%", width: 22, height: 22,
                 cursor: "pointer", fontSize: 12, display: "flex",
                 alignItems: "center", justifyContent: "center",
@@ -142,9 +142,9 @@ function ImageUploadField({ obj, set, setError }) {
         ) : (
           <Box sx={{
             width: 80, height: 80, borderRadius: "50%",
-            backgroundColor: "#0f1e36", border: "2px dashed rgba(15,184,166,0.2)",
+            backgroundColor: "var(--bg-input)", border: "2px dashed rgba(28,138,126,0.2)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#4a6080", fontSize: 24,
+            color: "var(--zy-slate-300)", fontSize: 24,
           }}>
             👤
           </Box>
@@ -155,18 +155,18 @@ function ImageUploadField({ obj, set, setError }) {
             variant="outlined"
             disabled={uploading}
             sx={{
-              borderColor: "rgba(15,184,166,0.3)", color: "#2dd4bf",
+              borderColor: "rgba(28,138,126,0.3)", color: "var(--accent-light)",
               textTransform: "none", fontSize: "12px",
-              "&:hover": { borderColor: "#0fb8a6", backgroundColor: "rgba(15,184,166,0.08)" },
+              "&:hover": { borderColor: "var(--zy-teal-500)", backgroundColor: "rgba(28,138,126,0.08)" },
             }}
           >
             {uploading ? (
-              <CircularProgress size={14} sx={{ color: "#0fb8a6", mr: 1 }} thickness={5} />
+              <CircularProgress size={14} sx={{ color: "var(--zy-teal-500)", mr: 1 }} thickness={5} />
             ) : null}
             {uploading ? "Uploading..." : preview ? "Change Photo" : "Upload Photo"}
             <input type="file" accept="image/*" hidden onChange={handleFileChange} />
           </Button>
-          <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 0.5 }}>
+          <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", mt: 0.5 }}>
             JPG, PNG, WebP. Max 5MB.
           </Typography>
         </Box>
@@ -199,7 +199,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
 
   return (
     <Box sx={{ mt: 2 }}>
-      <Typography sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, mb: 1 }}>
+      <Typography sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, mb: 1 }}>
         {isEdit ? "Set New Password (optional)" : "Initial Password *"}
       </Typography>
 
@@ -217,7 +217,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
             "& .MuiOutlinedInput-root": {
               ...(sharedFieldSx["& .MuiOutlinedInput-root"] || {}),
               paddingRight: "40px !important",
-              backgroundColor: isEdit ? "#0a1525" : "#0f1e36",
+              backgroundColor: isEdit ? "var(--bg-primary)" : "var(--bg-input)",
             },
           }}
         />
@@ -226,7 +226,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
           onClick={() => setShowPassword(!showPassword)}
           sx={{
             position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-            color: "#4a6080", "&:hover": { color: "#0fb8a6" },
+            color: "var(--zy-slate-300)", "&:hover": { color: "var(--zy-teal-500)" },
           }}
           type="button"
         >
@@ -246,11 +246,11 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
               key={i}
               sx={{
                 fontSize: "10px",
-                color: req.test(obj.password) ? "#34d399" : "#4a6080",
+                color: req.test(obj.password) ? "var(--success)" : "var(--zy-slate-300)",
                 display: "flex", alignItems: "center", gap: 0.5,
                 "&::before": {
                   content: req.test(obj.password) ? '"✓"' : '"○"',
-                  color: req.test(obj.password) ? "#34d399" : "#4a6080",
+                  color: req.test(obj.password) ? "var(--success)" : "var(--zy-slate-300)",
                   marginRight: "2px",
                 },
               }}
@@ -281,7 +281,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
             onClick={() => setShowConfirm(!showConfirm)}
             sx={{
               position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-              color: "#4a6080", "&:hover": { color: "#0fb8a6" },
+              color: "var(--zy-slate-300)", "&:hover": { color: "var(--zy-teal-500)" },
             }}
             type="button"
           >
@@ -291,7 +291,7 @@ function PasswordField({ obj, set, isEdit = false, error, setError }) {
       )}
 
       {isEdit && (
-        <Typography sx={{ color: "#283848", fontSize: "11px", mt: 0.5, fontStyle: "italic" }}>
+        <Typography sx={{ color: "var(--zy-slate-700)", fontSize: "11px", mt: 0.5, fontStyle: "italic" }}>
           Leave blank to keep the current password. Enter a new password to change it.
         </Typography>
       )}
@@ -535,7 +535,7 @@ export default function Doctors() {
   if (loading) {
     return (
       <PageContainer sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CircularProgress sx={{ color: "#0fb8a6" }} size={48} thickness={3} />
+        <CircularProgress sx={{ color: "var(--zy-teal-500)" }} size={48} thickness={3} />
       </PageContainer>
     );
   }
@@ -554,7 +554,7 @@ export default function Doctors() {
 
   const renderTenantSelect = (obj, set) => (
     <FormControl fullWidth margin="normal">
-      <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>
+      <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>
         Tenant (Clinic)
       </InputLabel>
       <Select
@@ -564,13 +564,13 @@ export default function Doctors() {
           const t = tenants.find(t => t.id === e.target.value);
           set(p => ({ ...p, tenantId: e.target.value || "", providerId: e.target.value || "", tenantName: t ? (isBilingual(t.name) ? { ...t.name } : createBilingual(getLang(t.name))) : createBilingual(), licenseKey: t?.licenseKey || "" }));
         }}
-        sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}
+        sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}
       >
-        <MenuItem value="" sx={{ backgroundColor: "#0f1e36", color: "#6b7e9b", fontStyle: "italic" }}>
+        <MenuItem value="" sx={{ backgroundColor: "var(--bg-input)", color: "var(--zy-slate-300)", fontStyle: "italic" }}>
           — No Tenant (Individual) —
         </MenuItem>
         {tenants.map(t => (
-          <MenuItem key={t.id} value={t.id} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+          <MenuItem key={t.id} value={t.id} sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>
             {getLang(t.name) || t.name}
           </MenuItem>
         ))}
@@ -580,20 +580,20 @@ export default function Doctors() {
 
   const renderSpecSelect = (obj, set) => (
     <FormControl fullWidth margin="normal">
-      <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>
+      <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>
         Specialization / التخصص
       </InputLabel>
       <Select
         label="Specialization / التخصص"
         value={obj.specialization}
         onChange={e => set(p => ({ ...p, specialization: e.target.value }))}
-        sx={{ backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}
+        sx={{ backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}
       >
         {SPECIALIZATIONS.map(s => (
-          <MenuItem key={s.value} value={s.value} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+          <MenuItem key={s.value} value={s.value} sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>
             <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
               <Typography sx={{ fontSize: "13px", fontWeight: 600 }}>{s.en}</Typography>
-              <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{s.ar}</Typography>
+              <Typography sx={{ fontSize: "11px", color: "var(--zy-teal-100)", fontFamily: "sans-serif" }}>{s.ar}</Typography>
             </Box>
           </MenuItem>
         ))}
@@ -617,10 +617,10 @@ export default function Doctors() {
             <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>
+            <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>
               Doctor Management
             </Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">
               Manage doctors across all tenants
             </Typography>
           </Box>
@@ -631,13 +631,13 @@ export default function Doctors() {
               value={tenantFilter}
               onChange={e => setTenantFilter(e.target.value)}
               displayEmpty
-              sx={{ height: 38, fontSize: "12px", backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" }, "& .MuiSvgIcon-root": { color: "#4a6080" } }}
+              sx={{ height: 38, fontSize: "12px", backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" }, "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" } }}
             >
-              <MenuItem value="ALL" sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+              <MenuItem value="ALL" sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>
                 All Tenants
               </MenuItem>
               {tenants.map(t => (
-                <MenuItem key={t.id} value={t.id} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+                <MenuItem key={t.id} value={t.id} sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>
                   {getLang(t.name)}
                 </MenuItem>
               ))}
@@ -665,9 +665,9 @@ export default function Doctors() {
               mb: 3,
               backgroundColor: "rgba(248,113,113,0.1)",
               border: "1px solid rgba(248,113,113,0.25)",
-              color: "#f87171",
+              color: "var(--danger)",
               borderRadius: "12px",
-              "& .MuiAlert-icon": { color: "#f87171" },
+              "& .MuiAlert-icon": { color: "var(--danger)" },
             }}
           >
             {error}
@@ -676,14 +676,14 @@ export default function Doctors() {
 
         <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
           {[
-            { label: "Total Doctors", value: doctors.length, color: "#60a5fa" },
-            { label: "Active", value: active, color: "#34d399" },
-            { label: "Inactive", value: doctors.length - active, color: "#f87171" },
-            { label: "Tenants", value: tenants.length, color: "#2dd4bf" },
+            { label: "Total Doctors", value: doctors.length, color: "var(--zy-info)" },
+            { label: "Active", value: active, color: "var(--success)" },
+            { label: "Inactive", value: doctors.length - active, color: "var(--danger)" },
+            { label: "Tenants", value: tenants.length, color: "var(--accent-light)" },
           ].map(s => (
             <StatCard key={s.label}>
               <Typography sx={{
-                color: "#4a6080",
+                color: "var(--zy-slate-300)",
                 fontSize: "11px",
                 fontWeight: 600,
                 textTransform: "uppercase",
@@ -720,10 +720,10 @@ export default function Doctors() {
                       <TableCell colSpan={7}>
                         <EmptyState>
                           <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>👨‍⚕️</Typography>
-                          <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>
+                          <Typography sx={{ color: "var(--zy-slate-300)", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>
                             No doctors found
                           </Typography>
-                          <Typography sx={{ color: "#283848", fontSize: "13px" }}>
+                          <Typography sx={{ color: "var(--zy-slate-700)", fontSize: "13px" }}>
                             {tenantFilter !== "ALL"
                               ? "No doctors for this tenant."
                               : "Click \"+ New Doctor\" to add one."}
@@ -745,24 +745,24 @@ export default function Doctors() {
                             ) : (
                               <Box sx={{
                                 width: 32, height: 32, borderRadius: "50%",
-                                backgroundColor: "#0f1e36",
+                                backgroundColor: "var(--bg-input)",
                                 display: "flex", alignItems: "center", justifyContent: "center",
-                                fontSize: 12, color: "#4a6080",
+                                fontSize: 12, color: "var(--zy-slate-300)",
                               }}>
                                 {getLang(d.name)?.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() || '?'}
                               </Box>
                             )}
                             <Box>
-                              <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                              <Typography sx={{ fontWeight: 600, color: "var(--text-primary)" }}>
                                 Dr. {getLang(d.name)}
                               </Typography>
                               {getLang(d.name, "ar") && getLang(d.name, "ar") !== getLang(d.name, "en") && (
-                                <Typography sx={{ fontSize: "11px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
+                                <Typography sx={{ fontSize: "11px", color: "var(--zy-teal-100)", mt: 0.25, fontFamily: "sans-serif" }}>
                                   {getLang(d.name, "ar")}
                                 </Typography>
                               )}
                               {d.email && (
-                                <Typography sx={{ fontSize: "11px", color: "#4a6080", mt: 0.25 }}>
+                                <Typography sx={{ fontSize: "11px", color: "var(--zy-slate-300)", mt: 0.25 }}>
                                   {d.email}
                                 </Typography>
                               )}
@@ -772,9 +772,9 @@ export default function Doctors() {
                         <TableCell>
                           <Typography sx={{
                             fontSize: "12px",
-                            color: "#9ecfca",
-                            backgroundColor: "rgba(15,184,166,0.08)",
-                            border: "1px solid rgba(15,184,166,0.12)",
+                            color: "var(--zy-teal-100)",
+                            backgroundColor: "rgba(28,138,126,0.08)",
+                            border: "1px solid rgba(28,138,126,0.12)",
                             borderRadius: 6,
                             px: 1, py: 0.25,
                             display: "inline-block",
@@ -788,8 +788,8 @@ export default function Doctors() {
                             if (spec) {
                               return (
                                 <Box sx={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-                                  <Typography sx={{ fontSize: "13px", color: "#dde6f0" }}>{spec.en}</Typography>
-                                  <Typography sx={{ fontSize: "11px", color: "#9ecfca", fontFamily: "sans-serif" }}>{spec.ar}</Typography>
+                                  <Typography sx={{ fontSize: "13px", color: "var(--text-secondary)" }}>{spec.en}</Typography>
+                                  <Typography sx={{ fontSize: "11px", color: "var(--zy-teal-100)", fontFamily: "sans-serif" }}>{spec.ar}</Typography>
                                 </Box>
                               );
                             }
@@ -801,7 +801,7 @@ export default function Doctors() {
                           <Typography sx={{
                             fontFamily: "monospace",
                             fontSize: "12px",
-                            color: d.licenseKey ? "#34d399" : "#4a6080",
+                            color: d.licenseKey ? "var(--success)" : "var(--zy-slate-300)",
                           }}>
                             {d.licenseKey || "Not assigned"}
                           </Typography>
@@ -845,7 +845,7 @@ export default function Doctors() {
 
       <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={dialogTitleSx}>Add New Doctor</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <ImageUploadField obj={formData} set={setFormData} error={error} setError={setError} />
           <BilingualInput label="Full Name" labelAr="الاسم الكامل" value={formData.name} onChange={v => setFormData(p => ({ ...p, name: v }))} required />
           {renderTenantSelect(formData, setFormData)}
@@ -873,7 +873,7 @@ export default function Doctors() {
               label="License Key (from tenant)"
               value={formData.licenseKey}
               disabled
-              sx={{ "& .MuiInputBase-root": { backgroundColor: "#0d1a2e", color: "#34d399" }, "& .MuiInputLabel-root": { color: "#3a5070", fontSize: "12px", fontWeight: 600 }, "& .Mui-disabled": { WebkitTextFillColor: "#34d399 !important" } }}
+              sx={{ "& .MuiInputBase-root": { backgroundColor: "var(--bg-secondary)", color: "var(--success)" }, "& .MuiInputLabel-root": { color: "var(--text-dark)", fontSize: "12px", fontWeight: 600 }, "& .Mui-disabled": { WebkitTextFillColor: "var(--success) !important" } }}
             />
           ) : (
             fieldEl("License Key *", "licenseKey", formData, setFormData, {
@@ -907,7 +907,7 @@ export default function Doctors() {
 
       <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={dialogTitleSx}>Edit Doctor</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           <ImageUploadField obj={editData} set={setEditData} error={error} setError={setError} />
           <BilingualInput label="Full Name" labelAr="الاسم الكامل" value={editData.name} onChange={v => setEditData(p => ({ ...p, name: v }))} required />
           {renderTenantSelect(editData, setEditData)}
@@ -956,11 +956,11 @@ export default function Doctors() {
 
       <Dialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth PaperProps={{ sx: dialogPaperSx }}>
         <DialogTitle sx={dialogTitleSx}>Confirm Delete</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
-          <Typography sx={{ color: "#dde6f0", mb: 1 }}>
-            Delete <strong style={{ color: "#f87171" }}>Dr. {getLang(deleteConfirm?.name)}</strong>?
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
+          <Typography sx={{ color: "var(--text-secondary)", mb: 1 }}>
+            Delete <strong style={{ color: "var(--danger)" }}>Dr. {getLang(deleteConfirm?.name)}</strong>?
           </Typography>
-          <Typography sx={{ color: "#4a6080", fontSize: "13px", mb: 3 }}>
+          <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "13px", mb: 3 }}>
             This action cannot be undone.
           </Typography>
           <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>

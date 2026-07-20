@@ -70,6 +70,10 @@ export default async function handler(req, res) {
       disabled: false,
     });
 
+    // Bind the doctor's UID so the dashboard can be authorized via the
+    // `doctor_id` token claim (doctors are not in any tenant staffUids array).
+    await auth.setCustomUserClaims(userRecord.uid, { doctor_id: uid });
+
     console.log('✅ Doctor auth account created:', userRecord.uid, 'for doctor:', uid);
 
     return res.status(200).json({

@@ -25,11 +25,11 @@ import { styled } from "@mui/material/styles";
 import { PageContainer, TopBar, ContentWrapper, GlassPanel, StyledTableContainer, ActionButton, StatCard, EmptyState, dialogPaperSx, dialogTitleSx, sharedFieldSx } from "./components/shared/PageShells";
 
 const StyledSelect = styled(Select)({
-  backgroundColor: "#0f1e36", borderRadius: "10px", color: "#dde6f0", fontSize: "14px",
-  "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.18)" },
-  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(15,184,166,0.35)" },
-  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#0fb8a6" },
-  "& .MuiSvgIcon-root": { color: "#4a6080" },
+  backgroundColor: "var(--bg-input)", borderRadius: "10px", color: "var(--text-secondary)", fontSize: "14px",
+  "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.18)" },
+  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(28,138,126,0.35)" },
+  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "var(--zy-teal-500)" },
+  "& .MuiSvgIcon-root": { color: "var(--zy-slate-300)" },
 });
 
 function isUnlimited(v) { return v === -1 || v === Infinity; }
@@ -153,7 +153,7 @@ export default function ERPSettings() {
   if (loading) {
     return (
       <PageContainer sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <CircularProgress sx={{ color: "#0fb8a6" }} size={48} thickness={3} />
+        <CircularProgress sx={{ color: "var(--zy-teal-500)" }} size={48} thickness={3} />
       </PageContainer>
     );
   }
@@ -174,8 +174,8 @@ export default function ERPSettings() {
             <img src={logo} alt="Smart Clinic" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </Box>
           <Box>
-            <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>ERP Integration</Typography>
-            <Typography sx={{ color: "#4a6080", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Configure SaaS metadata for the ERP system</Typography>
+            <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: { xs: "15px", sm: "18px" } }}>ERP Integration</Typography>
+            <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontStyle: "italic" }} className="hide-on-mobile">Configure SaaS metadata for the ERP system</Typography>
           </Box>
         </Box>
         <Box sx={{ display: "flex", gap: 1.5 }}>
@@ -184,9 +184,9 @@ export default function ERPSettings() {
             disabled={migrating}
             sx={{
               borderRadius: "9px", textTransform: "none", fontWeight: 600, fontSize: "12px", padding: "8px 18px",
-              background: "linear-gradient(to right, #7c3aed, #6d28d9)", color: "white",
+              background: "linear-gradient(to right, var(--zy-teal-900), var(--zy-teal-900))", color: "white",
               boxShadow: "0 4px 14px rgba(124,58,237,0.40)",
-              "&:hover": { background: "linear-gradient(to right, #6d28d9, #5b21b6)", transform: "translateY(-1px)" },
+              "&:hover": { background: "linear-gradient(to right, var(--zy-teal-900), var(--zy-teal-900))", transform: "translateY(-1px)" },
               transition: "all 0.2s ease",
             }}
           >
@@ -201,26 +201,26 @@ export default function ERPSettings() {
 
       <ContentWrapper>
         {error && (
-          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>
+          <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 3, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--danger)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--danger)" } }}>
             {error}
           </Alert>
         )}
 
         {migrateResult && migrateResult.errors.length > 0 && (
-          <Alert severity="warning" onClose={() => setMigrateResult(null)} sx={{ mb: 3, backgroundColor: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "#f59e0b", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f59e0b" } }}>
+          <Alert severity="warning" onClose={() => setMigrateResult(null)} sx={{ mb: 3, backgroundColor: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "var(--zy-warning)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--zy-warning)" } }}>
             Migration errors: {migrateResult.errors.join("; ")}
           </Alert>
         )}
 
         <Box className="stats-grid" sx={{ mb: 3 }}>
           {[
-            { label: "Total Tenants", value: tenants.length, color: "#2dd4bf" },
-            { label: "ERP Enabled",   value: erpEnabled,     color: "#34d399" },
-            { label: "ERP Disabled",  value: erpDisabled,    color: "#f87171" },
-            { label: "Active",        value: active,         color: "#60a5fa" },
+            { label: "Total Tenants", value: tenants.length, color: "var(--accent-light)" },
+            { label: "ERP Enabled",   value: erpEnabled,     color: "var(--success)" },
+            { label: "ERP Disabled",  value: erpDisabled,    color: "var(--danger)" },
+            { label: "Active",        value: active,         color: "var(--zy-info)" },
           ].map(s => (
             <StatCard key={s.label}>
-              <Typography sx={{ color: "#4a6080", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>{s.label}</Typography>
+              <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", mb: 0.5 }}>{s.label}</Typography>
               <Typography sx={{ color: s.color, fontSize: "28px", fontWeight: 700, lineHeight: 1 }}>{s.value}</Typography>
             </StatCard>
           ))}
@@ -248,8 +248,8 @@ export default function ERPSettings() {
                       <TableCell colSpan={8}>
                         <EmptyState>
                           <Typography sx={{ fontSize: "40px", mb: 1, opacity: 0.3 }}>⚡</Typography>
-                          <Typography sx={{ color: "#4a6080", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants found</Typography>
-                          <Typography sx={{ color: "#283848", fontSize: "13px" }}>Create tenants in the Tenants page first</Typography>
+                          <Typography sx={{ color: "var(--zy-slate-300)", fontWeight: 600, fontSize: "15px", mb: 0.5 }}>No tenants found</Typography>
+                          <Typography sx={{ color: "var(--zy-slate-700)", fontSize: "13px" }}>Create tenants in the Tenants page first</Typography>
                         </EmptyState>
                       </TableCell>
                     </TableRow>
@@ -260,11 +260,11 @@ export default function ERPSettings() {
                       return (
                         <TableRow key={t.id}>
                           <TableCell>
-                            <Typography sx={{ fontWeight: 600, color: "#eaf2ff" }}>
+                            <Typography sx={{ fontWeight: 600, color: "var(--text-primary)" }}>
                               {t.name?.en || t.name || t.id}
                             </Typography>
                             {t.name?.ar && (
-                              <Typography sx={{ fontSize: "11px", color: "#9ecfca", mt: 0.25, fontFamily: "sans-serif" }}>
+                              <Typography sx={{ fontSize: "11px", color: "var(--zy-teal-100)", mt: 0.25, fontFamily: "sans-serif" }}>
                                 {t.name.ar}
                               </Typography>
                             )}
@@ -272,9 +272,9 @@ export default function ERPSettings() {
                           <TableCell>
                             <Chip label={planId} size="small" sx={{
                               fontWeight: 600, fontSize: "10px", borderRadius: "8px", height: "24px",
-                              backgroundColor: planId === "ENTERPRISE" ? "rgba(139,92,246,0.14)" : planId === "PRO" ? "rgba(59,130,246,0.14)" : "rgba(15,184,166,0.10)",
-                              color: planId === "ENTERPRISE" ? "#a78bfa" : planId === "PRO" ? "#60a5fa" : "#2dd4bf",
-                              border: `1px solid ${planId === "ENTERPRISE" ? "rgba(139,92,246,0.28)" : planId === "PRO" ? "rgba(59,130,246,0.28)" : "rgba(15,184,166,0.20)"}`,
+                              backgroundColor: planId === "ENTERPRISE" ? "rgba(139,92,246,0.14)" : planId === "PRO" ? "rgba(59,130,246,0.14)" : "rgba(28,138,126,0.10)",
+                              color: planId === "ENTERPRISE" ? "var(--zy-teal-100)" : planId === "PRO" ? "var(--zy-info)" : "var(--accent-light)",
+                              border: `1px solid ${planId === "ENTERPRISE" ? "rgba(139,92,246,0.28)" : planId === "PRO" ? "rgba(59,130,246,0.28)" : "rgba(28,138,126,0.20)"}`,
                             }} />
                           </TableCell>
                           <TableCell>
@@ -284,18 +284,18 @@ export default function ERPSettings() {
                               sx={{
                                 fontWeight: 600, fontSize: "10px", borderRadius: "8px", height: "24px",
                                 backgroundColor: t.erpEnabled ? "rgba(52,211,153,0.14)" : "rgba(248,113,113,0.14)",
-                                color: t.erpEnabled ? "#34d399" : "#f87171",
+                                color: t.erpEnabled ? "var(--success)" : "var(--danger)",
                                 border: `1px solid ${t.erpEnabled ? "rgba(52,211,153,0.28)" : "rgba(248,113,113,0.28)"}`,
                               }}
                             />
                           </TableCell>
                           <TableCell>
-                            <Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>
+                            <Typography sx={{ color: "var(--text-secondary)", fontSize: "13px" }}>
                               {isUnlimited(lic.maxUsers) ? "∞" : (lic.maxUsers ?? "—")}
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            <Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>
+                            <Typography sx={{ color: "var(--text-secondary)", fontSize: "13px" }}>
                               {isUnlimited(lic.maxDoctors) ? "∞" : (lic.maxDoctors ?? "—")}
                             </Typography>
                           </TableCell>
@@ -304,12 +304,12 @@ export default function ERPSettings() {
                               {(lic.enabledModules || []).map(m => (
                                 <Chip key={m} label={MODULE_LABELS[m]?.en || m} size="small" sx={{
                                   fontWeight: 600, fontSize: "9px", height: "20px", borderRadius: "6px",
-                                  backgroundColor: "rgba(15,184,166,0.10)", color: "#2dd4bf",
-                                  border: "1px solid rgba(15,184,166,0.20)",
+                                  backgroundColor: "rgba(28,138,126,0.10)", color: "var(--accent-light)",
+                                  border: "1px solid rgba(28,138,126,0.20)",
                                 }} />
                               ))}
                               {(!lic.enabledModules || lic.enabledModules.length === 0) && (
-                                <Typography sx={{ color: "#4a6080", fontSize: "11px" }}>—</Typography>
+                                <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px" }}>—</Typography>
                               )}
                             </Box>
                           </TableCell>
@@ -320,7 +320,7 @@ export default function ERPSettings() {
                               sx={{
                                 fontWeight: 600, fontSize: "10px", borderRadius: "12px", height: "28px",
                                 backgroundColor: t.status === "ACTIVE" ? "rgba(52,211,153,0.14)" : "rgba(248,113,113,0.14)",
-                                color: t.status === "ACTIVE" ? "#34d399" : "#f87171",
+                                color: t.status === "ACTIVE" ? "var(--success)" : "var(--danger)",
                                 border: `1px solid ${t.status === "ACTIVE" ? "rgba(52,211,153,0.28)" : "rgba(248,113,113,0.28)"}`,
                               }}
                             />
@@ -343,52 +343,52 @@ export default function ERPSettings() {
 
       <Dialog open={configOpen} onClose={() => setConfigOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { ...dialogPaperSx, maxHeight: { xs: "100vh", sm: "none" } } }}>
         <DialogTitle sx={dialogTitleSx}>ERP Configuration — {configTarget?.name?.en || configTarget?.id || ""}</DialogTitle>
-        <DialogContent sx={{ p: "24px", backgroundColor: "#0b1628" }}>
+        <DialogContent sx={{ p: "24px", backgroundColor: "var(--bg-secondary)" }}>
           {configErrors.length > 0 && (
-            <Alert severity="error" sx={{ mb: 2, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "#f87171", borderRadius: "12px", "& .MuiAlert-icon": { color: "#f87171" } }}>
+            <Alert severity="error" sx={{ mb: 2, backgroundColor: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", color: "var(--danger)", borderRadius: "12px", "& .MuiAlert-icon": { color: "var(--danger)" } }}>
               {configErrors.map((e, i) => <div key={i}>{e}</div>)}
             </Alert>
           )}
 
-          <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "14px", mb: 2 }}>Tenant Settings</Typography>
+          <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "14px", mb: 2 }}>Tenant Settings</Typography>
 
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2, p: 2, backgroundColor: "#0a1428", borderRadius: "12px", border: "1px solid rgba(15,184,166,0.10)" }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2, p: 2, backgroundColor: "var(--bg-primary)", borderRadius: "12px", border: "1px solid rgba(28,138,126,0.10)" }}>
             <Box>
-              <Typography sx={{ color: "#dde6f0", fontSize: "14px", fontWeight: 600 }}>ERP Enabled</Typography>
-              <Typography sx={{ color: "#4a6080", fontSize: "11px" }}>Allow this tenant to use ERP web features</Typography>
+              <Typography sx={{ color: "var(--text-secondary)", fontSize: "14px", fontWeight: 600 }}>ERP Enabled</Typography>
+              <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px" }}>Allow this tenant to use ERP web features</Typography>
             </Box>
             <Switch
               checked={configForm.erpEnabled}
               onChange={e => setConfigForm(p => ({ ...p, erpEnabled: e.target.checked }))}
-              sx={{ "& .MuiSwitch-switchBase.Mui-checked": { color: "#0fb8a6" }, "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "rgba(15,184,166,0.40)" }, "& .MuiSwitch-track": { backgroundColor: "rgba(255,255,255,0.10)" } }}
+              sx={{ "& .MuiSwitch-switchBase.Mui-checked": { color: "var(--zy-teal-500)" }, "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { backgroundColor: "rgba(28,138,126,0.40)" }, "& .MuiSwitch-track": { backgroundColor: "rgba(255,255,255,0.10)" } }}
             />
           </Box>
 
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2, mb: 2 }}>
             <FormControl fullWidth>
-              <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Tenant Status</InputLabel>
+              <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Tenant Status</InputLabel>
               <StyledSelect label="Tenant Status" value={configForm.status} onChange={e => setConfigForm(p => ({ ...p, status: e.target.value }))}>
-                <MenuItem value="ACTIVE" sx={{ backgroundColor: "#0f1e36", color: "#34d399" }}>ACTIVE</MenuItem>
-                <MenuItem value="INACTIVE" sx={{ backgroundColor: "#0f1e36", color: "#f87171" }}>INACTIVE</MenuItem>
+                <MenuItem value="ACTIVE" sx={{ backgroundColor: "var(--bg-input)", color: "var(--success)" }}>ACTIVE</MenuItem>
+                <MenuItem value="INACTIVE" sx={{ backgroundColor: "var(--bg-input)", color: "var(--danger)" }}>INACTIVE</MenuItem>
               </StyledSelect>
             </FormControl>
             <FormControl fullWidth>
-              <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>License Status</InputLabel>
+              <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>License Status</InputLabel>
               <StyledSelect label="License Status" value={configForm.licenseStatus} onChange={e => setConfigForm(p => ({ ...p, licenseStatus: e.target.value }))}>
-                <MenuItem value="ACTIVE" sx={{ backgroundColor: "#0f1e36", color: "#34d399" }}>ACTIVE</MenuItem>
-                <MenuItem value="INACTIVE" sx={{ backgroundColor: "#0f1e36", color: "#f87171" }}>INACTIVE</MenuItem>
-                <MenuItem value="EXPIRED" sx={{ backgroundColor: "#0f1e36", color: "#ef4444" }}>EXPIRED</MenuItem>
+                <MenuItem value="ACTIVE" sx={{ backgroundColor: "var(--bg-input)", color: "var(--success)" }}>ACTIVE</MenuItem>
+                <MenuItem value="INACTIVE" sx={{ backgroundColor: "var(--bg-input)", color: "var(--danger)" }}>INACTIVE</MenuItem>
+                <MenuItem value="EXPIRED" sx={{ backgroundColor: "var(--bg-input)", color: "var(--zy-danger)" }}>EXPIRED</MenuItem>
               </StyledSelect>
             </FormControl>
           </Box>
 
-          <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "14px", mb: 2, mt: 1 }}>Plan & Limits</Typography>
+          <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "14px", mb: 2, mt: 1 }}>Plan & Limits</Typography>
 
           <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: "#3a5070", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "#0fb8a6" } }}>Plan</InputLabel>
+            <InputLabel sx={{ color: "var(--text-dark)", fontSize: "12px", fontWeight: 600, "&.Mui-focused": { color: "var(--zy-teal-500)" } }}>Plan</InputLabel>
             <StyledSelect label="Plan" value={configForm.plan} onChange={e => handlePlanChange(e.target.value)}>
               {PLAN_KEYS.map(p => (
-                <MenuItem key={p} value={p} sx={{ backgroundColor: "#0f1e36", color: "#dde6f0" }}>
+                <MenuItem key={p} value={p} sx={{ backgroundColor: "var(--bg-input)", color: "var(--text-secondary)" }}>
                   {p} — {PLANS[p].maxUsers === -1 ? "Unlimited users" : `${PLANS[p].maxUsers} users`}, {PLANS[p].maxDoctors === -1 ? "unlimited doctors" : `${PLANS[p].maxDoctors} doctors`}
                 </MenuItem>
               ))}
@@ -426,8 +426,8 @@ export default function ERPSettings() {
             sx={sharedFieldSx}
           />
 
-          <Typography sx={{ color: "#eaf2ff", fontWeight: 700, fontSize: "14px", mb: 1, mt: 2 }}>Enabled Modules</Typography>
-          <Box sx={{ p: 2, backgroundColor: "#0a1428", borderRadius: "12px", border: "1px solid rgba(15,184,166,0.10)" }}>
+          <Typography sx={{ color: "var(--text-primary)", fontWeight: 700, fontSize: "14px", mb: 1, mt: 2 }}>Enabled Modules</Typography>
+          <Box sx={{ p: 2, backgroundColor: "var(--bg-primary)", borderRadius: "12px", border: "1px solid rgba(28,138,126,0.10)" }}>
             <FormGroup row>
               {ALL_MODULES.map(m => (
                 <FormControlLabel
@@ -445,16 +445,16 @@ export default function ERPSettings() {
                         }));
                       }}
                       disabled={configForm.plan === "ENTERPRISE" && configForm.enabledModules.includes("*")}
-                      sx={{ color: "#4a6080", "&.Mui-checked": { color: "#0fb8a6" } }}
+                      sx={{ color: "var(--zy-slate-300)", "&.Mui-checked": { color: "var(--zy-teal-500)" } }}
                     />
                   }
-                  label={<Typography sx={{ color: "#dde6f0", fontSize: "13px" }}>{MODULE_LABELS[m]?.en || m}</Typography>}
+                  label={<Typography sx={{ color: "var(--text-secondary)", fontSize: "13px" }}>{MODULE_LABELS[m]?.en || m}</Typography>}
                   sx={{ minWidth: "140px", mb: 0.5 }}
                 />
               ))}
             </FormGroup>
             {configForm.plan === "ENTERPRISE" && (
-              <Typography sx={{ color: "#4a6080", fontSize: "11px", mt: 1, fontStyle: "italic" }}>
+              <Typography sx={{ color: "var(--zy-slate-300)", fontSize: "11px", mt: 1, fontStyle: "italic" }}>
                 Enterprise plan includes all modules by default.
               </Typography>
             )}

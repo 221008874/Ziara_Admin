@@ -42,24 +42,24 @@ export function NotificationProvider({ children }) {
             boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
             fontWeight: 500, fontSize: "13px",
             ...(severity === "success" && {
-              backgroundColor: "#0d6832",
-              color: "#d1fae5",
-              "& .MuiAlert-icon": { color: "#34d399" },
+              backgroundColor: "var(--zy-success)",
+              color: "var(--zy-success)",
+              "& .MuiAlert-icon": { color: "var(--success)" },
             }),
             ...(severity === "error" && {
-              backgroundColor: "#7f1d1d",
-              color: "#fecaca",
-              "& .MuiAlert-icon": { color: "#f87171" },
+              backgroundColor: "var(--zy-danger)",
+              color: "var(--zy-danger)",
+              "& .MuiAlert-icon": { color: "var(--danger)" },
             }),
             ...(severity === "info" && {
-              backgroundColor: "#0e3a5c",
-              color: "#bae6fd",
-              "& .MuiAlert-icon": { color: "#38bdf8" },
+              backgroundColor: "var(--zy-slate-900)",
+              color: "var(--zy-teal-100)",
+              "& .MuiAlert-icon": { color: "var(--zy-info)" },
             }),
             ...(severity === "warning" && {
-              backgroundColor: "#5c3d0e",
-              color: "#fde68a",
-              "& .MuiAlert-icon": { color: "#fbbf24" },
+              backgroundColor: "var(--zy-ochre-600)",
+              color: "var(--zy-warning)",
+              "& .MuiAlert-icon": { color: "var(--warning)" },
             }),
           }}
         >
