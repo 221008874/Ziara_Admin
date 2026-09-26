@@ -1,26 +1,6 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
-
-if (!getApps().length) {
-  try {
-    const base64Key = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_BASE64;
-    if (!base64Key || base64Key.length < 50) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON_BASE64 is missing or too short');
-    }
-    const decoded = Buffer.from(base64Key, 'base64').toString('utf-8');
-    const serviceAccount = JSON.parse(decoded);
-    if (!serviceAccount.project_id || !serviceAccount.private_key) {
-      throw new Error('Service account JSON is missing required fields');
-    }
-    initializeApp({ credential: cert(serviceAccount) });
-  } catch (err) {
-    console.error('Firebase Admin init failed:', err.message);
-  }
-}
-
-const auth = getAuth();
-const firestore = getFirestore();
+import { getDb, ERP } from '../_lib/firebase-admin';
+import { verifyAdminAuth } from '../../src/lib/auth-middleware';
+const firestore = getDb(ERP);
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -40,15 +20,19 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Authorization required' });
   }
 
+  // Verification is pinned to the Community project (where panel admins sign in);
+  // the data below lives in the ERP project. See src/lib/auth-middleware.js.
   let decoded;
   try {
-    decoded = await auth.verifyIdToken(authHeader.split('Bearer ')[1]);
-  } catch {
+    decoded = await verifyAdminAuth(req);
+  } catch (err) {
+    if (err.message === 'AUTH_REQUIRED') {
+      return res.status(401).json({ error: 'Authorization required' });
+    }
+    if (err.message === 'ADMIN_REQUIRED') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
     return res.status(401).json({ error: 'Invalid or expired token' });
-  }
-
-  if (!decoded.admin) {
-    return res.status(403).json({ error: 'Admin access required' });
   }
 
   const { receiptId, tenantId } = req.body;

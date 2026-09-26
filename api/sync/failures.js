@@ -1,15 +1,7 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getDb, COMMUNITY } from '../_lib/firebase-admin';
+import { verifyAdminAuth } from '../../src/lib/auth-middleware';
 
-if (!getApps().length) {
-  const base64Key = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_BASE64;
-  if (base64Key && base64Key.length >= 50) {
-    const decoded = Buffer.from(base64Key, 'base64').toString('utf-8');
-    initializeApp({ credential: cert(JSON.parse(decoded)) });
-  }
-}
-
-const db = getFirestore();
+const db = getDb(COMMUNITY);
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
@@ -29,14 +21,17 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Authorization required' });
   }
 
+  // Verification is pinned to the Community project (where panel admins sign in).
+  // See src/lib/auth-middleware.js.
   try {
-    const { getAuth } = await import('firebase-admin/auth');
-    const token = authHeader.split('Bearer ')[1];
-    const decoded = await getAuth().verifyIdToken(token);
-    if (!decoded.admin && decoded.role !== 'admin') {
+    await verifyAdminAuth(req);
+  } catch (err) {
+    if (err.message === 'AUTH_REQUIRED') {
+      return res.status(401).json({ error: 'Authorization required' });
+    }
+    if (err.message === 'ADMIN_REQUIRED') {
       return res.status(403).json({ error: 'Admin access required' });
     }
-  } catch {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 

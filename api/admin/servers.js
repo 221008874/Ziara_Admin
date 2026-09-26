@@ -1,26 +1,7 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
 import { verifyAdminAuth } from '../../src/lib/auth-middleware';
+import { getDb, COMMUNITY } from '../_lib/firebase-admin';
 
-if (!getApps().length) {
-  try {
-    const base64Key = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_BASE64;
-    if (!base64Key || base64Key.length < 50) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON_BASE64 is missing or too short');
-    }
-    const decoded = Buffer.from(base64Key, 'base64').toString('utf-8');
-    const serviceAccount = JSON.parse(decoded);
-    if (!serviceAccount.project_id || !serviceAccount.private_key) {
-      throw new Error('Service account JSON is missing required fields');
-    }
-    initializeApp({ credential: cert(serviceAccount) });
-    console.log('✅ Firebase Admin initialized (servers)');
-  } catch (err) {
-    console.error('❌ Firebase Admin init failed:', err.message);
-  }
-}
-
-const db = getFirestore();
+const db = getDb(COMMUNITY);
 
 // `servers/{mac}` carries licenseKey and tunnelUrl. It stays deny-by-default in
 // Firestore rules (the relay POSTs the shared X-Sync-Token to whatever

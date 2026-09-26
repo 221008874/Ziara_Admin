@@ -1,24 +1,5 @@
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-
-if (!getApps().length) {
-  try {
-    const base64Key = process.env.FIREBASE_SERVICE_ACCOUNT_JSON_BASE64;
-    if (!base64Key || base64Key.length < 50) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON_BASE64 is missing or too short');
-    }
-    const decoded = Buffer.from(base64Key, 'base64').toString('utf-8');
-    const serviceAccount = JSON.parse(decoded);
-    if (!serviceAccount.project_id || !serviceAccount.private_key) {
-      throw new Error('Service account JSON is missing required fields');
-    }
-    initializeApp({ credential: cert(serviceAccount) });
-  } catch (err) {
-    console.error('Firebase Admin init failed:', err.message);
-  }
-}
-
-const auth = getAuth();
+import { getAdminAuth, COMMUNITY } from '../_lib/firebase-admin';
+const auth = getAdminAuth(COMMUNITY);
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
