@@ -1,4 +1,5 @@
 import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, limit, getDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { db } from "../firebase";
 import { COLLECTIONS } from "./core";
 
@@ -63,11 +64,27 @@ export const deleteRelease = async (appId, version) => {
   await deleteDoc(doc(db, COLLECTIONS.APP_VERSIONS, appId, "releases", version));
 };
 
+/**
+ * Read the registered clinic servers.
+ *
+ * Served by /api/admin/servers (Admin SDK) rather than the client SDK: the
+ * `servers` collection carries licenseKey/tunnelUrl and is deliberately
+ * deny-by-default in Firestore rules, so a client read is (correctly) denied.
+ * The handler is gated on the platform-admin claim and returns a projection.
+ */
 export const getClinicServers = async () => {
-  const q = query(
-    collection(db, COLLECTIONS.SERVERS),
-    orderBy("lastSeen", "desc")
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const user = getAuth().currentUser;
+  if (!user) {
+    return [];
+  }
+  const token = await user.getIdToken();
+  const response = await fetch("/api/admin/servers", {
+    headers: { Authorization: `Bearer ${token}` },
+    signal: AbortSignal.timeout(20000),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to load clinic servers (HTTP ${response.status})`);
+  }
+  const data = await response.json();
+  return Array.isArray(data?.servers) ? data.servers : [];
 };
